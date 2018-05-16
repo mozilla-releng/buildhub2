@@ -1,0 +1,128 @@
+schema:
+  title: Release
+  description: Mozilla software releases.
+  type: object
+  additionalProperties: false
+  required:
+    - source
+    - download
+    - target
+  properties:
+    build:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          title: Build ID
+          description: Build ID
+        date:
+          type: string
+          format: date-time
+          title: Build date
+          description: 'i.e: 2017-04-13T21:49:00Z'
+        number:
+          type: integer
+          title: Version
+          description: Build number
+        as:
+          type: string
+          title: Assembler
+          description: Executable
+        ld:
+          type: string
+          title: Linker
+          description: Executable
+        cc:
+          type: string
+          title: C compiler
+          description: Command-line
+        cxx:
+          type: string
+          title: C++ compiler
+          description: Command-line
+        host:
+          type: string
+          title: Compiler host alias
+          description: (cpu)-(vendor)-(os)
+        target:
+          type: string
+          title: Target host alias
+          description: (cpu)-(vendor)-(os)
+    target:
+      type: object
+      additionalProperties: false
+      required:
+        - platform
+        - locale
+        - version
+        - channel
+      properties:
+        platform:
+          type: string
+          title: Platform
+          description: Operating system and Architecture
+        os:
+          type: string
+          title: OS
+          description: Operating system family
+          enum:
+            - linux
+            - win
+            - mac
+            - android
+            - maemo
+        locale:
+          type: string
+          title: Locale
+        version:
+          type: string
+          title: Version
+        channel:
+          type: string
+          title: Update channel
+    source:
+      type: object
+      additionalProperties: false
+      required:
+        - product
+      properties:
+        product:
+          type: string
+          title: Product
+          description: Product name
+        repository:
+          type: string
+          title: Repository
+        tree:
+          type: string
+          title: Tree
+          description: i.e mozilla-central
+        revision:
+          type: string
+          title: Revision number in the tree
+    download:
+      type: object
+      additionalProperties: false
+      required:
+        - url
+        - mimetype
+        - size
+        - date
+      properties:
+        url:
+          type: string
+          title: URL
+          description: URL of the build
+        mimetype:
+          type: string
+          title: Mimetype
+        date:
+          type: string
+          format: date-time
+          title: Date
+          description: Build publication date
+        size:
+          type: integer
+          title: Size
+          description: In bytes
