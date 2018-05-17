@@ -1,4 +1,4 @@
-from decouple import config  #, Csv
+from decouple import config
 from unipath import Path
 import dj_database_url
 
@@ -8,11 +8,6 @@ SECRET_KEY = config('SECRET_KEY', default='doesntmatter')
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-# ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost')
-
-
-# Application definition
-
 INSTALLED_APPS = [
     # 'django.contrib.admin',
     # 'django.contrib.auth',
@@ -20,6 +15,7 @@ INSTALLED_APPS = [
     # 'django.contrib.sessions',
     # 'django.contrib.messages',
     # 'django.contrib.staticfiles',
+
     'buildhub.main',
     'buildhub.ingest',
 ]
@@ -32,7 +28,6 @@ DATABASES = {
         cast=dj_database_url.parse
     )
 }
-
 
 LANGUAGE_CODE = 'en-us'
 
