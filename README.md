@@ -74,3 +74,17 @@ Running this script, it will populate an S3 bucket called
 [`buildhub-sqs-test`](https://s3.console.aws.amazon.com/s3/buckets/buildhub-sqs-test/?region=us-west-2&tab=overview).
 All writes to that DB will trigger an SQS event to a queue called
 [`buildhub-s3-events`](https://sqs.us-west-2.amazonaws.com/927034868273/buildhub-s3-events).
+
+## Run the tests
+
+Run all the things:
+
+```sh
+pytest
+```
+
+With code coverage:
+
+```sh
+pytest --cov=buildhub --cov-report html
+```

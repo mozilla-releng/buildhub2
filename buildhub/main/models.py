@@ -1,3 +1,7 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, you can obtain one at http://mozilla.org/MPL/2.0/.
+
 import hashlib
 import json
 
@@ -9,7 +13,8 @@ from django.dispatch import receiver
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
-from django.db.models.signals import pre_save
+# from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.utils.encoding import force_bytes
 
 
@@ -41,7 +46,7 @@ class Build(models.Model):
         validate(build, schema)
 
     @classmethod
-    def insert(cls, build, validate=False):
+    def insert(cls, build, skip_validation=False):
         """Optimized version that tries to insert but doesn't complain if
         the build_hash is already there."""
 
@@ -76,14 +81,14 @@ class Build(models.Model):
         #    - MEAN   7.04ms
         #    - MEDIAN 4.40ms
         #
-        if validate:
+        if not skip_validation:
             cls.validate_build(build)
         build_hash = cls.get_build_hash(build)
         if not cls.objects.filter(build_hash=build_hash).exists():
             return cls.objects.create(build_hash=build_hash, build=build)
 
     @classmethod
-    def bulk_insert(cls, builds, validate=False):
+    def bulk_insert(cls, builds, skip_validation=False):
         """Bulk insert that avoids potential conflict inserts by first
         checking for existances.
 
@@ -93,8 +98,8 @@ class Build(models.Model):
         # Not until https://code.djangoproject.com/ticket/28668 lands.
         hashes = {}
         for build in builds:
-            if validate:
-                cls.validate(build)
+            if not skip_validation:
+                cls.validate_build(build)
             hashes[cls.get_build_hash(build)] = build
         for build_hash in cls.objects.filter(
             build_hash__in=hashes.keys()
@@ -106,11 +111,15 @@ class Build(models.Model):
         return len(hashes)
 
 
-@receiver(pre_save, sender=Build)
-def prepare(sender, instance, **kwargs):
-    if not instance.build_hash:
-        assert instance.build
-        instance.build_hash = sender.get_build_hash(instance.build)
+# @receiver(pre_save, sender=Build)
+# def prepare(sender, instance, **kwargs):
+#     assert instance.build
+#     assert instance.build_hash
+#     # if not instance.build_hash:
+#     #     assert instance.build
+#     #     instance.build_hash = sender.get_build_hash(instance.build)
 
-    if not kwargs.get('skip_validation'):
-        Build.validate_build(instance.build)
+
+@receiver(post_save, sender=Build)
+def send_to_elasticsearch(sender, instance, **kwargs):
+    print("SEND TO ES!")
