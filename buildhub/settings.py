@@ -42,56 +42,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Home-butchered
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': config('DJANGO_LOG_LEVEL', 'INFO'),
-#         },
-#         'boto3': {
-#             'handlers': ['console'],
-#             'level': config('BOTO3_LOG_LEVEL', 'INFO'),
-#         },
-#         'botocore': {
-#             'handlers': ['console'],
-#             'level': config('BOTOCORE_LOG_LEVEL', 'INFO'),
-#         },
-#
-#     },
-# }
-
-# Basic dockerflow
-# LOGGING = {
-#     'version': 1,
-#     'formatters': {
-#         'json': {
-#             '()': 'dockerflow.logging.JsonLogFormatter',
-#             'logger_name': 'myproject'
-#         }
-#     },
-#     'handlers': {
-#         'console': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'json'
-#         },
-#     },
-#     'loggers': {
-#         'request.summary': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
-#         },
-#     }
-# }
-
 # Dockerflow from Tecken
 LOGGING_USE_JSON = config('LOGGING_USE_JSON', True, cast=bool)
 
@@ -180,6 +130,9 @@ LOGGING = {
     },
 }
 
+# If you all you know is the queue *name* and its AWS region,
+# make the URL be:
+#   aws://https://sqs.$NAME_OF_REGION.amazonaws.com/$NAME_OF_QUEUE
 SQS_QUEUE_URL = config('SQS_QUEUE_URL')
 
 # For more details, see:
@@ -193,6 +146,8 @@ SQS_QUEUE_WAIT_TIME_SECONDS = config(
 # The duration (in seconds) that the received messages are hidden
 # from subsequent retrieve requests after being retrieved by
 # a ReceiveMessage request.
+# Note! This only really matters when multiple concurrent consumers run
+# daemons that consume the queue.
 SQS_QUEUE_VISIBILITY_TIMEOUT = config(
     'SQS_QUEUE_VISIBILITY_TIMEOUT', cast=int, default=5,
 )

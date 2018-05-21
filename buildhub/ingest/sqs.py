@@ -5,6 +5,7 @@ import io
 from urllib.parse import urlparse
 
 import boto3
+from jsonschema import ValidationError
 from botocore.exceptions import ClientError
 
 from buildhub.main.models import Build
@@ -21,6 +22,7 @@ def process_event(config, body):
             logger.debug(f"Ignoring record because it's not S3")
             continue
         # Only bother if the filename is exactly "buildhub.json"
+        # XXX Use os.path.basename()
         if not s3['object']['key'].endswith('/buildhub.json'):
             logger.debug(f"Ignoring S3 key {s3['object']['key']}")
             continue
@@ -31,11 +33,12 @@ def process_event(config, body):
 def process_buildhub_json_key(config, s3):
     logger.debug(f"S3 buildhub.json key {s3!r}")
     key_name = s3['object']['key']
+    # XXX Again, use os.path.basename
     assert key_name.endswith('/buildhub.json'), key_name
     bucket_name = s3['bucket']['name']
     # We need a S3 connection client to be able to download this one.
     if bucket_name not in config:
-        print('Creating a new BOTO3 S3 CLIENT')
+        logger.debug('Creating a new BOTO3 S3 CLIENT')
         config[bucket_name] = boto3.client('s3', config['region_name'])
 
     with io.BytesIO() as f:
@@ -50,20 +53,38 @@ def process_buildhub_json_key(config, s3):
                 return
             raise
 
+        # After it has been populated by download_fileobj() we need to
+        # rewind it so we can send it to json.load().
         f.seek(0)
+        # Before exiting this context (and freeing up the binary data),
+        # we turn it into a Python dict.
         build = json.load(f)
-    inserted = Build.insert(build=build, validate=True)
+
+    # Note that we don't try deal with invalidate builds here. If this
+    # `validate=True` leads to a `ValidationError` exception, the daemon
+    # is expected to finish and the build will not be deleted off the queue.
+    # XXX Needs to deal with how to avoid corrupt buildhub.json S3 keys
+    # never leaving the system.
+    try:
+        inserted = Build.insert(build=build, validate=True)
+    except ValidationError as exc:
+        # We're only doing a try:except ValidationError: here so we get a
+        # chance to log a useful message about the S3 object and the
+        # validation error message.
+        logger.warning(
+            "Failed to insert build because the build was not valid. "
+            f"S3 key {key_name!r} (bucket {bucket_name!r}). "
+            f"Validation error message: {exc.message}"
+        )
+        raise
     if inserted:
         logger.info(
             f"Inserted {key_name} as a valid Build ({inserted.build_hash})"
         )
     else:
-        # Could compute
         logger.info(
             f"Did not insert {key_name} because we already had it"
         )
-    # print(s3)
-    # raise Exception('Stop!')
 
 
 def start(
@@ -78,56 +99,38 @@ def start(
     if not region_name:
         region_name = re.findall(r'sqs\.(.*?)\.amazonaws\.com', queue_url)[0]
 
-    logger.debug("Connecting to queue %r in %r", queue_name, region_name)
+    logger.debug(
+        f"Connecting to SQS queue {queue_name!r} (in {region_name!r})"
+    )
     sqs = boto3.resource('sqs', region_name=region_name)
     queue = sqs.get_queue_by_name(QueueName=queue_name)
-    # for i in itertools.count():
-    count = 0
 
     # This is a mutable that will be included in every callback.
-    # It's intended as cheap state so that things like S3 client configuration
-    # and connection can be reused without having to be bootstrapped in vain.
+    # It's intended as cheap state so that things like S3 client
+    # configuration and connection can be reused without having to
+    # be bootstrapped in vain.
     config = {
         'region_name': region_name
     }
-    loops=0
+
+    # By default, we receive 1 message per call to `queue.receive_messages()`
+    # but you can change that with settings.SQS_QUEUE_MAX_NUMBER_OF_MESSAGES.
+    # If it's 1, the number of "loops" will be the same as the number "count".
+    count = 0
+    loops = 0
     while True:
-        loops+=1
+        loops += 1
+
         for message in queue.receive_messages(
             WaitTimeSeconds=wait_time,
             VisibilityTimeout=visibility_timeout,
             MaxNumberOfMessages=max_number_of_messages,
         ):
+            logger.debug(f"About to process message number {count}")
             process_event(config, json.loads(message.body))
             count += 1
-            logger.info(f"Processed event number {count}")
             message.delete()
+            logger.info(f"Processed event number {count} (loops={loops})")
 
             # if count > 40:
             #     raise Exception
-
-    print('count',count)
-    print('loops',loops)
-
-
-    # class Consumer(SqsListener):
-    #     def handle_message(self, body, attributes, messages_attributes):
-    #         # Remember, if this method runs without an exception the message
-    #         # is automatically deleted.
-    #         print("BODY")
-    #         print(body)
-    #         print('ATTRIBUTES')
-    #         print(attributes)
-    #         print('MESSAGES ATTRIBUTES')
-    #         print(messages_attributes)
-    #         print()
-    #
-    # print('QUEUE NAME ', repr(queue_name))
-    # print('REGION NAME', repr(region_name))
-    # print('OPTIONS', options)
-    # Consumer(
-    #     queue_name,
-    #     # error_queue='my-error-queue',
-    #     region_name=region_name,
-    #     **options,
-    # ).listen()
