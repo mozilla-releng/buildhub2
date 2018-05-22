@@ -1,0 +1,41 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.elasticsearch-query-doc {
+  font-size: 16px;
+  margin-top: 7px;
+}
+
+.elasticsearch-query-doc a {
+  color: #fff;
+  padding: 20px 15px 20px 15px;
+}
+
+.project-info {
+  color: #fff;
+}
+.project-info > div {
+  display: inline-block;
+  margin-right: 20px;
+  margin-top: 7px;
+}
+.project-info a {
+  color: #fff;
+}
+
+table a {
+  text-decoration: none;
+}
+
+table em {
+  background-color: yellow;
+}
+
+.sk-table td, .sk-table th {
+  padding: .5em .5em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

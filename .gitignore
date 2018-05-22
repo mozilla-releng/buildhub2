@@ -1,2 +1,4 @@
 .pytest_cache
 htmlcov/
+ui/node_modules
+ui/build

@@ -2,26 +2,32 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
-from decouple import config
+from decouple import config, Csv
 from unipath import Path
 import dj_database_url
 
 BASE_DIR = Path(__file__).parent
 
-SECRET_KEY = config('SECRET_KEY', default='doesntmatter')
+SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost')
 
 INSTALLED_APPS = [
-    # 'django.contrib.admin',
-    # 'django.contrib.auth',
     'django.contrib.contenttypes',
-    # 'django.contrib.sessions',
-    # 'django.contrib.messages',
-    # 'django.contrib.staticfiles',
+    'corsheaders',
 
     'buildhub.main',
+    'buildhub.api',
     'buildhub.ingest',
+]
+
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 
@@ -42,6 +48,15 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+ROOT_URLCONF = 'buildhub.urls'
+
+
+# Note-to-self; By default 'corsheaders.middleware.CorsMiddleware' only kicks
+# in when matched to this regex.
+CORS_URLS_REGEX = r'^/api/.*$'
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Dockerflow from Tecken
@@ -96,7 +111,7 @@ LOGGING = {
             'propagate': False,
         },
         'django.request': {
-            'level': 'ERROR',
+            'level': 'INFO',
             'handlers': ['console'],
             'propagate': False,
         },
@@ -159,10 +174,15 @@ SQS_QUEUE_MAX_NUMBER_OF_MESSAGES = config(
     'SQS_QUEUE_MAX_NUMBER_OF_MESSAGES', cast=int, default=1,
 )
 
+# Name of the Elasticsearch index to put builds into
+ES_BUILD_INDEX = config('ES_BUILD_INDEX', 'buildhub2')
+ES_BUILD_INDEX_SETTINGS = {
+    'refresh_interval': config('ES_REFRESH_INTERVAL', '1s')
+}
 
-# if 'AWS_ACCOUNT_ID' not in os.environ:
-#     # The reason for doing this is because sqs_listener can't run at all
-#     # if you haven't set os.environ['AWS_ACCOUNT_ID'].
-#     # That means you need to always set it on the command line and you
-#     # can't benefit from the .env file that decouple can use.
-#     os.environ['AWS_ACCOUNT_ID'] = config('AWS_ACCESS_KEY_ID')
+ES_URLS = config('ES_URLS', default='localhost:9200', cast=Csv())
+ES_CONNECTIONS = {
+    'default': {
+        'hosts': ES_URLS,
+    },
+}

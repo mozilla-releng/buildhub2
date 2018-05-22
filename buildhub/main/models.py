@@ -17,6 +17,8 @@ from django.contrib.postgres.fields import JSONField
 from django.db.models.signals import post_save
 from django.utils.encoding import force_bytes
 
+from buildhub.main.search import BuildDoc, es_retry
+
 
 with open(Path(settings.BASE_DIR, 'schema.yaml')) as f:
     SCHEMA = yaml.load(f)['schema']
@@ -29,6 +31,9 @@ class Build(models.Model):
 
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.build_hash!r}>"
+
+    def to_search(self, **kwargs):
+        return BuildDoc.create(self.id, **self.build)
 
     hash_prefix = 'v1'
 
@@ -122,4 +127,5 @@ class Build(models.Model):
 
 @receiver(post_save, sender=Build)
 def send_to_elasticsearch(sender, instance, **kwargs):
-    print("SEND TO ES!")
+    doc = instance.to_search()
+    es_retry(doc.save)
