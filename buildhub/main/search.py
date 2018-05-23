@@ -24,7 +24,7 @@ build_index = Index(settings.ES_BUILD_INDEX)
 build_index.settings(**settings.ES_BUILD_INDEX_SETTINGS)
 
 
-@backoff(
+@backoff.on_exception(
     backoff.constant,
     # The NotFoundError is a bit more tricky. Perhaps we want to delete
     # an item from Elasticsearch (at the time of writing; no plan to delete

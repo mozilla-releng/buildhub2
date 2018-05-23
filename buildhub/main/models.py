@@ -97,19 +97,33 @@ class Build(models.Model):
         """Bulk insert that avoids potential conflict inserts by first
         checking for existances.
 
-        Note! This method is NOT thread-safe.
+        Note! This method is NOT thread-safe. The reason is that we query
+        the database which build hashes it does *not* have, then we come
+        back to this code and prepare to send them to the database with
+        Build.objects.bulk_create(). So if new builds are made during that
+        window of time, you might get conflict errors during the bulk insert.
+
+        Note! This method does NOT update Elasticsearch.
         """
         # Note! Unfortunately, there is no easy way to do a bulk insert.
         # Not until https://code.djangoproject.com/ticket/28668 lands.
         hashes = {}
         for build in builds:
-            if not skip_validation:
-                cls.validate_build(build)
             hashes[cls.get_build_hash(build)] = build
         for build_hash in cls.objects.filter(
             build_hash__in=hashes.keys()
         ).values_list('build_hash', flat=True):
             hashes.pop(build_hash)
+        if not skip_validation:
+            # Only run the validation on the records that we're about to
+            # insert.
+            # The reason we're doing this late is because calculating the
+            # build's hash string is much much faster than calling
+            # `cls.validate_build(build)` on the build.
+            # Did some benchmarks on this and found that it takes about
+            # 1.5ms to run the validation and 0.03ms to generate the hash.
+            for build in hashes.values():
+                cls.validate_build(build)
         cls.objects.bulk_create([
             cls(build_hash=k, build=v) for k, v in hashes.items()
         ])
