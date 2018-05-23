@@ -1,1 +1,34 @@
-{"build": {"as": "$(CC)", "cc": "/builds/worker/workspace/build/src/clang/bin/clang -target x86_64-apple-darwin11 -B /builds/worker/workspace/build/src/cctools/bin -isysroot /builds/worker/workspace/build/src/MacOSX10.11.sdk -std=gnu99", "id": "20180510160705", "cxx": "/builds/worker/workspace/build/src/clang/bin/clang++ -target x86_64-apple-darwin11 -B /builds/worker/workspace/build/src/cctools/bin -isysroot /builds/worker/workspace/build/src/MacOSX10.11.sdk -std=gnu++14", "date": "2018-05-10T16:07:05Z", "host": "x86_64-pc-linux-gnu", "number": 1, "target": "x86_64-apple-darwin"}, "source": {"tree": "releases/mozilla-beta", "product": "devedition", "revision": "1c40b4b4e81274767b91235ac8489da2adc04dd8", "repository": "https://hg.mozilla.org/releases/mozilla-beta"}, "target": {"os": "mac", "locale": "ca", "channel": "aurora", "version": "61.0b4rc1", "platform": "macosx"}, "download": {"url": "https://archive.mozilla.org/pub/devedition/candidates/61.0b4-candidates/build1/mac/ca/Firefox 61.0b4.dmg", "date": "2018-05-10T18:02:17Z", "size": 64504466, "mimetype": "application/x-apple-diskimage"}}
+{
+  "build": {
+    "as": "$(CC)",
+    "cc":
+      "/builds/worker/workspace/build/src/clang/bin/clang -target x86_64-apple-darwin11 -B /builds/worker/workspace/build/src/cctools/bin -isysroot /builds/worker/workspace/build/src/MacOSX10.11.sdk -std=gnu99",
+    "id": "20180510160705",
+    "cxx":
+      "/builds/worker/workspace/build/src/clang/bin/clang++ -target x86_64-apple-darwin11 -B /builds/worker/workspace/build/src/cctools/bin -isysroot /builds/worker/workspace/build/src/MacOSX10.11.sdk -std=gnu++14",
+    "date": "2018-05-10T16:07:05Z",
+    "host": "x86_64-pc-linux-gnu",
+    "number": 1,
+    "target": "x86_64-apple-darwin"
+  },
+  "source": {
+    "tree": "releases/mozilla-beta",
+    "product": "devedition",
+    "revision": "1c40b4b4e81274767b91235ac8489da2adc04dd8",
+    "repository": "https://hg.mozilla.org/releases/mozilla-beta"
+  },
+  "target": {
+    "os": "mac",
+    "locale": "ca",
+    "channel": "aurora",
+    "version": "61.0b4rc1",
+    "platform": "macosx"
+  },
+  "download": {
+    "url":
+      "https://archive.mozilla.org/pub/devedition/candidates/61.0b4-candidates/build1/mac/ca/Firefox 61.0b4.dmg",
+    "date": "2018-05-10T18:02:17Z",
+    "size": 64504466,
+    "mimetype": "application/x-apple-diskimage"
+  }
+}
