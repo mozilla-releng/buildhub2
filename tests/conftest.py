@@ -4,10 +4,46 @@
 
 import pytest
 import mock
+import requests
 # import requests_mock
 import botocore
 # from markus.testing import MetricsMock
+from django.conf import settings
 
+from buildhub.main.search import build_index
+
+
+def pytest_configure():
+    """Automatically called by pytest-django. Here's our chance to make sure
+    the settings are tight and specific to running tests."""
+
+    # This makes sure we never actually use the Elasticsearch index
+    # we use for development.
+    settings.ES_BUILD_INDEX = 'test_index'
+
+    # Make sure we can ping the Elasticsearch
+    response = requests.get(settings.ES_URLS[0])
+    response.raise_for_status()
+
+
+# @pytest.fixture(scope="session", autouse=True)  # XXX Do I need scope=session?
+# @pytest.fixture(autouse=True)  # XXX Do I need scope=session?
+
+@pytest.fixture
+def elasticsearch(request):
+    assert build_index._name.startswith('test_')
+    build_index.delete(ignore=404)
+    build_index.create()
+    yield build_index
+    build_index.delete(ignore=404)
+    # build_index.delete(ignore=404)
+    # build_index.create()
+    #
+    #
+    # def some_resource_fin():
+    #     build_index.delete(ignore=404)
+    #
+    # request.addfinalizer(some_resource_fin)
 
 # @pytest.fixture
 # def metricsmock():

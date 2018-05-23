@@ -75,6 +75,7 @@ class BuildDoc(DocType):
     def create(cls, id, **doc):
         assert id and isinstance(id, int) and id > 0
         return BuildDoc(
+            meta={'id': id},
             id=id,
             build=_Build(**doc['build']),
             source=_Source(**doc['source']),

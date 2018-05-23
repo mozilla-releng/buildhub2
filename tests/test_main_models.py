@@ -9,6 +9,7 @@ import pytest
 from jsonschema import ValidationError
 
 from buildhub.main.models import Build
+from buildhub.main.search import BuildDoc
 
 
 def load(name):
@@ -22,7 +23,7 @@ def VALID_BUILD():
 
 
 @pytest.mark.django_db
-def test_insert():
+def test_insert(settings):
     build = VALID_BUILD()
     inserted = Build.insert(build)
     assert inserted.build_hash
@@ -37,12 +38,43 @@ def test_insert():
 
 
 @pytest.mark.django_db
-def test_insert_invalid():
+def test_insert_writes_to_elasticsearch(settings, elasticsearch):
     build = VALID_BUILD()
-    build.pop('target')
+    inserted = Build.insert(build)
+    assert inserted
+
+    # Because Elasticsearch is async, the content written won't be there
+    # until we wait or flush.
+    elasticsearch.flush()
+    search = BuildDoc.search()
+    response = search.execute()
+    assert response.hits.total == 1
+    build_doc, = response
+    assert build_doc.id == inserted.id
+    as_dict = build_doc.to_dict()
+    as_dict.pop('id')
+    # Can't easily compare these because elasticseach_dsl will convert
+    # dates to datetime.datetime objects.
+    # But if we convert dates from the Elasticsearch query to a string
+    # we can compare.
+    as_dict['build']['date'] = as_dict['build']['date'].isoformat()[:19]
+    as_dict['download']['date'] = as_dict['download']['date'].isoformat()[:19]
+    build = inserted.build
+    build['build']['date'] = build['build']['date'][:19]
+    build['download']['date'] = build['download']['date'][:19]
+    assert as_dict == build
+
+
+@pytest.mark.django_db
+def test_insert_invalid(settings):
+    build = VALID_BUILD()
+    # We can't completely mess with the schema to the point were it
+    # breaks Elasticsearch writes.
+    build['source']['junk'] = True
     with pytest.raises(ValidationError) as exception:
         Build.insert(build)
-    assert "'target' is a required property" in str(exception.value)
+    err_msg = "Additional properties are not allowed ('junk' was unexpected)"
+    assert err_msg in str(exception.value)
 
     # The 'skip_validation' is kinda dumb but it exists for when you're
     # super certain that the stuff you're inserting really is valid.
