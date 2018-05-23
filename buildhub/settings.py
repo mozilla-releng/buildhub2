@@ -5,6 +5,7 @@
 import os
 
 from configurations import Configuration, values
+from dockerflow.version import get_version
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -50,12 +51,14 @@ class Core(Configuration, AWS, CORS):
 
     # THIS_DIR = os.path.dirname(os.path.abspath(__file__))
     # BASE_DIR = os.path.dirname(THIS_DIR)
+    BASE_DIR = BASE_DIR
 
-    # VERSION = get_version(BASE_DIR)
+    VERSION = get_version(BASE_DIR)
 
     INSTALLED_APPS = [
         'django.contrib.contenttypes',
         'corsheaders',
+        'dockerflow.django',
 
         'buildhub.main',
         'buildhub.api',
@@ -67,6 +70,7 @@ class Core(Configuration, AWS, CORS):
         'corsheaders.middleware.CorsMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'dockerflow.django.middleware.DockerflowMiddleware',
     ]
 
     ROOT_URLCONF = 'buildhub.urls'
@@ -192,6 +196,11 @@ class Base(Core, Elasticsearch):
                     'handlers': ['console'],
                     'propagate': False,
                 },
+                'elasticsearch': {
+                    'level': 'WARNING',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
                 'request.summary': {
                     'handlers': ['console'],
                     'level': 'INFO',
@@ -215,6 +224,19 @@ class Localdev(Base):
 
     LOGGING_USE_JSON = values.BooleanValue(False)
 
+    @property
+    def VERSION(self):
+        # this was breaking in ci
+        import subprocess
+        output = subprocess.check_output(
+            # Use the absolute path of 'git' here to avoid 'git'
+            # not being the git we expect in Docker.
+            ['/usr/bin/git', 'describe', '--tags', '--always', '--abbrev=0']
+        )  # nosec
+        if output:
+            return {'version': output.decode().strip()}
+        else:
+            return {}
 
 class Test(Localdev):
     """Configuration to be used during testing"""

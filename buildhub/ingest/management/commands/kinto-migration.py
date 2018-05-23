@@ -81,6 +81,7 @@ class Command(BaseCommand):
             inserted = Build.bulk_insert(
                 builds,
                 skip_validation=skip_validation,
+                metadata={'kinto-migration': True},
             )
             t1 = time.time()
             done += len(batch)
