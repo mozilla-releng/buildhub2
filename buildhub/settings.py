@@ -2,187 +2,222 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
-from decouple import config, Csv
-from unipath import Path
-import dj_database_url
+import os
 
-BASE_DIR = Path(__file__).parent
+from configurations import Configuration, values
 
-SECRET_KEY = config('SECRET_KEY')
-
-DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(), default='localhost')
-
-INSTALLED_APPS = [
-    'django.contrib.contenttypes',
-    'corsheaders',
-
-    'buildhub.main',
-    'buildhub.api',
-    'buildhub.ingest',
-]
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-
-DATABASES = {
-    'default': config(
-        'DATABASE_URL',
-        default='postgresql://localhost/buildhub2',
-        cast=dj_database_url.parse
+class AWS:
+    """AWS configuration"""
+    # If you all you know is the queue *name* and its AWS region,
+    # make the URL be:
+    #   aws://https://sqs.$NAME_OF_REGION.amazonaws.com/$NAME_OF_QUEUE
+    SQS_QUEUE_URL = values.URLValue(
+        'https://sqs.us-west-2.amazonaws.com/927034868273/buildhub-s3-events'
     )
-}
 
-LANGUAGE_CODE = 'en-us'
+    # For more details, see:
+    # http://boto3.readthedocs.io/en/latest/reference/services/sqs.html#SQS.Queue.receive_messages
 
-TIME_ZONE = 'UTC'
+    # The duration (in seconds) for which the call waits for a message
+    # to arrive in the queue before returning.
+    SQS_QUEUE_WAIT_TIME_SECONDS = values.IntegerValue(10)
 
-USE_I18N = True
+    # The duration (in seconds) that the received messages are hidden
+    # from subsequent retrieve requests after being retrieved by
+    # a ReceiveMessage request.
+    # Note! This only really matters when multiple concurrent consumers run
+    # daemons that consume the queue.
+    SQS_QUEUE_VISIBILITY_TIMEOUT = values.IntegerValue(5)
 
-USE_L10N = True
-
-USE_TZ = True
-
-ROOT_URLCONF = 'buildhub.urls'
-
-
-# Note-to-self; By default 'corsheaders.middleware.CorsMiddleware' only kicks
-# in when matched to this regex.
-CORS_URLS_REGEX = r'^/api/.*$'
-
-CORS_ORIGIN_ALLOW_ALL = True
+    # The maximum number of messages to return.
+    # Valid values are 1 to 10. Default is 1.
+    SQS_QUEUE_MAX_NUMBER_OF_MESSAGES = values.IntegerValue(1)
 
 
-# Dockerflow from Tecken
-LOGGING_USE_JSON = config('LOGGING_USE_JSON', True, cast=bool)
+class CORS:
+    # Note-to-self; By default 'corsheaders.middleware.CorsMiddleware'
+    # only kicks in when matched to this regex.
+    CORS_URLS_REGEX = r'^/api/.*$'
 
-LOGGING_DEFAULT_LEVEL = config('LOGGING_DEFAULT_LEVEL', 'INFO')
+    CORS_ORIGIN_ALLOW_ALL = True
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'json': {
-            '()': 'dockerflow.logging.JsonLogFormatter',
-            'logger_name': 'buildhub',
-        },
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(name)s %(message)s',
-        },
-    },
-    'handlers': {
-        'console': {
-            'level': LOGGING_DEFAULT_LEVEL,
-            'class': 'logging.StreamHandler',
-            'formatter': (
-                'json' if LOGGING_USE_JSON else 'verbose'
-            ),
-        },
-        'sentry': {
-            'level': 'ERROR',
-            'class': (
-                'raven.contrib.django.raven_compat.handlers'
-                '.SentryHandler'
-            ),
-        },
-        'null': {
-            'class': 'logging.NullHandler',
-        },
-    },
-    'root': {
-        'level': 'INFO',
-        'handlers': ['sentry', 'console'],
-    },
-    'loggers': {
-        'django': {
-            'level': 'WARNING',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'django.db.backends': {
-            'level': 'ERROR',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'django.request': {
-            'level': 'INFO',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'raven': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'sentry.errors': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'buildhub': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'markus': {
-            'level': 'INFO',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-        'request.summary': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
-        },
-    },
-}
 
-# If you all you know is the queue *name* and its AWS region,
-# make the URL be:
-#   aws://https://sqs.$NAME_OF_REGION.amazonaws.com/$NAME_OF_QUEUE
-SQS_QUEUE_URL = config('SQS_QUEUE_URL')
+class Core(Configuration, AWS, CORS):
+    """Settings that will never change per-environment."""
 
-# For more details, see:
-# http://boto3.readthedocs.io/en/latest/reference/services/sqs.html#SQS.Queue.receive_messages
+    # THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+    # BASE_DIR = os.path.dirname(THIS_DIR)
 
-# The duration (in seconds) for which the call waits for a message
-# to arrive in the queue before returning.
-SQS_QUEUE_WAIT_TIME_SECONDS = config(
-    'SQS_QUEUE_WAIT_TIME_SECONDS', cast=int, default=10
-)
-# The duration (in seconds) that the received messages are hidden
-# from subsequent retrieve requests after being retrieved by
-# a ReceiveMessage request.
-# Note! This only really matters when multiple concurrent consumers run
-# daemons that consume the queue.
-SQS_QUEUE_VISIBILITY_TIMEOUT = config(
-    'SQS_QUEUE_VISIBILITY_TIMEOUT', cast=int, default=5,
-)
-# The maximum number of messages to return.
-# Valid values are 1 to 10. Default is 1.
-SQS_QUEUE_MAX_NUMBER_OF_MESSAGES = config(
-    'SQS_QUEUE_MAX_NUMBER_OF_MESSAGES', cast=int, default=1,
-)
+    # VERSION = get_version(BASE_DIR)
 
-# Name of the Elasticsearch index to put builds into
-ES_BUILD_INDEX = config('ES_BUILD_INDEX', 'buildhub2')
-ES_BUILD_INDEX_SETTINGS = {
-    'refresh_interval': config('ES_REFRESH_INTERVAL', '1s')
-}
+    INSTALLED_APPS = [
+        'django.contrib.contenttypes',
+        'corsheaders',
 
-ES_URLS = config('ES_URLS', default='localhost:9200', cast=Csv())
-ES_CONNECTIONS = {
-    'default': {
-        'hosts': ES_URLS,
-    },
-}
+        'buildhub.main',
+        'buildhub.api',
+        'buildhub.ingest',
+    ]
+
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'corsheaders.middleware.CorsMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
+
+    ROOT_URLCONF = 'buildhub.urls'
+
+    WSGI_APPLICATION = 'buildhub.wsgi.application'
+
+    # Internationalization
+    LANGUAGE_CODE = 'en-us'
+    TIME_ZONE = 'UTC'
+    USE_I18N = False
+    USE_L10N = False
+    USE_TZ = True
+
+
+class Elasticsearch:
+    # Name of the Elasticsearch index to put builds into
+    ES_BUILD_INDEX = values.Value('buildhub2')
+    ES_REFRESH_INTERVAL = values.Value('1s')
+
+    @property
+    def ES_BUILD_INDEX_SETTINGS(self):
+        return {
+            'refresh_interval': self.ES_REFRESH_INTERVAL,
+        }
+
+    ES_URLS = values.ListValue(['localhost:9200'])
+
+    @property
+    def ES_CONNECTIONS(self):
+        return {
+            'default': {
+                'hosts': self.ES_URLS,
+            },
+        }
+
+
+class Base(Core, Elasticsearch):
+    """Settings that may change per-environment, some with defaults."""
+
+    # Django
+    SECRET_KEY = values.SecretValue()
+    DEBUG = values.BooleanValue(default=False)
+    ALLOWED_HOSTS = values.ListValue([])
+
+    # Database
+    DATABASES = values.DatabaseURLValue('postgresql://localhost/buildhub2')
+    CONN_MAX_AGE = values.IntegerValue(60)
+
+    # Logging
+    LOGGING_USE_JSON = values.BooleanValue(True)
+    LOGGING_DEFAULT_LEVEL = values.Value('INFO')
+
+    @property
+    def LOGGING(self):
+        return {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'formatters': {
+                'json': {
+                    '()': 'dockerflow.logging.JsonLogFormatter',
+                    'logger_name': 'buildhub',
+                },
+                'verbose': {
+                    'format': '%(levelname)s %(asctime)s %(name)s %(message)s',
+                },
+            },
+            'handlers': {
+                'console': {
+                    'level': self.LOGGING_DEFAULT_LEVEL,
+                    'class': 'logging.StreamHandler',
+                    'formatter': (
+                        'json' if self.LOGGING_USE_JSON else 'verbose'
+                    ),
+                },
+                'sentry': {
+                    'level': 'ERROR',
+                    'class': (
+                        'raven.contrib.django.raven_compat.handlers'
+                        '.SentryHandler'
+                    ),
+                },
+                'null': {
+                    'class': 'logging.NullHandler',
+                },
+            },
+            'root': {
+                'level': 'INFO',
+                'handlers': ['sentry', 'console'],
+            },
+            'loggers': {
+                'django': {
+                    'level': 'WARNING',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
+                'django.db.backends': {
+                    'level': 'ERROR',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
+                'django.request': {
+                    'level': 'INFO',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
+                'raven': {
+                    'level': 'DEBUG',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
+                'sentry.errors': {
+                    'level': 'DEBUG',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
+                'buildhub': {
+                    'level': 'DEBUG',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
+                'markus': {
+                    'level': 'INFO',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
+                'request.summary': {
+                    'handlers': ['console'],
+                    'level': 'INFO',
+                    'propagate': False,
+                },
+                'django.security.DisallowedHost': {
+                    'handlers': ['null'],
+                    'propagate': False,
+                },
+            },
+        }
+
+
+class Localdev(Base):
+    """Configuration to be used during local development and base class
+    for testing"""
+
+    DOTENV = os.path.join(BASE_DIR, '.env')
+
+    DEBUG = values.BooleanValue(default=True)
+
+    LOGGING_USE_JSON = values.BooleanValue(False)
+
+
+class Test(Localdev):
+    """Configuration to be used during testing"""
+    DEBUG = False
+    ES_BUILD_INDEX = 'test_buildhub2'
+    SECRET_KEY = values.Value('not-so-secret-after-all')

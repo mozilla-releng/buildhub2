@@ -26,24 +26,14 @@ def pytest_configure():
     response.raise_for_status()
 
 
-# @pytest.fixture(scope="session", autouse=True)  # XXX Do I need scope=session?
-# @pytest.fixture(autouse=True)  # XXX Do I need scope=session?
-
 @pytest.fixture
 def elasticsearch(request):
+    # XXX Needs a docstring
     assert build_index._name.startswith('test_')
     build_index.delete(ignore=404)
     build_index.create()
     yield build_index
     build_index.delete(ignore=404)
-    # build_index.delete(ignore=404)
-    # build_index.create()
-    #
-    #
-    # def some_resource_fin():
-    #     build_index.delete(ignore=404)
-    #
-    # request.addfinalizer(some_resource_fin)
 
 # @pytest.fixture
 # def metricsmock():
