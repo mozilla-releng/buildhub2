@@ -27,6 +27,7 @@ with open(os.path.join(settings.BASE_DIR, 'schema.yaml')) as f:
 class Build(models.Model):
     build_hash = models.CharField(max_length=45, unique=True)
     build = JSONField()
+    metadata = JSONField(default={})
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __repr__(self):
@@ -51,9 +52,13 @@ class Build(models.Model):
         validate(build, schema)
 
     @classmethod
-    def insert(cls, build, skip_validation=False):
+    def insert(cls, build, metadata=None, skip_validation=False):
         """Optimized version that tries to insert but doesn't complain if
         the build_hash is already there."""
+        metadata = metadata or {}
+        if skip_validation:
+            metadata['skip_validation'] = True
+        metadata['version'] = settings.VERSION
 
         # Two options for how to insert without raising conflict errors.
         #
@@ -90,10 +95,14 @@ class Build(models.Model):
             cls.validate_build(build)
         build_hash = cls.get_build_hash(build)
         if not cls.objects.filter(build_hash=build_hash).exists():
-            return cls.objects.create(build_hash=build_hash, build=build)
+            return cls.objects.create(
+                build_hash=build_hash,
+                build=build,
+                metadata=metadata,
+            )
 
     @classmethod
-    def bulk_insert(cls, builds, skip_validation=False):
+    def bulk_insert(cls, builds, metadata=None, skip_validation=False):
         """Bulk insert that avoids potential conflict inserts by first
         checking for existances.
 
@@ -105,6 +114,10 @@ class Build(models.Model):
 
         Note! This method does NOT update Elasticsearch.
         """
+        metadata = metadata or {}
+        if skip_validation:
+            metadata['skip_validation'] = True
+        metadata['version'] = settings.VERSION
         # Note! Unfortunately, there is no easy way to do a bulk insert.
         # Not until https://code.djangoproject.com/ticket/28668 lands.
         hashes = {}
@@ -125,7 +138,11 @@ class Build(models.Model):
             for build in hashes.values():
                 cls.validate_build(build)
         cls.objects.bulk_create([
-            cls(build_hash=k, build=v) for k, v in hashes.items()
+            cls(
+                build_hash=k,
+                build=v,
+                metadata=metadata,
+            ) for k, v in hashes.items()
         ])
         return len(hashes)
 

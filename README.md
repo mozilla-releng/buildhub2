@@ -13,7 +13,7 @@ Make sure it's in UTC, with:
 
 ```sh
 psql buildhub2
-buildhub2=# ALTER DATABASE dbname SET TIMEZONE TO UTC;
+buildhub2=# ALTER DATABASE buildhub2 SET TIMEZONE TO UTC;
 ```
 
 Note, when Django starts it will always set the timezone to UTC but setting
