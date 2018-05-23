@@ -2,12 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
 import hashlib
 import json
 
 import yaml
 from jsonschema import validate
-from unipath import Path
 
 from django.dispatch import receiver
 from django.db import models
@@ -20,7 +20,7 @@ from django.utils.encoding import force_bytes
 from buildhub.main.search import BuildDoc, es_retry
 
 
-with open(Path(settings.BASE_DIR, 'schema.yaml')) as f:
+with open(os.path.join(settings.BASE_DIR, 'schema.yaml')) as f:
     SCHEMA = yaml.load(f)['schema']
 
 

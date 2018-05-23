@@ -64,13 +64,10 @@ def process_buildhub_json_key(config, s3):
         # we turn it into a Python dict.
         build = json.load(f)
 
-    # Note that we don't try deal with invalidate builds here. If this
-    # `validate=True` leads to a `ValidationError` exception, the daemon
-    # is expected to finish and the build will not be deleted off the queue.
     # XXX Needs to deal with how to avoid corrupt buildhub.json S3 keys
     # never leaving the system.
     try:
-        inserted = Build.insert(build=build, validate=True)
+        inserted = Build.insert(build=build)
     except ValidationError as exc:
         # We're only doing a try:except ValidationError: here so we get a
         # chance to log a useful message about the S3 object and the
@@ -134,7 +131,7 @@ def start(
             process_event(config, json.loads(message.body))
             count += 1
             message.delete()
-            logger.info(f"Processed event number {count} (loops={loops})")
+            logger.debug(f"Processed event number {count} (loops={loops})")
 
             # if count > 40:
             #     raise Exception
