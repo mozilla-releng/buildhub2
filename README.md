@@ -87,4 +87,5 @@ With code coverage:
 
 ```sh
 pytest --cov=buildhub --cov-report html
+open htmlcov/index.html
 ```
