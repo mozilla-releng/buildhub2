@@ -32,6 +32,7 @@ def test_start_happy_path(
                 's3': {
                     'object': {
                         'key': 'some/path/to/buildhub.json',
+                        'eTag': 'e4eb6609382efd6b3bc9deec616ad5c0',
                     },
                     'bucket': {
                         'name': 'buildhubses',
@@ -42,6 +43,7 @@ def test_start_happy_path(
                 's3': {
                     'object': {
                         'key': 'not/a/buildhub.json/file',
+                        'eTag': '77e09ba7e37836c2cf0ce59e1e8361ab',
                     },
                     'bucket': {
                         'name': 'buildhubses',
@@ -88,6 +90,7 @@ def test_ingest_idempotently(
                 's3': {
                     'object': {
                         'key': 'some/path/to/buildhub.json',
+                        'eTag': 'e4eb6609382efd6b3bc9deec616ad5c0',
                     },
                     'bucket': {
                         'name': 'buildhubses',
@@ -137,6 +140,7 @@ def test_start_file_not_found(
                 's3': {
                     'object': {
                         'key': 'some/path/to/buildhub.json',
+                        'eTag': 'e4eb6609382efd6b3bc9deec616ad5c0',
                     },
                     'bucket': {
                         'name': 'buildhubses',
@@ -167,6 +171,7 @@ def test_start_file_not_found(
     # It should have created 1 Build
     assert not Build.objects.all().exists()
 
+
 @pytest.mark.django_db
 @mock.patch('buildhub.ingest.sqs.boto3')
 def test_bad_client_errors(
@@ -183,6 +188,7 @@ def test_bad_client_errors(
                 's3': {
                     'object': {
                         'key': 'some/path/to/buildhub.json',
+                        'eTag': 'e4eb6609382efd6b3bc9deec616ad5c0',
                     },
                     'bucket': {
                         'name': 'buildhubses',
@@ -227,6 +233,7 @@ def test_not_valid_buildhub_json(
                 's3': {
                     'object': {
                         'key': 'some/path/to/buildhub.json',
+                        'eTag': 'e4eb6609382efd6b3bc9deec616ad5c0',
                     },
                     'bucket': {
                         'name': 'buildhubses',

@@ -30,6 +30,14 @@ class Build(models.Model):
     metadata = JSONField(default={})
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Every time we insert a build from an S3 key, we write these
+    # down. The advantage is that when we run the backfill script
+    # we can very quickly figure out if we have this build or not without
+    # having to first download the S3 object, get its build_hash and look
+    # it up that way.
+    s3_object_key = models.CharField(max_length=400, null=True)
+    s3_object_etag = models.CharField(max_length=400, null=True)
+
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.build_hash!r}>"
 
@@ -52,13 +60,13 @@ class Build(models.Model):
         validate(build, schema)
 
     @classmethod
-    def insert(cls, build, metadata=None, skip_validation=False):
+    def insert(cls, build, metadata=None, skip_validation=False, **kwargs):
         """Optimized version that tries to insert but doesn't complain if
         the build_hash is already there."""
         metadata = metadata or {}
         if skip_validation:
             metadata['skip_validation'] = True
-        metadata['version'] = settings.VERSION
+        metadata.update(settings.VERSION)
 
         # Two options for how to insert without raising conflict errors.
         #
@@ -99,6 +107,7 @@ class Build(models.Model):
                 build_hash=build_hash,
                 build=build,
                 metadata=metadata,
+                **kwargs
             )
 
     @classmethod
@@ -117,7 +126,7 @@ class Build(models.Model):
         metadata = metadata or {}
         if skip_validation:
             metadata['skip_validation'] = True
-        metadata['version'] = settings.VERSION
+        metadata.update(settings.VERSION)
         # Note! Unfortunately, there is no easy way to do a bulk insert.
         # Not until https://code.djangoproject.com/ticket/28668 lands.
         hashes = {}
