@@ -3,3 +3,4 @@ htmlcov/
 ui/node_modules
 ui/build
 version.json
+.vscode/

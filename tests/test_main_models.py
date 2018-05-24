@@ -2,9 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
-# import copy
-import os
-import json
 import pytest
 from jsonschema import ValidationError
 
@@ -12,19 +9,9 @@ from buildhub.main.models import Build
 from buildhub.main.search import BuildDoc
 
 
-def load(name):
-    with open(os.path.join(os.path.dirname(__file__), name)) as f:
-        return json.load(f)
-
-
-def VALID_BUILD():
-    # Returns a new copy of a valid buildhub.json as a Python dict.
-    return load('valid-buildhub.json')
-
-
 @pytest.mark.django_db
-def test_insert(settings):
-    build = VALID_BUILD()
+def test_insert(settings, valid_build):
+    build = valid_build()
     inserted = Build.insert(build)
     assert inserted.build_hash
     assert inserted.build == build
@@ -38,8 +25,8 @@ def test_insert(settings):
 
 
 @pytest.mark.django_db
-def test_insert_writes_to_elasticsearch(settings, elasticsearch):
-    build = VALID_BUILD()
+def test_insert_writes_to_elasticsearch(settings, elasticsearch, valid_build):
+    build = valid_build()
     inserted = Build.insert(build)
     assert inserted
 
@@ -66,8 +53,8 @@ def test_insert_writes_to_elasticsearch(settings, elasticsearch):
 
 
 @pytest.mark.django_db
-def test_insert_invalid(settings):
-    build = VALID_BUILD()
+def test_insert_invalid(settings, valid_build):
+    build = valid_build()
     # We can't completely mess with the schema to the point were it
     # breaks Elasticsearch writes.
     build['source']['junk'] = True
@@ -82,9 +69,9 @@ def test_insert_invalid(settings):
 
 
 @pytest.mark.django_db
-def test_bulk_insert():
-    one = VALID_BUILD()
-    two = VALID_BUILD()
+def test_bulk_insert(valid_build):
+    one = valid_build()
+    two = valid_build()
     assert one == two
     assert one is not two
     insert_count = Build.bulk_insert([one, two])
@@ -93,7 +80,7 @@ def test_bulk_insert():
     assert Build.objects.all().count() == 1
 
     two['download']['size'] += 1
-    three = VALID_BUILD()
+    three = valid_build()
     three['download']['size'] += 2
     insert_count = Build.bulk_insert([one, two, three])
     assert insert_count == 2
@@ -109,9 +96,9 @@ def test_bulk_insert():
 
 
 @pytest.mark.django_db
-def test_bulk_insert_invalid():
-    one = VALID_BUILD()
-    two = VALID_BUILD()
+def test_bulk_insert_invalid(valid_build):
+    one = valid_build()
+    two = valid_build()
     two.pop('target')
     with pytest.raises(ValidationError) as exception:
         Build.bulk_insert([one, two])

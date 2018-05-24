@@ -5,7 +5,9 @@
 import json
 import logging
 import re
+import os
 import io
+import itertools
 from urllib.parse import urlparse
 
 import boto3
@@ -18,6 +20,55 @@ from buildhub.main.models import Build
 logger = logging.getLogger('buildhub')
 
 
+def start(
+    queue_url,
+    region_name=None,
+    wait_time=10,
+    visibility_timeout=5,
+    max_number_of_messages=1,
+):
+
+    queue_name = urlparse(queue_url).path.split('/')[-1]
+    if not region_name:
+        region_name = re.findall(r'sqs\.(.*?)\.amazonaws\.com', queue_url)[0]
+
+    logger.debug(
+        f"Connecting to SQS queue {queue_name!r} (in {region_name!r})"
+    )
+    sqs = boto3.resource('sqs', region_name=region_name)
+    queue = sqs.get_queue_by_name(QueueName=queue_name)
+
+    # This is a mutable that will be included in every callback.
+    # It's intended as cheap state so that things like S3 client
+    # configuration and connection can be reused without having to
+    # be bootstrapped in vain.
+    config = {
+        'region_name': region_name
+    }
+
+    # By default, we receive 1 message per call to `queue.receive_messages()`
+    # but you can change that with settings.SQS_QUEUE_MAX_NUMBER_OF_MESSAGES.
+    # If it's 1, the number of "loops" will be the same as the number "count".
+    count = 0
+    # Use `itertools.count()` instead of `while True` to be able to mock it in
+    # tests.
+    for loops in itertools.count():
+        for message in queue.receive_messages(
+            WaitTimeSeconds=wait_time,
+            VisibilityTimeout=visibility_timeout,
+            MaxNumberOfMessages=max_number_of_messages,
+        ):
+            logger.debug(f"About to process message number {count}")
+            process_event(config, json.loads(message.body))
+            count += 1
+            message.delete()
+            logger.debug(f"Processed event number {count} (loops={loops + 1})")
+
+        # if loops>=10:raise Exception#during testing
+        # if loops > 40:
+        #     raise Exception
+
+
 def process_event(config, body):
     for record in body.get('Records', []):
         s3 = record.get('s3')
@@ -26,8 +77,7 @@ def process_event(config, body):
             logger.debug(f"Ignoring record because it's not S3")
             continue
         # Only bother if the filename is exactly "buildhub.json"
-        # XXX Use os.path.basename()
-        if not s3['object']['key'].endswith('/buildhub.json'):
+        if not os.path.basename(s3['object']['key']) == 'buildhub.json':
             logger.debug(f"Ignoring S3 key {s3['object']['key']}")
             continue
 
@@ -37,8 +87,7 @@ def process_event(config, body):
 def process_buildhub_json_key(config, s3):
     logger.debug(f"S3 buildhub.json key {s3!r}")
     key_name = s3['object']['key']
-    # XXX Again, use os.path.basename
-    assert key_name.endswith('/buildhub.json'), key_name
+    assert os.path.basename(key_name) == 'buildhub.json', key_name
     bucket_name = s3['bucket']['name']
     # We need a S3 connection client to be able to download this one.
     if bucket_name not in config:
@@ -86,52 +135,3 @@ def process_buildhub_json_key(config, s3):
         logger.info(
             f"Did not insert {key_name} because we already had it"
         )
-
-
-def start(
-    queue_url,
-    region_name=None,
-    wait_time=10,
-    visibility_timeout=5,
-    max_number_of_messages=1,
-):
-
-    queue_name = urlparse(queue_url).path.split('/')[-1]
-    if not region_name:
-        region_name = re.findall(r'sqs\.(.*?)\.amazonaws\.com', queue_url)[0]
-
-    logger.debug(
-        f"Connecting to SQS queue {queue_name!r} (in {region_name!r})"
-    )
-    sqs = boto3.resource('sqs', region_name=region_name)
-    queue = sqs.get_queue_by_name(QueueName=queue_name)
-
-    # This is a mutable that will be included in every callback.
-    # It's intended as cheap state so that things like S3 client
-    # configuration and connection can be reused without having to
-    # be bootstrapped in vain.
-    config = {
-        'region_name': region_name
-    }
-
-    # By default, we receive 1 message per call to `queue.receive_messages()`
-    # but you can change that with settings.SQS_QUEUE_MAX_NUMBER_OF_MESSAGES.
-    # If it's 1, the number of "loops" will be the same as the number "count".
-    count = 0
-    loops = 0
-    while True:
-        loops += 1
-
-        for message in queue.receive_messages(
-            WaitTimeSeconds=wait_time,
-            VisibilityTimeout=visibility_timeout,
-            MaxNumberOfMessages=max_number_of_messages,
-        ):
-            logger.debug(f"About to process message number {count}")
-            process_event(config, json.loads(message.body))
-            count += 1
-            message.delete()
-            logger.debug(f"Processed event number {count} (loops={loops})")
-
-            # if count > 40:
-            #     raise Exception

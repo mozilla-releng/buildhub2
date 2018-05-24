@@ -238,8 +238,10 @@ class Localdev(Base):
         else:
             return {}
 
+
 class Test(Localdev):
     """Configuration to be used during testing"""
     DEBUG = False
     ES_BUILD_INDEX = 'test_buildhub2'
     SECRET_KEY = values.Value('not-so-secret-after-all')
+    SQS_QUEUE_URL = 'https://sqs.ca-north-2.amazonaws.com/123/buildhub-s3-events'
