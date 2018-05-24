@@ -15,9 +15,12 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-        start(
-            settings.SQS_QUEUE_URL,
-            wait_time=settings.SQS_QUEUE_WAIT_TIME_SECONDS,
-            visibility_timeout=settings.SQS_QUEUE_VISIBILITY_TIMEOUT,
-            max_number_of_messages=settings.SQS_QUEUE_MAX_NUMBER_OF_MESSAGES,
-        )
+        try:
+            start(
+                settings.SQS_QUEUE_URL,
+                wait_time=settings.SQS_QUEUE_WAIT_TIME_SECONDS,
+                visibility_timeout=settings.SQS_QUEUE_VISIBILITY_TIMEOUT,
+                max_number_of_messages=settings.SQS_QUEUE_MAX_NUMBER_OF_MESSAGES,  # noqa
+            )
+        except KeyboardInterrupt:
+            print("Bye bye!")

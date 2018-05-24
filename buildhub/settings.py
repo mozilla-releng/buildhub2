@@ -18,6 +18,9 @@ class AWS:
     SQS_QUEUE_URL = values.URLValue(
         'https://sqs.us-west-2.amazonaws.com/927034868273/buildhub-s3-events'
     )
+    S3_BUCKET_URL = values.URLValue(
+        'https://s3-us-west-2.amazonaws.com/buildhub-sqs-test'
+    )
 
     # For more details, see:
     # http://boto3.readthedocs.io/en/latest/reference/services/sqs.html#SQS.Queue.receive_messages
@@ -244,4 +247,7 @@ class Test(Localdev):
     DEBUG = False
     ES_BUILD_INDEX = 'test_buildhub2'
     SECRET_KEY = values.Value('not-so-secret-after-all')
-    SQS_QUEUE_URL = 'https://sqs.ca-north-2.amazonaws.com/123/buildhub-s3-events'
+    SQS_QUEUE_URL = (
+        'https://sqs.ca-north-2.amazonaws.com/123/buildhub-s3-events'
+    )
+    S3_BUCKET_URL = 'https://s3-eu-south-1.amazonaws.com/buildhubses'

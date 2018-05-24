@@ -116,7 +116,11 @@ def process_buildhub_json_key(config, s3):
     # XXX Needs to deal with how to avoid corrupt buildhub.json S3 keys
     # never leaving the system.
     try:
-        inserted = Build.insert(build=build)
+        inserted = Build.insert(
+            build=build,
+            s3_object_key=s3['object']['key'],
+            s3_object_etag=s3['object']['eTag'],
+        )
     except ValidationError as exc:
         # We're only doing a try:except ValidationError: here so we get a
         # chance to log a useful message about the S3 object and the
