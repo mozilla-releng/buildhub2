@@ -138,5 +138,3 @@ def get_matching_s3_objs(
         except KeyError:
             break
         loops += 1
-        if loops > 10:
-            raise Exception("IT WENT NUTS")
