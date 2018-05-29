@@ -28,7 +28,7 @@ class Command(BaseCommand):
             print(
                 "When doing re-index, it's adviced that you set "
                 "environment variable:\n\n"
-                "\tES_REFRESH_INTERVAL=-1\n\n"
+                "\tDJANGO_ES_REFRESH_INTERVAL=-1\n\n"
                 "for much faster reindexing."
             )
             print("\n")
@@ -37,11 +37,12 @@ class Command(BaseCommand):
         build_index.create()
 
         es = connections.get_connection()
-        report_every = 500
+        report_every = 1_000
         count = 0
 
-        iterator = Build.objects.all().order_by("created_at")
-        total_count = iterator.count()
+        qs = Build.objects.all().order_by("created_at")
+        total_count = qs.count()
+        iterator = qs.iterator(chunk_size=10_000)
 
         index_name = settings.ES_BUILD_INDEX
         for success, doc in streaming_bulk(
