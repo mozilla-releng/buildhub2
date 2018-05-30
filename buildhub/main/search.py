@@ -10,7 +10,7 @@ from elasticsearch_dsl import (
     Index,
     DocType,
     InnerDoc,
-    Nested,
+    Object,
     Long,
     Date,
     Keyword,
@@ -66,10 +66,12 @@ class _Download(InnerDoc):
 @build_index.doc_type
 class BuildDoc(DocType):
     id = Keyword(required=True)
-    build = Nested(_Build)
-    source = Nested(_Source)
-    target = Nested(_Target)
-    download = Nested(_Download)
+    # Note! The reason for using Object() instead of Nested() is because
+    # SearchKit doesn't work if it's nested. This works though.
+    build = Object(_Build)
+    source = Object(_Source)
+    target = Object(_Target)
+    download = Object(_Download)
 
     @classmethod
     def create(cls, id, **doc):

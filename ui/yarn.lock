@@ -6212,9 +6212,9 @@ schema-utils@^0.x:
     ajv "^6.1.0"
     ajv-keywords "^3.1.0"
 
-searchkit@2.3.0-9:
-  version "2.3.0-9"
-  resolved "https://registry.yarnpkg.com/searchkit/-/searchkit-2.3.0-9.tgz#4d05316d7234ab7094dab8e9f467ea0963ac04f5"
+searchkit@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/searchkit/-/searchkit-2.3.0.tgz#bef3e60f85fa1714df73e256693b0946539cc4fa"
   dependencies:
     "@types/history" "^4.6.0"
     "@types/lodash" "^4.14.77"

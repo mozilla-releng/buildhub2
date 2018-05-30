@@ -1,20 +1,29 @@
-import requests
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, you can obtain one at http://mozilla.org/MPL/2.0/.
+
+import json
+import logging
 
 from django import http
-from django.conf import settings
+
+from buildhub.main.search import BuildDoc
+
+
+logger = logging.getLogger('buildhub')
 
 
 def search(request):
     """Proxy requests to Elasticsearch"""
-    # XXX Need to figure out how kinto-elasticsearch does this
+    search = BuildDoc.search()
     if request.method in ('POST',):
-        if list(request.POST.items()):
-            raise NotImplementedError('work harder!')
-        response = requests.get(
-            settings.ES_URLS[0] + '/' + settings.ES_BUILD_INDEX + '/_search'
-        )
-        response.raise_for_status()
-        http_response = http.JsonResponse(response.json())
-    else:
-        http_response = http.JsonResponse({'it': 'works'})
+        arguments = json.loads(request.body.decode('utf-8'))
+        if arguments:
+            search.update_from_dict(arguments)
+    response = search.execute()
+    logger.info(
+        f"Finding {format(response.hits.total, ',')} total records."
+    )
+    response_dict = response.to_dict()
+    http_response = http.JsonResponse(response_dict)
     return http_response
