@@ -27,7 +27,7 @@ help:
 	./bin/cp-env-file.sh
 
 build: .env
-	docker-compose build base
+	docker-compose build
 	touch .docker-build
 
 clean: .env stop
