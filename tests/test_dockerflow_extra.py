@@ -7,7 +7,7 @@ import mock
 import io
 
 import pytest
-from elasticsearch.exceptions import ConnectionError
+from requests.exceptions import ConnectionError
 from jsonschema import ValidationError
 from django.core.management import call_command
 
@@ -24,32 +24,29 @@ def test_check_elasticsearch(elasticsearch):
 
 
 def test_check_elasticsearch_connection_error(mocker):
-    mocked_fetch_stats = mocker.patch("buildhub.dockerflow_extra.fetch_stats")
+    mocked_fetch = mocker.patch("buildhub.dockerflow_extra.fetch")
 
     def mocked_side_effect(index):
         raise ConnectionError("Oh no!")
 
-    mocked_fetch_stats.side_effect = mocked_side_effect
+    mocked_fetch.side_effect = mocked_side_effect
     errors = check_elasticsearch(None)
     assert errors
     error, = errors
     assert 'Unable to connect to Elasticsearch' in error.msg
 
 
-def test_check_elasticsearch_shards_failed(mocker):
-    mocked_fetch_stats = mocker.patch("buildhub.dockerflow_extra.fetch_stats")
+def test_check_elasticsearch_failed_health(mocker):
+    mocked_fetch = mocker.patch("buildhub.dockerflow_extra.fetch")
 
     def mocked_side_effect(index):
-        return {
-            '_shards': {
-                'failed': 3,
-            }
-        }
+        return "Not looking good"
 
-    mocked_fetch_stats.side_effect = mocked_side_effect
+    mocked_fetch.side_effect = mocked_side_effect
     errors = check_elasticsearch(None)
     assert errors
     error, = errors
-    assert '3 shard(s) are failing on Elasticsearch' in error.msg
+    assert 'not healthy' in error.msg
+    assert 'Not looking good' in error.msg
 
 

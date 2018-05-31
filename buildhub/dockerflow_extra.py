@@ -6,13 +6,11 @@ import time
 import logging
 
 import backoff
-from elasticsearch.exceptions import ConnectionError
+import requests
 
 from django.core import checks
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-
-from buildhub.main.search import build_index
 
 logger = logging.getLogger('buildhub')
 
@@ -24,7 +22,7 @@ def _backoff_hdlr(details):
         "{kwargs}".format(**details)
     )
 
-connection_exceptions = (ConnectionError,)
+connection_exceptions = (requests.exceptions.ConnectionError,)
 
 @backoff.on_exception(
     backoff.expo,
@@ -32,19 +30,20 @@ connection_exceptions = (ConnectionError,)
     max_tries=3,
     on_backoff=_backoff_hdlr,
 )
-def fetch_stats(idx):
-    return build_index.stats()
+def fetch(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.text
 
 
 def check_elasticsearch(app_configs, **kwargs):
     errors = []
+    url = f"{settings.ES_URLS[0]}/_cat/health"
     try:
-        stats = fetch_stats(build_index)
-        failed = stats['_shards']['failed']
-        if failed:
+        health = fetch(url)
+        if not (' green ' in health or ' yellow ' in health):
             errors.append(checks.Error(
-                f"{failed} shard(s) are failing on Elasticsearch "
-                f"on {settings.ES_URLS[0]}",
+                f"Elasticsearch ({settings.ES_URLS[0]}) not healthy ({health!r}).",
                 id="buildhub.health.E002"
             ))
     except connection_exceptions as exception:
