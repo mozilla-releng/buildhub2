@@ -108,7 +108,7 @@ class Elasticsearch:
             'refresh_interval': self.ES_REFRESH_INTERVAL,
         }
 
-    ES_URLS = values.ListValue(['localhost:9200'])
+    ES_URLS = values.ListValue(['http://localhost:9200'])
 
     @property
     def ES_CONNECTIONS(self):
@@ -127,9 +127,18 @@ class Base(Core, Elasticsearch):
     DEBUG = values.BooleanValue(default=False)
     ALLOWED_HOSTS = values.ListValue([])
 
-    # Database
-    DATABASES = values.DatabaseURLValue('postgresql://localhost/buildhub2')
+    _DATABASES = values.DatabaseURLValue('postgresql://localhost/buildhub2')
     CONN_MAX_AGE = values.IntegerValue(60)
+
+    @property
+    def DATABASES(self):
+        """Because it's not possible to set 'CONN_MAX_AGE' with a URL,
+        we patch the 'DATABASES' dict *after* django-configurations has done its
+        thing."""
+        DATABASES = self._DATABASES.value.copy()
+        if self.CONN_MAX_AGE:
+            DATABASES['default']['CONN_MAX_AGE'] = self.CONN_MAX_AGE
+        return DATABASES
 
     # Logging
     LOGGING_USE_JSON = values.BooleanValue(True)
@@ -243,7 +252,6 @@ class Localdev(Base):
 
     @property
     def VERSION(self):
-        # this was breaking in ci
         import subprocess
         output = subprocess.check_output(
             # Use the absolute path of 'git' here to avoid 'git'
@@ -256,7 +264,7 @@ class Localdev(Base):
             return {}
 
 
-class Test(Localdev):
+class Test(Base):
     """Configuration to be used during testing"""
     DEBUG = False
     ES_BUILD_INDEX = 'test_buildhub2'
@@ -265,3 +273,4 @@ class Test(Localdev):
         'https://sqs.ca-north-2.amazonaws.com/123/buildhub-s3-events'
     )
     S3_BUCKET_URL = 'https://s3-eu-south-1.amazonaws.com/buildhubses'
+    VERSION = {'version': 'Testing'}
