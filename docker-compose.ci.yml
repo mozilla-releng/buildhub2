@@ -24,7 +24,7 @@ services:
       args:
         - FRONTEND_SENTRY_PUBLIC_DSN
         - CI
-    image: buildhub:build
+    image: buildhub2
     depends_on:
       - db
       - elasticsearch
