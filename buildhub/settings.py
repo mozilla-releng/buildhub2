@@ -87,6 +87,15 @@ class Core(Configuration, AWS, CORS):
     USE_L10N = False
     USE_TZ = True
 
+    DOCKERFLOW_CHECKS = [
+        # Defaults are documented here:
+        # https://python-dockerflow.readthedocs.io/en/latest/django.html#dockerflow-checks
+        'dockerflow.django.checks.check_database_connected',
+        'dockerflow.django.checks.check_migrations_applied',
+
+        'buildhub.dockerflow_extra.check_elasticsearch',
+    ]
+
 
 class Elasticsearch:
     # Name of the Elasticsearch index to put builds into
@@ -194,13 +203,18 @@ class Base(Core, Elasticsearch):
                     'handlers': ['console'],
                     'propagate': False,
                 },
+                'backoff': {
+                    'level': 'INFO',
+                    'handlers': ['console'],
+                    'propagate': False,
+                },
                 'markus': {
                     'level': 'INFO',
                     'handlers': ['console'],
                     'propagate': False,
                 },
                 'elasticsearch': {
-                    'level': 'WARNING',
+                    'level': 'ERROR',
                     'handlers': ['console'],
                     'propagate': False,
                 },
