@@ -9,7 +9,7 @@ from functools import partial
 import pytest
 import mock
 import requests
-# import requests_mock
+import requests_mock
 # import botocore
 # from markus.testing import MetricsMock
 from django.conf import settings
@@ -110,20 +110,20 @@ def json_poster(client):
 #         yield mm
 
 
-# @pytest.fixture
-# def requestsmock():
-#     """Return a context where requests are all mocked.
-#     Usage::
-#
-#         def test_something(requestsmock):
-#             requestsmock.get(
-#                 'https://example.com/path'
-#                 content=b'The content'
-#             )
-#             # Do stuff that involves requests.get('http://example.com/path')
-#     """
-#     with requests_mock.mock() as m:
-#         yield m
+@pytest.fixture
+def requestsmock():
+    """Return a context where requests are all mocked.
+    Usage::
+
+        def test_something(requestsmock):
+            requestsmock.get(
+                'https://example.com/path'
+                content=b'The content'
+            )
+            # Do stuff that involves requests.get('http://example.com/path')
+    """
+    with requests_mock.mock() as m:
+        yield m
 
 
 # # This needs to be imported at least once. Otherwise the mocking
