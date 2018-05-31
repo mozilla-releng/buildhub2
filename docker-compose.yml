@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 services:
   db:
@@ -19,7 +19,8 @@ services:
     ports:
       - 9200:9200
 
-  base:
+  # Web container is a prod-like fully-functioning container.
+  web:
     build:
       context: .
       dockerfile: Dockerfile
@@ -33,11 +34,6 @@ services:
       - DEVELOPMENT=1
     env_file:
       - .env
-
-  # Web container is a prod-like fully-functioning container.
-  web:
-    extends:
-      service: base
     depends_on:
       - db
       - elasticsearch
@@ -49,23 +45,6 @@ services:
     volumes:
       - $PWD:/app
     command: web-dev
-
-  # Container specifically for running tests.
-  test:
-    extends:
-      service: web
-    command: test
-
-  # Web container is a prod-like fully-functioning container.
-  gunicorn:
-    extends:
-      service: base
-    depends_on:
-      - db
-      - elasticsearch
-    ports:
-      - "8000:8000"
-    command: web
 
   ui:
     build:
