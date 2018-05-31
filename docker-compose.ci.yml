@@ -19,6 +19,8 @@ services:
     # server.
     # Ideally I would like this to match what we use in docker-compose.yml
     # image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+    # See also
+    # https://discuss.circleci.com/t/running-elasticsearch-5/8559?u=peterbe
     image: levlaz/elasticsearch-docker-ci:5.1.1
     container_name: elasticsearch
     environment:

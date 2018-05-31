@@ -10,16 +10,6 @@ RUN mkdir /app && \
     groupadd --gid 10001 app && \
     useradd --no-create-home --uid 10001 --gid 10001 --home-dir /app app
 
-# install a few essentials and clean apt caches afterwards
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        apt-transport-https build-essential curl git
-
-# Clean up apt
-RUN apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 COPY . /app
 
 # Install Python dependencies
