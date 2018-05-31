@@ -12,6 +12,7 @@ services:
     # https://hub.docker.com/r/levlaz/elasticsearch-docker-ci/ which disabled
     # the bootstrap checks (see its README) you can at least start an Elasticsearch 5
     # server.
+    # Ideally I would like this to match what we use in docker-compose.yml
     # image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
     image: levlaz/elasticsearch-docker-ci:5.1.1
     container_name: elasticsearch
