@@ -12,3 +12,4 @@ exclude=
     # Sphinx docs is best left as is
     docs/conf.py,
     hack.*py,
+    buildhub/wsgi.py,
