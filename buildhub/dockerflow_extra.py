@@ -25,7 +25,7 @@ def _backoff_hdlr(details):
 connection_exceptions = (requests.exceptions.ConnectionError,)
 
 @backoff.on_exception(
-    backoff.expo,
+    backoff.constant,
     connection_exceptions,
     max_tries=3,
     on_backoff=_backoff_hdlr,
