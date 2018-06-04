@@ -13,30 +13,12 @@ usage() {
   exit 1
 }
 
-wait_for() {
-  tries=0
-  echo "Waiting for $1 to listen on $2..."
-  while true; do
-    echo "...tried $tries times"
-    [[ $tries -lt $TRIES ]] || return
-    (echo > /dev/tcp/$1/$2) >/dev/null 2>&1
-    result=
-    [[ $? -eq 0 ]] && return
-    sleep $SLEEP
-    tries=$((tries + 1))
-  done
-}
-
 [ $# -lt 1 ] && usage
 
 # Only wait for backend services in development
 # http://stackoverflow.com/a/13864829
 # For example, bin/test.sh sets 'DEVELOPMENT' to something
 if [ ! -z ${DEVELOPMENT+x} ]; then
-  # XXX Once the waiting stuff works in CI, we can delete all of these
-  # loud echo log statements maybe.
-  # echo "Waiting for db 5432"
-  # wait_for db 5432
   echo "Waiting for elasticsearch:9200"
   ./bin/wait-for-elasticsearch.py elasticsearch 9200
 else

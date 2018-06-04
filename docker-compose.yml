@@ -24,6 +24,17 @@ services:
     ports:
       - 9200:9200
 
+    # I don't think this healthcheck is ever used
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:9200"]
+        # # test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+        # # test: ["CMD", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+        # test: curl -f localhost:9200/_cluster/health || exit 100
+        # # interval: 3s
+        # interval: 10s
+        # timeout: 30s
+        # retries: 10
+
   # Web container is a prod-like fully-functioning container.
   web:
     build:
