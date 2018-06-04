@@ -35,8 +35,8 @@ wait_for() {
 if [ ! -z ${DEVELOPMENT+x} ]; then
   # XXX Once the waiting stuff works in CI, we can delete all of these
   # loud echo log statements maybe.
-  echo "Waiting for db 5432"
-  wait_for db 5432
+  # echo "Waiting for db 5432"
+  # wait_for db 5432
   echo "Waiting for elasticsearch:9200"
   ./bin/wait-for-elasticsearch.py elasticsearch 9200
 else
