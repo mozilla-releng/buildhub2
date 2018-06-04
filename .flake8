@@ -1,0 +1,15 @@
+[flake8]
+max-line-length = 88
+exclude=
+    # ignore the migrations since they are created faulty by default
+    buildhub/*/migrations/*,
+    # No use in checking the Node modules
+    ui/node_modules/*/*/*,
+    # No need to traverse our git directory
+    .git,
+    # There's no value in checking cache directories
+    __pycache__,
+    # Sphinx docs is best left as is
+    docs/conf.py,
+    hack.*py,
+    buildhub/wsgi.py,

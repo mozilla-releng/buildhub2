@@ -9,7 +9,7 @@ set -eo pipefail
 : "${GUNICORN_TIMEOUT:=300}"
 
 usage() {
-  echo "usage: ./bin/run.sh daemon|web|migrate|web-dev|test|bash"
+  echo "usage: ./bin/run.sh daemon|web|migrate|web-dev|test|bash|lintcheck"
   exit 1
 }
 
@@ -39,6 +39,9 @@ case $1 in
   web-dev)
     ${CMD_PREFIX_PYTHON:-python} manage.py migrate --noinput
     ${CMD_PREFIX_PYTHON:-python} manage.py runserver 0.0.0.0:${PORT}
+    ;;
+  lintcheck)
+    flake8 buildhub tests
     ;;
   test)
     pytest

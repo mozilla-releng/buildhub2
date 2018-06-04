@@ -13,4 +13,3 @@ class MainConfig(AppConfig):
     @staticmethod
     def _connect_elasticsearch():
         connections.configure(**settings.ES_CONNECTIONS)
-

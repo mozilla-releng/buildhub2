@@ -19,18 +19,6 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
-
-
-        # if not bulk_refresh_interval:
-        #     print(" WARNING ".center(80, "-"))
-        #     print(
-        #         "When doing re-index, it's adviced that you set "
-        #         "environment variable:\n\n"
-        #         "\tDJANGO_ES_REFRESH_INTERVAL=-1\n\n"
-        #         "for much faster reindexing."
-        #     )
-        #     print("\n")
-
         build_index.delete(ignore=404)
         build_index.create()
         es_url = settings.ES_URLS[0]
@@ -38,7 +26,7 @@ class Command(BaseCommand):
         update_settings_url = f"{es_url}/{index_name}/_settings"
         response = requests.put(update_settings_url, json={
             "index": {
-                "refresh_interval" : "-1"
+                "refresh_interval": "-1"
             }
         })
         response.raise_for_status()
