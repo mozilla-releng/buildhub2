@@ -11,6 +11,7 @@ help:
 	@echo "  test             Runs the Python test suite"
 	@echo "  run              Runs the whole stack, served on http://localhost:8000/"
 	@echo "  gunicorn         Runs the whole stack using gunicorn on http://localhost:8000/"
+	@echo "  lintcheck        Check that the code is well formatted"
 	@echo "  stop             Stops the docker containers"
 	@echo "  django-shell     Django integrative shell"
 	@echo "  psql             Open the psql cli"
@@ -64,6 +65,10 @@ gunicorn: .env .docker-build
 
 django-shell: .env .docker-build
 	docker-compose run web python manage.py shell
+
+lintcheck: .env .docker-build
+	docker-compose run web lintcheck
+	docker-compose run ui lintcheck
 
 docs: .env .docker-build
 	docker-compose run -u 0 web ./bin/build_docs.sh
