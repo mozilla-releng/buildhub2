@@ -35,6 +35,7 @@ services:
       - db
       - elasticsearch
     environment:
+      # This tells run.sh to wait for databases to be fully up.
       - DEVELOPMENT=1
       - DJANGO_CONFIGURATION=Test
       - DATABASE_URL=postgresql://postgres@db/postgres

@@ -7,16 +7,18 @@ from requests.exceptions import ConnectionError
 
 def _backoff_hdlr(details):
     print(
-        "Backing off {wait:0.1f} seconds after {tries} tries"
+        "Backing off {wait:.1f}s, {tries} tries, {elapsed:.1f}s elapsed"
         "".format(**details)
     )
 
 
 @backoff.on_exception(
-    backoff.expo,
+    backoff.constant,
     ConnectionError,
     max_tries=12,
     on_backoff=_backoff_hdlr,
+    interval=2,
+    jitter=None,
 )
 def fetch(url):
     response = requests.get(url)

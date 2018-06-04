@@ -29,9 +29,6 @@ services:
         - CI
     # This builds the tecken:build container
     image: buildhub:build
-    environment:
-      - DJANGO_CONFIGURATION
-      - DEVELOPMENT=1
     env_file:
       - .env
     depends_on:
@@ -40,8 +37,10 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - DJANGO_CONFIGURATION
       - DATABASE_URL=postgresql://postgres@db/postgres
       - DJANGO_ES_URLS=http://elasticsearch:9200
+      - DEVELOPMENT=1
     volumes:
       - $PWD:/app
     command: web-dev
