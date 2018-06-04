@@ -33,6 +33,8 @@ wait_for() {
 # http://stackoverflow.com/a/13864829
 # For example, bin/test.sh sets 'DEVELOPMENT' to something
 if [ ! -z ${DEVELOPMENT+x} ]; then
+  # XXX Once the waiting stuff works in CI, we can delete all of these
+  # loud echo log statements maybe.
   echo "Waiting for db 5432"
   wait_for db 5432
   echo "Waiting for elasticsearch:9200"
