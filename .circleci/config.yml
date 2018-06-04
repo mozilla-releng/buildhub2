@@ -28,6 +28,7 @@ jobs:
       - image: ubuntu:16.04
     working_directory: ~/buildhub2
     steps:
+      - setup_remote_docker
       - run:
           name: Install essential packages
           command: |
@@ -56,7 +57,7 @@ jobs:
             # curl -L https://github.com/docker/compose/releases/download/1.16.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
             # chmod +x /usr/local/bin/docker-compose
 
-      - setup_remote_docker
+      # - setup_remote_docker
       # - setup_remote_docker:
       #     version: 17.09.0-ce
 
