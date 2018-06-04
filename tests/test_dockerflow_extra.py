@@ -2,16 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
-import json
-import mock
-import io
-
-import pytest
 from requests.exceptions import ConnectionError
-from jsonschema import ValidationError
-from django.core.management import call_command
 
-from buildhub.main.models import Build
 from buildhub.dockerflow_extra import check_elasticsearch
 
 
@@ -48,5 +40,3 @@ def test_check_elasticsearch_failed_health(mocker):
     error, = errors
     assert 'not healthy' in error.msg
     assert 'Not looking good' in error.msg
-
-

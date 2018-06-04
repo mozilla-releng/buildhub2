@@ -82,7 +82,7 @@ jobs:
       - run:
           name: Lint check Python code
           command: |
-            docker-compose -f docker-compose.ci.yml run web lintcheck
+            docker-compose -f docker-compose.ci.yml run test lintcheck
 
       - run:
           name: Run ui build

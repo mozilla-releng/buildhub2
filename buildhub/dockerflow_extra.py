@@ -2,7 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
-import time
 import logging
 
 import backoff
@@ -10,7 +9,7 @@ import requests
 
 from django.core import checks
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
+
 
 logger = logging.getLogger('buildhub')
 
@@ -22,7 +21,9 @@ def _backoff_hdlr(details):
         "{kwargs}".format(**details)
     )
 
+
 connection_exceptions = (requests.exceptions.ConnectionError,)
+
 
 @backoff.on_exception(
     backoff.constant,
@@ -52,5 +53,3 @@ def check_elasticsearch(app_configs, **kwargs):
             id="buildhub.health.E001"
         ))
     return errors
-
-
