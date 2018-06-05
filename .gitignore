@@ -5,3 +5,4 @@ ui/build
 version.json
 .vscode/
 .docker-build
+.cache/

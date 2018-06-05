@@ -5,7 +5,7 @@ from django.apps import AppConfig
 
 
 class MainConfig(AppConfig):
-    name = 'buildhub.main'
+    name = "buildhub.main"
 
     def ready(self):
         self._connect_elasticsearch()

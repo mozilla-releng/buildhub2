@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 from buildhub.main.models import Build
 
 
-logger = logging.getLogger('buildhub')
+logger = logging.getLogger("buildhub")
 
 
 def start(
@@ -28,23 +28,19 @@ def start(
     max_number_of_messages=1,
 ):
 
-    queue_name = urlparse(queue_url).path.split('/')[-1]
+    queue_name = urlparse(queue_url).path.split("/")[-1]
     if not region_name:
-        region_name = re.findall(r'sqs\.(.*?)\.amazonaws\.com', queue_url)[0]
+        region_name = re.findall(r"sqs\.(.*?)\.amazonaws\.com", queue_url)[0]
 
-    logger.debug(
-        f"Connecting to SQS queue {queue_name!r} (in {region_name!r})"
-    )
-    sqs = boto3.resource('sqs', region_name=region_name)
+    logger.debug(f"Connecting to SQS queue {queue_name!r} (in {region_name!r})")
+    sqs = boto3.resource("sqs", region_name=region_name)
     queue = sqs.get_queue_by_name(QueueName=queue_name)
 
     # This is a mutable that will be included in every callback.
     # It's intended as cheap state so that things like S3 client
     # configuration and connection can be reused without having to
     # be bootstrapped in vain.
-    config = {
-        'region_name': region_name
-    }
+    config = {"region_name": region_name}
 
     # By default, we receive 1 message per call to `queue.receive_messages()`
     # but you can change that with settings.SQS_QUEUE_MAX_NUMBER_OF_MESSAGES.
@@ -70,14 +66,14 @@ def start(
 
 
 def process_event(config, body):
-    for record in body.get('Records', []):
-        s3 = record.get('s3')
+    for record in body.get("Records", []):
+        s3 = record.get("s3")
         if not s3:
             # If it's not an S3 event, we don't care.
             logger.debug(f"Ignoring record because it's not S3")
             continue
         # Only bother if the filename is exactly "buildhub.json"
-        if not os.path.basename(s3['object']['key']) == 'buildhub.json':
+        if not os.path.basename(s3["object"]["key"]) == "buildhub.json":
             logger.debug(f"Ignoring S3 key {s3['object']['key']}")
             continue
 
@@ -86,22 +82,21 @@ def process_event(config, body):
 
 def process_buildhub_json_key(config, s3):
     logger.debug(f"S3 buildhub.json key {s3!r}")
-    key_name = s3['object']['key']
-    assert os.path.basename(key_name) == 'buildhub.json', key_name
-    bucket_name = s3['bucket']['name']
+    key_name = s3["object"]["key"]
+    assert os.path.basename(key_name) == "buildhub.json", key_name
+    bucket_name = s3["bucket"]["name"]
     # We need a S3 connection client to be able to download this one.
     if bucket_name not in config:
-        logger.debug('Creating a new BOTO3 S3 CLIENT')
-        config[bucket_name] = boto3.client('s3', config['region_name'])
+        logger.debug("Creating a new BOTO3 S3 CLIENT")
+        config[bucket_name] = boto3.client("s3", config["region_name"])
 
     with io.BytesIO() as f:
         try:
             config[bucket_name].download_fileobj(bucket_name, key_name, f)
         except ClientError as exception:
-            if exception.response['Error']['Code'] == '404':
+            if exception.response["Error"]["Code"] == "404":
                 logger.warning(
-                    f"Tried to download {key_name} (in {bucket_name}) "
-                    "but not found."
+                    f"Tried to download {key_name} (in {bucket_name}) " "but not found."
                 )
                 return
             raise
@@ -118,8 +113,8 @@ def process_buildhub_json_key(config, s3):
     try:
         inserted = Build.insert(
             build=build,
-            s3_object_key=s3['object']['key'],
-            s3_object_etag=s3['object']['eTag'],
+            s3_object_key=s3["object"]["key"],
+            s3_object_etag=s3["object"]["eTag"],
         )
     except ValidationError as exc:
         # We're only doing a try:except ValidationError: here so we get a
@@ -132,10 +127,6 @@ def process_buildhub_json_key(config, s3):
         )
         raise
     if inserted:
-        logger.info(
-            f"Inserted {key_name} as a valid Build ({inserted.build_hash})"
-        )
+        logger.info(f"Inserted {key_name} as a valid Build ({inserted.build_hash})")
     else:
-        logger.info(
-            f"Did not insert {key_name} because we already had it"
-        )
+        logger.info(f"Did not insert {key_name} because we already had it")

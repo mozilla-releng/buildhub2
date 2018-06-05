@@ -8,20 +8,30 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Build',
+            name="Build",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('build_hash', models.CharField(max_length=45, unique=True)),
-                ('build', django.contrib.postgres.fields.jsonb.JSONField()),
-                ('metadata', django.contrib.postgres.fields.jsonb.JSONField(default={})),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('s3_object_key', models.CharField(max_length=400, null=True)),
-                ('s3_object_etag', models.CharField(max_length=400, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("build_hash", models.CharField(max_length=45, unique=True)),
+                ("build", django.contrib.postgres.fields.jsonb.JSONField()),
+                (
+                    "metadata",
+                    django.contrib.postgres.fields.jsonb.JSONField(default={}),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("s3_object_key", models.CharField(max_length=400, null=True)),
+                ("s3_object_etag", models.CharField(max_length=400, null=True)),
             ],
-        ),
+        )
     ]

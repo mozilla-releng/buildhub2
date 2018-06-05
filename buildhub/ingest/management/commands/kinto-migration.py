@@ -26,9 +26,7 @@ logger = logging.getLogger("buildhub")
 
 
 @backoff.on_exception(
-    backoff.constant,
-    requests.exceptions.RequestException,
-    max_tries=3,
+    backoff.constant, requests.exceptions.RequestException, max_tries=3
 )
 def fetch(session, url):
     logger.debug(f"Fetching {url}")
@@ -42,23 +40,25 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
-        parser.add_argument('kinto-url')
+        parser.add_argument("kinto-url")
         parser.add_argument(
-            '--skip-validation', default=False, action='store_true',
+            "--skip-validation",
+            default=False,
+            action="store_true",
             help=(
                 "If you really trust the records you get out of Kinto you "
                 "can skip the validation of each and every record."
-            )
+            ),
         )
 
     def handle(self, *args, **options):
         # Ping it first
-        kinto_url = options['kinto-url']
+        kinto_url = options["kinto-url"]
         r = requests.get(kinto_url)
         r.raise_for_status()
-        assert r.json()['project_name'] == 'kinto', r.json()
+        assert r.json()["project_name"] == "kinto", r.json()
 
-        if kinto_url.endswith('/'):
+        if kinto_url.endswith("/"):
             kinto_url = kinto_url[:-1]
         url = (
             f"{kinto_url}/buckets/build-hub/collections/releases/records"
@@ -67,32 +67,32 @@ class Command(BaseCommand):
         pages = 0
         session = requests.Session()
         done = 0
-        skip_validation = options['skip_validation']
+        skip_validation = options["skip_validation"]
         for batch, total_records in self.iterator(session, url):
             logger.info(f"Page {pages + 1} ({len(batch)} records)")
             # Now let's bulk insert these
             builds = []
             for record in batch:
-                record.pop('id')
-                record.pop('last_modified')
+                record.pop("id")
+                record.pop("last_modified")
                 builds.append(record)
             # Skip validation most of the time
             t0 = time.time()
             inserted = Build.bulk_insert(
                 builds,
                 skip_validation=skip_validation,
-                metadata={'kinto-migration': True},
+                metadata={"kinto-migration": True},
             )
             t1 = time.time()
             done += len(batch)
             logger.info(
                 "Inserted {} new out of {} in "
                 "{:.2f} seconds. {} of {} ({:.1f}%)".format(
-                    format(inserted, ','),
-                    format(len(builds), ','),
+                    format(inserted, ","),
+                    format(len(builds), ","),
                     t1 - t0,
-                    format(done, ','),
-                    format(total_records, ','),
+                    format(done, ","),
+                    format(total_records, ","),
                     100 * done / total_records,
                 )
             )
@@ -105,12 +105,12 @@ class Command(BaseCommand):
             response = fetch(session, url)
             response.raise_for_status()
             if total_records is None:
-                total_records = int(response.headers['Total-Records'])
-            yield response.json()['data'], total_records
+                total_records = int(response.headers["Total-Records"])
+            yield response.json()["data"], total_records
             try:
-                next_page = response.headers['Next-Page']
+                next_page = response.headers["Next-Page"]
                 if not next_page:
-                    raise KeyError('exists but empty value')
+                    raise KeyError("exists but empty value")
                 url = next_page
             except KeyError:
                 break

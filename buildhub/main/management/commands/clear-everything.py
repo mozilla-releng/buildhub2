@@ -10,15 +10,13 @@ from buildhub.main.models import Build
 
 
 class Command(BaseCommand):
-    help = (
-        "Delete all content from Postgres and Elasticsearch"
-    )
+    help = "Delete all content from Postgres and Elasticsearch"
 
     def handle(self, *args, **options):
 
         assert settings.DEBUG, "Only ever works in DEBUG mode"
 
-        if input("Are you sure? [y/N] ").lower().strip() != 'y':
+        if input("Are you sure? [y/N] ").lower().strip() != "y":
             print("Aborted!")
             return
         Build.objects.all().delete()

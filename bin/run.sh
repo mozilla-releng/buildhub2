@@ -40,8 +40,12 @@ case $1 in
     ${CMD_PREFIX_PYTHON:-python} manage.py migrate --noinput
     ${CMD_PREFIX_PYTHON:-python} manage.py runserver 0.0.0.0:${PORT}
     ;;
+  blackfix)
+    black buildhub tests
+    ;;
   lintcheck)
     flake8 buildhub tests
+    black --check buildhub tests
     ;;
   test)
     pytest

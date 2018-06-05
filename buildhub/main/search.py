@@ -6,19 +6,11 @@ import logging
 
 import backoff
 from elasticsearch.exceptions import TransportError
-from elasticsearch_dsl import (
-    Index,
-    DocType,
-    InnerDoc,
-    Object,
-    Long,
-    Date,
-    Keyword,
-)
+from elasticsearch_dsl import Index, DocType, InnerDoc, Object, Long, Date, Keyword
 from django.conf import settings
 
 
-logger = logging.getLogger('buildhub')
+logger = logging.getLogger("buildhub")
 
 build_index = Index(settings.ES_BUILD_INDEX)
 build_index.settings(**settings.ES_BUILD_INDEX_SETTINGS)
@@ -77,10 +69,10 @@ class BuildDoc(DocType):
     def create(cls, id, **doc):
         assert id and isinstance(id, int) and id > 0
         return BuildDoc(
-            meta={'id': id},
+            meta={"id": id},
             id=id,
-            build=_Build(**doc['build']),
-            source=_Source(**doc['source']),
-            target=_Target(**doc['target']),
-            download=_Download(**doc['download']),
+            build=_Build(**doc["build"]),
+            source=_Source(**doc["source"]),
+            target=_Target(**doc["target"]),
+            download=_Download(**doc["download"]),
         )
