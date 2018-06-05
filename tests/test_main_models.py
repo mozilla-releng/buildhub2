@@ -39,16 +39,16 @@ def test_insert_writes_to_elasticsearch(settings, elasticsearch, valid_build):
     build_doc, = response
     assert build_doc.id == inserted.id
     as_dict = build_doc.to_dict()
-    as_dict.pop('id')
+    as_dict.pop("id")
     # Can't easily compare these because elasticseach_dsl will convert
     # dates to datetime.datetime objects.
     # But if we convert dates from the Elasticsearch query to a string
     # we can compare.
-    as_dict['build']['date'] = as_dict['build']['date'].isoformat()[:19]
-    as_dict['download']['date'] = as_dict['download']['date'].isoformat()[:19]
+    as_dict["build"]["date"] = as_dict["build"]["date"].isoformat()[:19]
+    as_dict["download"]["date"] = as_dict["download"]["date"].isoformat()[:19]
     build = inserted.build
-    build['build']['date'] = build['build']['date'][:19]
-    build['download']['date'] = build['download']['date'][:19]
+    build["build"]["date"] = build["build"]["date"][:19]
+    build["download"]["date"] = build["download"]["date"][:19]
     assert as_dict == build
 
 
@@ -57,7 +57,7 @@ def test_insert_invalid(settings, valid_build):
     build = valid_build()
     # We can't completely mess with the schema to the point were it
     # breaks Elasticsearch writes.
-    build['source']['junk'] = True
+    build["source"]["junk"] = True
     with pytest.raises(ValidationError) as exception:
         Build.insert(build)
     err_msg = "Additional properties are not allowed ('junk' was unexpected)"
@@ -79,9 +79,9 @@ def test_bulk_insert(valid_build):
     assert insert_count == 1
     assert Build.objects.all().count() == 1
 
-    two['download']['size'] += 1
+    two["download"]["size"] += 1
     three = valid_build()
-    three['download']['size'] += 2
+    three["download"]["size"] += 2
     insert_count = Build.bulk_insert([one, two, three])
     assert insert_count == 2
     # Even though they're "inserted at the same time", their created_at
@@ -99,7 +99,7 @@ def test_bulk_insert(valid_build):
 def test_bulk_insert_invalid(valid_build):
     one = valid_build()
     two = valid_build()
-    two.pop('target')
+    two.pop("target")
     with pytest.raises(ValidationError) as exception:
         Build.bulk_insert([one, two])
     assert "'target' is a required property" in str(exception.value)

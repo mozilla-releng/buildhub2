@@ -10,6 +10,7 @@ import pytest
 import mock
 import requests
 import requests_mock
+
 # import botocore
 # from markus.testing import MetricsMock
 from django.conf import settings
@@ -23,7 +24,7 @@ def pytest_configure():
 
     # This makes sure we never actually use the Elasticsearch index
     # we use for development.
-    settings.ES_BUILD_INDEX = 'test_index'
+    settings.ES_BUILD_INDEX = "test_index"
 
     # Make sure we can ping the Elasticsearch
     response = requests.get(settings.ES_URLS[0])
@@ -50,7 +51,7 @@ def valid_build():
             build['target']['version'] = 'different'
             assert build2['target']['version'] != 'different'
     """
-    return partial(_load, 'valid-buildhub.json')
+    return partial(_load, "valid-buildhub.json")
 
 
 @pytest.fixture
@@ -67,7 +68,7 @@ def elasticsearch(request):
             assert something
 
     """
-    assert build_index._name.startswith('test_')
+    assert build_index._name.startswith("test_")
     build_index.delete(ignore=404)
     build_index.create()
     yield build_index
@@ -80,15 +81,18 @@ def json_poster(client):
     Uses the client instance to make a client.post() call with the 'data'
     as a valid JSON string with the right header.
     """
+
     def inner(url, data, **extra):
-        debug = extra.pop('debug', None)
+        debug = extra.pop("debug", None)
         if not isinstance(data, str):
             data = json.dumps(data)
-        extra['content_type'] = 'application/json'
+        extra["content_type"] = "application/json"
         if debug is not None:
-            extra['HTTP_DEBUG'] = str(debug)
+            extra["HTTP_DEBUG"] = str(debug)
         return client.post(url, data, **extra)
+
     return inner
+
 
 # @pytest.fixture
 # def metricsmock():
@@ -220,6 +224,6 @@ def itertools_count():
     It's the default.
     """
 
-    with mock.patch('buildhub.ingest.sqs.itertools') as mocked:
+    with mock.patch("buildhub.ingest.sqs.itertools") as mocked:
         mocked.count.return_value = [0]
         yield mocked

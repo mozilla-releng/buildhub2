@@ -11,7 +11,7 @@ from django.core import checks
 from django.conf import settings
 
 
-logger = logging.getLogger('buildhub')
+logger = logging.getLogger("buildhub")
 
 
 def _backoff_hdlr(details):
@@ -26,10 +26,7 @@ connection_exceptions = (requests.exceptions.ConnectionError,)
 
 
 @backoff.on_exception(
-    backoff.constant,
-    connection_exceptions,
-    max_tries=3,
-    on_backoff=_backoff_hdlr,
+    backoff.constant, connection_exceptions, max_tries=3, on_backoff=_backoff_hdlr
 )
 def fetch(url):
     response = requests.get(url)
@@ -42,14 +39,18 @@ def check_elasticsearch(app_configs, **kwargs):
     url = f"{settings.ES_URLS[0]}/_cat/health"
     try:
         health = fetch(url)
-        if not (' green ' in health or ' yellow ' in health):
-            errors.append(checks.Error(
-                f"Elasticsearch ({settings.ES_URLS[0]}) not healthy ({health!r}).",
-                id="buildhub.health.E002"
-            ))
+        if not (" green " in health or " yellow " in health):
+            errors.append(
+                checks.Error(
+                    f"Elasticsearch ({settings.ES_URLS[0]}) not healthy ({health!r}).",
+                    id="buildhub.health.E002",
+                )
+            )
     except connection_exceptions as exception:
-        errors.append(checks.Error(
-            f"Unable to connect to Elasticsearch on {settings.ES_URLS[0]}",
-            id="buildhub.health.E001"
-        ))
+        errors.append(
+            checks.Error(
+                f"Unable to connect to Elasticsearch on {settings.ES_URLS[0]}",
+                id="buildhub.health.E001",
+            )
+        )
     return errors

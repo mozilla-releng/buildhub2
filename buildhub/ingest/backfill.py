@@ -13,13 +13,12 @@ from django.db import transaction
 from buildhub.main.models import Build
 
 
-logger = logging.getLogger('buildhub')
+logger = logging.getLogger("buildhub")
 
 
 def backfill(s3_url, region_name=None):
-
     def download_and_insert(obj, maybe=False):
-        key = obj['Key']
+        key = obj["Key"]
         with io.BytesIO() as f:
             # 'bucket_name' and 's3_client' is hoisted from the closure
             s3_client.download_fileobj(bucket_name, key, f)
@@ -30,9 +29,7 @@ def backfill(s3_url, region_name=None):
             # we turn it into a Python dict.
             build = json.load(f)
         inserted = Build.insert(
-            build=build,
-            s3_object_key=obj['Key'],
-            s3_object_etag=obj['ETag'],
+            build=build, s3_object_key=obj["Key"], s3_object_etag=obj["ETag"]
         )
         if inserted:
             logger.info(f"New Build inserted from backfill ({key})")
@@ -44,12 +41,9 @@ def backfill(s3_url, region_name=None):
             # this build_hash already but the ETag isn't matching.
             # Update the s3_object_* attributes
             found = Build.objects.filter(
-                s3_object_key=key,
-                build_hash=Build.get_build_hash(build)
+                s3_object_key=key, build_hash=Build.get_build_hash(build)
             )
-            found.update(
-                s3_object_etag=obj['ETag'],
-            )
+            found.update(s3_object_etag=obj["ETag"])
 
     def is_equal_etags(etag1, etag2):
         if etag1.startswith('"'):
@@ -63,15 +57,15 @@ def backfill(s3_url, region_name=None):
     existing = get_builds_existing_map()
     existing_set = set(existing.keys())
     logger.info(f"We currently have {len(existing_set)} s3_object_keys")
-    bucket_name = urlparse(s3_url).path.split('/')[-1]
+    bucket_name = urlparse(s3_url).path.split("/")[-1]
     if not region_name:
-        region_name = re.findall(r's3[\.-](.*?)\.amazonaws\.com', s3_url)[0]
-    s3_client = boto3.client('s3', region_name)
+        region_name = re.findall(r"s3[\.-](.*?)\.amazonaws\.com", s3_url)[0]
+    s3_client = boto3.client("s3", region_name)
     count = 0
     for objs in get_matching_s3_objs(
-        s3_client, bucket_name, suffix='/buildhub.json', max_keys=100
+        s3_client, bucket_name, suffix="/buildhub.json", max_keys=100
     ):
-        keys = {x['Key']: x for x in objs}
+        keys = {x["Key"]: x for x in objs}
         keys_set = set(keys.keys())
         count += len(keys_set)
         # Of the keys that we've never seen in our database before,
@@ -83,7 +77,7 @@ def backfill(s3_url, region_name=None):
 
             for key in keys:
                 etag_before = existing[key]
-                if is_equal_etags(etag_before, keys[key]['ETag']):
+                if is_equal_etags(etag_before, keys[key]["ETag"]):
                     continue
                 # The Etag has changed!
                 download_and_insert(keys[key], maybe=True)
@@ -93,28 +87,19 @@ def backfill(s3_url, region_name=None):
 def get_builds_existing_map():
     existing = {}
     qs = Build.objects.filter(s3_object_key__isnull=False).only(
-        's3_object_key',
-        's3_object_etag',
+        "s3_object_key", "s3_object_etag"
     )
     while True:
-        for build in qs.order_by('id')[:1000]:
+        for build in qs.order_by("id")[:1000]:
             existing[build.s3_object_key] = build.s3_object_etag
-            qs = qs.filter(
-                id__gt=build.id,
-            )
+            qs = qs.filter(id__gt=build.id)
         else:
             break
 
     return existing
 
 
-def get_matching_s3_objs(
-    s3_client,
-    bucket,
-    prefix='',
-    suffix='',
-    max_keys=1000,
-):
+def get_matching_s3_objs(s3_client, bucket, prefix="", suffix="", max_keys=1000):
     """
     Return an iterator of S3 objects in batches.
 
@@ -122,19 +107,18 @@ def get_matching_s3_objs(
     :param prefix: Only fetch keys that start with this prefix (optional).
     :param suffix: Only fetch keys that end with this suffix (optional).
     """
-    kwargs = {'Bucket': bucket, 'MaxKeys': max_keys, 'Prefix': prefix}
+    kwargs = {"Bucket": bucket, "MaxKeys": max_keys, "Prefix": prefix}
     loops = 0
     while True:
         resp = s3_client.list_objects_v2(**kwargs)
         matched = [
-            obj for obj in resp['Contents']
-            if not suffix or obj['Key'].endswith(suffix)
+            obj for obj in resp["Contents"] if not suffix or obj["Key"].endswith(suffix)
         ]
         logger.info(f"Found {len(matched)} S3 keys on page {loops + 1}")
         if matched:
             yield matched
         try:
-            kwargs['ContinuationToken'] = resp['NextContinuationToken']
+            kwargs["ContinuationToken"] = resp["NextContinuationToken"]
         except KeyError:
             break
         loops += 1

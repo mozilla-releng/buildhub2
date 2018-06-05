@@ -9,6 +9,6 @@ import buildhub.api.urls
 
 
 urlpatterns = [
-    url(r'^api/', include(buildhub.api.urls, namespace='api')),
-    url(r'', lambda r: http.HttpResponse('Works\n'))
+    url(r"^api/", include(buildhub.api.urls, namespace="api")),
+    url(r"", lambda r: http.HttpResponse("Works\n")),
 ]

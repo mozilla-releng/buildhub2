@@ -24,11 +24,9 @@ class Command(BaseCommand):
         es_url = settings.ES_URLS[0]
         index_name = settings.ES_BUILD_INDEX
         update_settings_url = f"{es_url}/{index_name}/_settings"
-        response = requests.put(update_settings_url, json={
-            "index": {
-                "refresh_interval": "-1"
-            }
-        })
+        response = requests.put(
+            update_settings_url, json={"index": {"refresh_interval": "-1"}}
+        )
         response.raise_for_status()
 
         es = connections.get_connection()
@@ -40,10 +38,7 @@ class Command(BaseCommand):
         iterator = qs.iterator(chunk_size=10_000)
         for success, doc in streaming_bulk(
             es,
-            (
-                m.to_search().to_dict(True)
-                for m in iterator
-            ),
+            (m.to_search().to_dict(True) for m in iterator),
             index=index_name,
             doc_type="doc",
         ):
@@ -54,7 +49,7 @@ class Command(BaseCommand):
                 print(
                     format(count, ",").ljust(8),
                     "\t",
-                    "{:.1f}%".format(100 * count / total_count)
+                    "{:.1f}%".format(100 * count / total_count),
                 )
 
         # We have done a bunch of bulk inserts into Elasticsearch with
@@ -62,17 +57,20 @@ class Command(BaseCommand):
         # the index. See
         # https://www.elastic.co/guide/en/elasticsearch/reference/6.x/indices-update-settings.html#bulk
 
-        force_merge_url = (
-            f"{es_url}/{index_name}/_forcemerge?max_num_segments=5"
-        )
+        force_merge_url = f"{es_url}/{index_name}/_forcemerge?max_num_segments=5"
         response = requests.post(force_merge_url)
         response.raise_for_status()
         print("Force merged Elasticsearch index after bulk insert")
 
         # Restore refresh_interval
-        response = requests.put(update_settings_url, json={
-            "index": {
-                "refresh_interval": settings.ES_BUILD_INDEX_SETTINGS['refresh_interval']
-            }
-        })
+        response = requests.put(
+            update_settings_url,
+            json={
+                "index": {
+                    "refresh_interval": settings.ES_BUILD_INDEX_SETTINGS[
+                        "refresh_interval"
+                    ]
+                }
+            },
+        )
         response.raise_for_status()

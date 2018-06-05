@@ -12,6 +12,7 @@ help:
 	@echo "  run              Runs the whole stack, served on http://localhost:8000/"
 	@echo "  gunicorn         Runs the whole stack using gunicorn on http://localhost:8000/"
 	@echo "  lintcheck        Check that the code is well formatted"
+	@echo "  lintfix          Just try to fix all the possible linting errors"
 	@echo "  stop             Stops the docker containers"
 	@echo "  django-shell     Django integrative shell"
 	@echo "  psql             Open the psql cli"
@@ -69,6 +70,10 @@ django-shell: .env .docker-build
 lintcheck: .env .docker-build
 	docker-compose run web lintcheck
 	docker-compose run ui lintcheck
+
+lintfix: .env .docker-build
+	docker-compose run web blackfix
+	docker-compose run ui lintfix
 
 docs: .env .docker-build
 	docker-compose run -u 0 web ./bin/build_docs.sh

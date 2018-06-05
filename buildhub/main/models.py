@@ -13,6 +13,7 @@ from django.dispatch import receiver
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+
 # from django.db.models.signals import pre_save
 from django.db.models.signals import post_save
 from django.utils.encoding import force_bytes
@@ -20,8 +21,8 @@ from django.utils.encoding import force_bytes
 from buildhub.main.search import BuildDoc, es_retry
 
 
-with open(os.path.join(settings.BASE_DIR, 'schema.yaml')) as f:
-    SCHEMA = yaml.load(f)['schema']
+with open(os.path.join(settings.BASE_DIR, "schema.yaml")) as f:
+    SCHEMA = yaml.load(f)["schema"]
 
 
 class Build(models.Model):
@@ -44,16 +45,16 @@ class Build(models.Model):
     def to_search(self, **kwargs):
         return BuildDoc.create(self.id, **self.build)
 
-    hash_prefix = 'v1'
+    hash_prefix = "v1"
 
     @classmethod
     def get_build_hash(cls, build):
         """Set mutate=True if you don't mind it mutating."""
-        prefix = 'v1'
+        prefix = "v1"
         md5string = hashlib.md5(
             force_bytes(json.dumps(build, sort_keys=True))
         ).hexdigest()
-        return f'{prefix}:{md5string}'
+        return f"{prefix}:{md5string}"
 
     @classmethod
     def validate_build(cls, build, schema=SCHEMA):
@@ -65,7 +66,7 @@ class Build(models.Model):
         the build_hash is already there."""
         metadata = metadata or {}
         if skip_validation:
-            metadata['skip_validation'] = True
+            metadata["skip_validation"] = True
         metadata.update(settings.VERSION)
 
         # Two options for how to insert without raising conflict errors.
@@ -104,10 +105,7 @@ class Build(models.Model):
         build_hash = cls.get_build_hash(build)
         if not cls.objects.filter(build_hash=build_hash).exists():
             return cls.objects.create(
-                build_hash=build_hash,
-                build=build,
-                metadata=metadata,
-                **kwargs
+                build_hash=build_hash, build=build, metadata=metadata, **kwargs
             )
 
     @classmethod
@@ -125,16 +123,16 @@ class Build(models.Model):
         """
         metadata = metadata or {}
         if skip_validation:
-            metadata['skip_validation'] = True
+            metadata["skip_validation"] = True
         metadata.update(settings.VERSION)
         # Note! Unfortunately, there is no easy way to do a bulk insert.
         # Not until https://code.djangoproject.com/ticket/28668 lands.
         hashes = {}
         for build in builds:
             hashes[cls.get_build_hash(build)] = build
-        for build_hash in cls.objects.filter(
-            build_hash__in=hashes.keys()
-        ).values_list('build_hash', flat=True):
+        for build_hash in cls.objects.filter(build_hash__in=hashes.keys()).values_list(
+            "build_hash", flat=True
+        ):
             hashes.pop(build_hash)
         if not skip_validation:
             # Only run the validation on the records that we're about to
@@ -146,13 +144,9 @@ class Build(models.Model):
             # 1.5ms to run the validation and 0.03ms to generate the hash.
             for build in hashes.values():
                 cls.validate_build(build)
-        cls.objects.bulk_create([
-            cls(
-                build_hash=k,
-                build=v,
-                metadata=metadata,
-            ) for k, v in hashes.items()
-        ])
+        cls.objects.bulk_create(
+            [cls(build_hash=k, build=v, metadata=metadata) for k, v in hashes.items()]
+        )
         return len(hashes)
 
 

@@ -1,1 +1,1 @@
-default_app_config = 'buildhub.main.apps.MainConfig'
+default_app_config = "buildhub.main.apps.MainConfig"
