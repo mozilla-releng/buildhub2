@@ -3,6 +3,7 @@
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import json
 
 from configurations import Configuration, values
 from dockerflow.version import get_version
@@ -237,6 +238,10 @@ class Localdev(Base):
     def VERSION(self):
         import subprocess
 
+        fn = os.path.join(self.BASE_DIR, "version.json")
+        if os.path.isfile(fn):
+            with open(fn) as f:
+                return json.load(f)
         output = subprocess.check_output(
             # Use the absolute path of 'git' here to avoid 'git'
             # not being the git we expect in Docker.

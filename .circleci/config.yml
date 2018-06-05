@@ -89,6 +89,12 @@ jobs:
           command: |
             docker-compose -f docker-compose.ci.yml run ui
 
+      - run:
+          name: Copy static assets into the web container
+          command: |
+            docker container ls
+            docker cp ui/build/. buildhub_web_1:/tmp/build
+
       - store_artifacts:
           path: ui/build
 
