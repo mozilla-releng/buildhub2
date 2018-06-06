@@ -4,6 +4,7 @@
 
 import json
 import os
+import shutil
 from functools import partial
 
 import pytest
@@ -11,7 +12,6 @@ import mock
 import requests
 import requests_mock
 
-# import botocore
 # from markus.testing import MetricsMock
 from django.conf import settings
 
@@ -227,3 +227,26 @@ def itertools_count():
     with mock.patch("buildhub.ingest.sqs.itertools") as mocked:
         mocked.count.return_value = [0]
         yield mocked
+
+
+@pytest.fixture
+def temp_static_root(settings):
+    """Update settings such that settings.STATIC_ROOT is always an existing but
+    empty temporary directory.
+    This is useful when you want to control the settings.STATIC_ROOT content
+    explicitly.
+    Usage::
+
+        def test_something(temp_static_root):
+            assert os.path.isdir(temp_static_root)
+            assert not os.listdir(temp_static_root)
+            with open(temp_static_root + '/foo.html', 'w') as f:
+                f.write('<html>')
+                ...
+
+    """
+    assert os.path.basename(settings.STATIC_ROOT).startswith("test_")
+    if os.path.isdir(settings.STATIC_ROOT):
+        shutil.rmtree(settings.STATIC_ROOT)
+    os.makedirs(settings.STATIC_ROOT)
+    yield settings.STATIC_ROOT

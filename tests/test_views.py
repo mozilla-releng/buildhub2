@@ -1,0 +1,50 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, you can obtain one at http://mozilla.org/MPL/2.0/.
+
+import os
+
+
+def test_always_index_html(client, temp_static_root, settings):
+    with open(os.path.join(temp_static_root, "index.html"), "w") as f:
+        f.write(
+            """
+            <!doctype html><html>
+            <h1>Hi!</h1>
+            </html>
+            """.strip()
+        )
+    with open(os.path.join(temp_static_root, "foo.js"), "w") as f:
+        f.write(
+            """
+            $(function() {
+                alert('Hi!);
+            })
+            """.strip()
+        )
+
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response["content-type"] == "text/html"
+    content = response.getvalue().decode(response.charset)
+    assert "<h1>Hi!</h1>" in content
+
+    # Actually, it doesn't matter much what the URL is. You get this same content.
+    response = client.get("/some/path/react/router/maybe")
+    assert response.status_code == 200
+    second_content = response.getvalue().decode(response.charset)
+    assert content == second_content
+
+    # However, if the file exists it gets served thanks to Whitenoise
+    response = client.get("/foo.js")
+    assert response.status_code == 200
+    assert response["content-type"] == 'application/javascript; charset="utf-8"'
+    content = response.getvalue().decode(response.charset)
+    assert "alert('Hi!)" in content
+
+    # However, since we default all URLs back to $STATIC_ROOT/index.html and
+    # if you have a thing like <img src="/typo.pmg"> that would respond with
+    # 200 OK and would serve up a HTML page. That makes it rather hard to debug
+    # missing static assets.
+    response = client.get("/image.png")
+    assert response.status_code == 404

@@ -6,3 +6,4 @@ version.json
 .vscode/
 .docker-build
 .cache/
+/build/
