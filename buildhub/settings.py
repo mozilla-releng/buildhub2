@@ -1,5 +1,5 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
+# License, v. 2.0. If a copy of the MPL was not distribute this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
@@ -57,6 +57,9 @@ class Core(Configuration, AWS, CORS):
     # BASE_DIR = os.path.dirname(THIS_DIR)
     BASE_DIR = BASE_DIR
 
+    STATIC_URL = "/"
+    STATIC_ROOT = values.PathValue(os.path.join(BASE_DIR, "build"), check_exists=False)
+
     VERSION = get_version(BASE_DIR)
 
     INSTALLED_APPS = [
@@ -74,6 +77,7 @@ class Core(Configuration, AWS, CORS):
         "django.middleware.common.CommonMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "dockerflow.django.middleware.DockerflowMiddleware",
+        "whitenoise.middleware.WhiteNoiseMiddleware",
     ]
 
     ROOT_URLCONF = "buildhub.urls"
@@ -113,8 +117,9 @@ class Elasticsearch:
 
 
 class Base(Core, Elasticsearch):
-    """Settings that may change per-environment, some with defaults."""
+    """Settings that may change per-environment, som defaults."""
 
+    #
     # Django
     SECRET_KEY = values.SecretValue()
     DEBUG = values.BooleanValue(default=False)
@@ -125,8 +130,8 @@ class Base(Core, Elasticsearch):
 
     @property
     def DATABASES(self):
-        """Because it's not possible to set 'CONN_MAX_AGE' with a URL,
-        we patch the 'DATABASES' dict *after* django-configurations has done its
+        """Because it's not possible to set 'CONN_MAX_AGE a URL,
+        # we patch the 'DATABASES' dict *after* django-configurations has done its
         thing."""
         DATABASES = self._DATABASES.value.copy()
         if self.CONN_MAX_AGE:
@@ -257,3 +262,4 @@ class Test(Base):
     SQS_QUEUE_URL = "https://sqs.ca-north-2.amazonaws.com/123/buildhub-s3-events"
     S3_BUCKET_URL = "https://s3-eu-south-1.amazonaws.com/buildhubses"
     VERSION = {"version": "Testing"}
+    STATIC_ROOT = "/tmp/test_buildhub2"

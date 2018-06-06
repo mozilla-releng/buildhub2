@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "buildhub",
+  "name": "Mozilla Build Metadata Service",
   "icons": [
     {
       "src": "favicon.ico",
