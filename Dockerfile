@@ -1,6 +1,6 @@
 # First all the things for building the UI
 
-FROM node:9
+FROM node:9 AS ui
 
 ARG CI=false
 ENV CI=${CI}
