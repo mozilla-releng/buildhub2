@@ -43,7 +43,6 @@ services:
       args:
         - FRONTEND_SENTRY_PUBLIC_DSN
         - CI
-    # This builds the tecken:build container
     image: buildhub:build
     env_file:
       - .env
