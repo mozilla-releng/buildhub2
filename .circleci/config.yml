@@ -8,34 +8,17 @@
 
 version: 2
 jobs:
-  checkout_code:
+  build:
     docker:
       - image: ubuntu:16.04
     working_directory: ~/buildhub2
     steps:
-      - run:
-          name: Install essential packages
-          command: |
-            apt-get update && apt-get install -y ca-certificates git
       - checkout
-      - save_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-          paths:
-            - ~/buildhub2
 
-  build_test_and_deploy:
-    docker:
-      - image: ubuntu:16.04
-    working_directory: ~/buildhub2
-    steps:
       - run:
           name: Install essential packages
           command: |
             apt-get update && apt-get install -y ca-certificates curl
-
-      - restore_cache:
-          keys:
-            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
 
       - run:
           name: Install Docker client
@@ -108,28 +91,3 @@ jobs:
             if [ -n "${CIRCLE_TAG}" ]; then
               ./bin/deploy-dockerhub.sh "$CIRCLE_TAG"
             fi
-
-
-workflows:
-  version: 2
-
-  # workflow jobs are _not_ run in tag builds by default
-  # we use filters to whitelist jobs that should be run for tags
-
-  # workflow jobs are run in _all_ branch builds by default
-  # we use filters to blacklist jobs that shouldn't be run for a branch
-
-  # see: https://circleci.com/docs/2.0/workflows/#git-tag-job-execution
-
-  build-test-deploy:
-    jobs:
-      - checkout_code:
-          filters:
-            tags:
-              only: /.*/
-      - build_test_and_deploy:
-          requires:
-            - checkout_code
-          filters:
-            tags:
-              only: /.*/
