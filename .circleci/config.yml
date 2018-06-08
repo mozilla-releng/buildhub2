@@ -78,7 +78,9 @@ jobs:
       - run:
           name: Docs should build without error
         command: |
-            docker-compose -f docker-compose.ci.yml run test ./bin/build-docs.sh
+            # Does this work without running
+            # `docker-compose -f docker-compose.ci.yml build docs` first??
+            docker-compose -f docker-compose.ci.yml run docs
 
       - run:
           name: Push to Dockerhub

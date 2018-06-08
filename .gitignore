@@ -8,3 +8,4 @@ version.json
 .cache/
 /build/
 docs/_build/
+docs/.bash_history
