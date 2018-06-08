@@ -93,14 +93,8 @@ jobs:
           path: ui/build
 
       # - run:
-      #     name: Lint check
-      #     command: |
-      #       docker-compose -f docker-compose.ci.yml run buildhub lintcheck
-      #       docker-compose -f docker-compose.ci.yml run ui lintcheck
-
-      # - run:
       #     name: Docs should build without error
-      #     command: |
+    #     command: |
       #       docker-compose -f docker-compose.ci.yml run docs build
 
       - run:
@@ -109,39 +103,12 @@ jobs:
             # set DOCKER_DEPLOY=true in Circle UI to push to Dockerhub
             DOCKER_DEPLOY="${DOCKER_DEPLOY:-false}"
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              bin/deploy-dockerhub.sh latest
+              ./bin/deploy-dockerhub.sh latest
             fi
             if [ -n "${CIRCLE_TAG}" ]; then
-              bin/deploy-dockerhub.sh "$CIRCLE_TAG"
+              ./bin/deploy-dockerhub.sh "$CIRCLE_TAG"
             fi
 
-  # frontend:
-  #   docker:
-  #     - image: node:9
-  #   working_directory: ~/buildhub
-  #   steps:
-  #     - checkout
-
-  #     - run:
-  #         name: "Checking Versions"
-  #         command: |
-  #           node --version
-  #           yarn --version
-
-  #     - run:
-  #         name: Install frontend dependencies
-  #         command: |
-  #           cd ui
-  #           yarn
-
-  #     - run:
-  #         name: Build frontend
-  #         command: |
-  #           cd ui
-  #           yarn run build
-
-  #     - store_artifacts:
-  #         path: ui/build
 
 workflows:
   version: 2
