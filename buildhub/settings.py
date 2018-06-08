@@ -79,7 +79,7 @@ class Core(Configuration, AWS, CORS):
         "django.middleware.common.CommonMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "dockerflow.django.middleware.DockerflowMiddleware",
-        "whitenoise.middleware.WhiteNoiseMiddleware",
+        "buildhub.whitenoise_extra.BuildhubWhiteNoiseMiddleware",
     ]
 
     ROOT_URLCONF = "buildhub.urls"
@@ -100,6 +100,11 @@ class Core(Configuration, AWS, CORS):
         "dockerflow.django.checks.check_migrations_applied",
         "buildhub.dockerflow_extra.check_elasticsearch",
     ]
+
+    # The default is that Whitenoise sets `Access-Control-Allow-Origin: *` for
+    # static assets. We don't need that because we don't intend to serve the
+    # static assets via a CDN.
+    WHITENOISE_ALLOW_ALL_ORIGINS = False
 
 
 class Elasticsearch:

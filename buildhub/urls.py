@@ -17,7 +17,12 @@ def serve(request, **kwargs):
         return http.HttpResponseNotFound(request.path_info)
     document_root = kwargs["document_root"]
     assert os.path.isdir(document_root), document_root
-    return django_serve(request, "/index.html", **kwargs)
+
+    response = django_serve(request, "/index.html", **kwargs)
+    if isinstance(response, http.FileResponse):
+        max_age = 60 * 60 * 24
+        response["cache-control"] = f"max-age={max_age}, public"
+    return response
 
 
 urlpatterns = [
