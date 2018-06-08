@@ -35,14 +35,12 @@ import {
 
 import "searchkit/release/theme.css";
 
-import contribute_json from "./copied_contribute.json";
-
 // XXX This needs to change to the Prod default.
 const defaultCollectionURL = "http://localhost:8000/api/";
-const KINTO_COLLECTION_URL =
-  process.env.REACT_APP_KINTO_COLLECTION_URL || defaultCollectionURL;
+const COLLECTION_URL =
+  process.env.REACT_APP_COLLECTION_URL || defaultCollectionURL;
 
-const searchkit = new SearchkitManager(KINTO_COLLECTION_URL, {
+const searchkit = new SearchkitManager(COLLECTION_URL, {
   searchUrlPath: "search"
 });
 
@@ -75,7 +73,7 @@ const HitsTable = ({ hits }) => {
               _id,
               highlight
             }) => {
-              const recordUrl = `${KINTO_COLLECTION_URL}records/${_id}`;
+              const recordUrl = `${COLLECTION_URL}records/${_id}`;
               const revisionUrl = source.revision ? (
                 <a href={`${source.repository}/rev/${source.revision}`}>
                   {source.revision.substring(0, 6)}
@@ -169,12 +167,44 @@ const fullText = (query, options) => {
 };
 
 class ProjectInfo extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      contributeJson: JSON.parse(sessionStorage.getItem("contributeJson"))
+    };
+  }
+  componentDidMount() {
+    if (!this.state.contributeJson) {
+      fetch("/contribute.json").then(r => {
+        if (r.status === 200) {
+          r.json().then(response => {
+            this.setState({ contributeJson: response }, () => {
+              sessionStorage.setItem(
+                "contributeJson",
+                JSON.stringify(this.state.contributeJson)
+              );
+              console.log(
+                "Store this in sessionStorage?",
+                this.state.contributeJson
+              );
+            });
+          });
+        } else {
+          console.warn(r);
+        }
+      });
+    }
+  }
+
   render() {
+    if (!this.state.contributeJson) {
+      return null;
+    }
     const {
       repository: { url: source, license },
       participate: { docs: documentation },
       bugs: { report }
-    } = contribute_json;
+    } = this.state.contributeJson;
 
     return (
       <div className="project-info">
