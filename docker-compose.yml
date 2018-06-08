@@ -75,8 +75,9 @@ services:
   docs:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: buildhub:docs
+      dockerfile: docs/Dockerfile
+    volumes:
+      - $PWD/docs:/app
     command: build
 
 
