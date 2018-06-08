@@ -21,5 +21,5 @@
     "lint:prettier": "prettier --list-different src/**/*.js | ./lint_problems.sh",
     "lint:prettierfix": "prettier src/**/*.js --write"
   },
-  "proxy": "http://kinto:8888"
+  "proxy": "http://localhost:8000"
 }

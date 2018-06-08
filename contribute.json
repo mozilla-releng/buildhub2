@@ -1,0 +1,24 @@
+{
+  "name": "buildhub2",
+  "description": "Mozilla Build Metadata Service",
+  "participate": {
+    "irc": "irc://irc.mozilla.org/#storage-team",
+    "irc-contacts": [
+      "peterbe",
+      "mostlygeek"
+    ],
+    "docs": "https://buildhub2.readthedocs.io/en/latest/"
+  },
+  "repository": {
+    "url": "https://github.com/mozilla/buildhub2",
+    "license": "MPL 2.0"
+  },
+  "bugs": {
+    "list": "https://github.com/mozilla/buildhub2/issues",
+    "report": "https://github.com/mozilla/buildhub2/issues/new"
+  },
+  "urls": {
+    "prod": "tobedecided",
+    "stage": "tbd"
+  }
+}

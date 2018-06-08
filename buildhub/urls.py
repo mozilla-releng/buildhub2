@@ -1,6 +1,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
+
+import json
 import os
 
 from django import http
@@ -12,6 +14,14 @@ import buildhub.api.urls
 
 
 def serve(request, **kwargs):
+    if request.path_info == "/contribute.json":
+        # Advantages of having our own custom view over using
+        # django.view.static.serve is that we get the right content-type
+        # and as a view we write a unit test that checks that the JSON is valid
+        # and can be deserialized.
+        with open(os.path.join(settings.BASE_DIR, "contribute.json")) as f:
+            contribute_json_dict = json.load(f)
+        return http.JsonResponse(contribute_json_dict, json_dumps_params={"indent": 3})
     _, ext = os.path.splitext(request.path_info)
     if ext:
         return http.HttpResponseNotFound(request.path_info)
