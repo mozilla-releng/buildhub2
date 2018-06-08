@@ -8,20 +8,7 @@
 
 version: 2
 jobs:
-  checkout_code:
-    docker:
-      - image: ubuntu:16.04
-    working_directory: ~/buildhub2
-    steps:
-      - run:
-          name: Install essential packages
-          command: |
-            apt-get update && apt-get install -y ca-certificates git
-      - checkout
-      - save_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-          paths:
-            - ~/buildhub2
+  - checkout_code
 
   build_test_and_deploy:
     docker:
@@ -123,10 +110,6 @@ workflows:
 
   build-test-deploy:
     jobs:
-      - checkout_code:
-          filters:
-            tags:
-              only: /.*/
       - build_test_and_deploy:
           requires:
             - checkout_code
