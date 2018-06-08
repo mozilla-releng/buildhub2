@@ -43,7 +43,6 @@ services:
       args:
         - FRONTEND_SENTRY_PUBLIC_DSN
         - CI
-    # This builds the tecken:build container
     image: buildhub:build
     env_file:
       - .env
@@ -72,6 +71,14 @@ services:
     volumes:
       - $PWD/ui:/app
     command: start
+
+  docs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: buildhub:docs
+    command: build
+
 
 volumes:
   esdata:

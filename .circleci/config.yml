@@ -75,10 +75,10 @@ jobs:
       - store_artifacts:
           path: ui/build
 
-      # - run:
-      #     name: Docs should build without error
-    #     command: |
-      #       docker-compose -f docker-compose.ci.yml run docs build
+      - run:
+          name: Docs should build without error
+        command: |
+            docker-compose -f docker-compose.ci.yml run test ./bin/build-docs.sh
 
       - run:
           name: Push to Dockerhub
