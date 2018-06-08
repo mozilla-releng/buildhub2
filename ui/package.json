@@ -15,9 +15,9 @@
     "react-scripts": "1.0.7"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "start": "cp ../contribute.json src/copied_contribute.json && react-scripts start",
+    "build": "cp ../contribute.json src/copied_contribute.json && react-scripts build",
+    "test": "cp ../contribute.json src/copied_contribute.json && react-scripts test --env=jsdom",
     "lint:prettier": "prettier --list-different src/**/*.js | ./lint_problems.sh",
     "lint:prettierfix": "prettier src/**/*.js --write"
   },

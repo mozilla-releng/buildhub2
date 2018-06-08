@@ -7,3 +7,4 @@ version.json
 .docker-build
 .cache/
 /build/
+ui/src/copied_contribute.json

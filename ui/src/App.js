@@ -35,7 +35,7 @@ import {
 
 import "searchkit/release/theme.css";
 
-import contribute_json from "./contribute.json";
+import contribute_json from "./copied_contribute.json";
 
 // XXX This needs to change to the Prod default.
 const defaultCollectionURL = "http://localhost:8000/api/";

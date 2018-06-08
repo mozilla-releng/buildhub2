@@ -77,3 +77,12 @@ def test_custom_cache_control_serve(client, temp_static_root, settings):
 
     response = client.get("/", HTTP_IF_MODIFIED_SINCE=response["last-modified"])
     assert response.status_code == 304
+
+
+def test_contribute_json(client):
+    response = client.get("/contribute.json")
+    assert response.status_code == 200
+    # No point testing that the content can be deserialized because
+    # the view would Internal Server Error if the ./contribute.json
+    # file on disk is invalid.
+    assert response["Content-type"] == "application/json"
