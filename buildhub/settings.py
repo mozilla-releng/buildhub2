@@ -22,7 +22,8 @@ class AWS:
         "https://sqs.us-west-2.amazonaws.com/927034868273/buildhub-s3-events"
     )
     S3_BUCKET_URL = values.URLValue(
-        "https://s3-us-west-2.amazonaws.com/buildhub-sqs-test"
+        "https://s3-us-east-1.amazonaws.com/"
+        "net-mozaws-prod-delivery-inventory-us-east-1"
     )
 
     # For more details, see:
