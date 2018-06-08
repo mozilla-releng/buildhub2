@@ -7,3 +7,4 @@ version.json
 .docker-build
 .cache/
 /build/
+docs/_build/
