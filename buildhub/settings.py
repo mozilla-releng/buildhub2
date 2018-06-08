@@ -58,7 +58,9 @@ class Core(Configuration, AWS, CORS):
     BASE_DIR = BASE_DIR
 
     STATIC_URL = "/"
-    STATIC_ROOT = values.PathValue(os.path.join(BASE_DIR, "build"), check_exists=False)
+    STATIC_ROOT = values.PathValue(
+        os.path.join(BASE_DIR, "ui/build"), check_exists=False
+    )
 
     VERSION = get_version(BASE_DIR)
 
