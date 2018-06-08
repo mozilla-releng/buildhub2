@@ -48,3 +48,13 @@ def test_always_index_html(client, temp_static_root, settings):
     # missing static assets.
     response = client.get("/image.png")
     assert response.status_code == 404
+
+
+def test_custom_cache_control(client, temp_static_root, settings):
+    with open(os.path.join(temp_static_root, "main.8741ee2b.js"), "w") as f:
+        f.write("alert('Hi!)")
+
+    response = client.get("/main.8741ee2b.js")
+    assert response.status_code == 200
+    assert response["content-type"] == 'application/javascript; charset="utf-8"'
+    assert response["cache-control"] == "max-age=315360000, public, immutable"
