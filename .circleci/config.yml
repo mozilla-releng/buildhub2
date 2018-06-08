@@ -13,7 +13,7 @@ jobs:
       - image: ubuntu:16.04
     working_directory: ~/buildhub2
     steps:
-      - checkout_code
+      - checkout
 
       - run:
           name: Install essential packages
