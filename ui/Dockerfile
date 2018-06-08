@@ -19,4 +19,3 @@ EXPOSE 35729
 
 ENTRYPOINT ["/bin/bash", "/app/run.sh"]
 CMD ["start"]
-

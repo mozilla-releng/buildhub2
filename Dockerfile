@@ -1,3 +1,25 @@
+# First all the things for building the UI
+
+FROM node:9 AS ui
+
+ARG CI=false
+ENV CI=${CI}
+
+ADD ui/package.json /package.json
+ADD ui/yarn.lock /yarn.lock
+RUN yarn
+
+ENV NODE_PATH=/node_modules
+ENV PATH=$PATH:/node_modules/.bin
+
+COPY . /app
+WORKDIR /app
+
+RUN bin/build-ui.sh
+
+
+# Next, all the things for building the Python web service
+
 FROM python:3.6-slim@sha256:6f39e7dfc5158b351cfea004541fc85898452c2e4cbeb2b36f00c286fc957a88
 
 ENV PYTHONUNBUFFERED=1 \
@@ -21,6 +43,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Switch back to home directory
 WORKDIR /app
+
+# Copy built static assets from the ui container
+COPY --from=ui /app/ui/build /app/ui/build
 
 RUN chown -R 10001:10001 /app
 
