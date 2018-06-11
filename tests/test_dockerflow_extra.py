@@ -7,7 +7,7 @@ from requests.exceptions import ConnectionError
 from buildhub.dockerflow_extra import check_elasticsearch
 
 
-def test_check_elasticsearch(elasticsearch):
+def test_check_elasticsearch(elasticsearch, settings):
     """This is a fully functional test that requires a healthy Elasticsearch
     connection."""
     elasticsearch.flush()
@@ -32,11 +32,11 @@ def test_check_elasticsearch_failed_health(mocker):
     mocked_fetch = mocker.patch("buildhub.dockerflow_extra.fetch")
 
     def mocked_side_effect(index):
-        return "Not looking good"
+        return {"status": "brownish"}
 
     mocked_fetch.side_effect = mocked_side_effect
     errors = check_elasticsearch(None)
     assert errors
     error, = errors
     assert "not healthy" in error.msg
-    assert "Not looking good" in error.msg
+    assert "brownish" in error.msg

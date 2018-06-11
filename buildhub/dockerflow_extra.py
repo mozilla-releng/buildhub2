@@ -31,15 +31,15 @@ connection_exceptions = (requests.exceptions.ConnectionError,)
 def fetch(url):
     response = requests.get(url)
     response.raise_for_status()
-    return response.text
+    return response.json()
 
 
 def check_elasticsearch(app_configs, **kwargs):
     errors = []
-    url = f"{settings.ES_URLS[0]}/_cat/health"
+    url = f"{settings.ES_URLS[0]}/_cluster/health/{settings.ES_BUILD_INDEX}"
     try:
-        health = fetch(url)
-        if not (" green " in health or " yellow " in health):
+        health = fetch(url)["status"]
+        if not (health in ("yellow", "green")):
             errors.append(
                 checks.Error(
                     f"Elasticsearch ({settings.ES_URLS[0]}) not healthy ({health!r}).",

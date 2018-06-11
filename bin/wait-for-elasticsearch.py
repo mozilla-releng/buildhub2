@@ -7,7 +7,7 @@ from requests.exceptions import ConnectionError, HTTPError
 
 def _backoff_hdlr(details):
     # We can do this because this handler function is very specific.
-    details['url'] = details['args'][0]
+    details["url"] = details["args"][0]
     print(
         "Backing off {url} for {wait:.1f}s, {tries} tries, {elapsed:.1f}s elapsed"
         "".format(**details)
@@ -41,7 +41,11 @@ def fetch(url):
     response.raise_for_status()
 
 
-def run(hostname, port):
+def run(hostname, port=None):
+    if "http://" in hostname:
+        hostname = hostname.replace("http://", "")
+    if port is None:
+        hostname, port = hostname.split(":")
     url = f"http://{hostname}:{port}"
 
     try:
@@ -52,6 +56,7 @@ def run(hostname, port):
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
+
     sys.exit(run(*sys.argv[1:]))

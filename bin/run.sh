@@ -19,8 +19,8 @@ usage() {
 # http://stackoverflow.com/a/13864829
 # For example, bin/test.sh sets 'DEVELOPMENT' to something
 if [ ! -z ${DEVELOPMENT+x} ]; then
-  echo "Waiting for elasticsearch:9200"
-  ./bin/wait-for-elasticsearch.py elasticsearch 9200
+  echo "Waiting for $DJANGO_ES_URLS"
+  ./bin/wait-for-elasticsearch.py "$DJANGO_ES_URLS"
 else
   echo "Not waiting for any services"
 fi

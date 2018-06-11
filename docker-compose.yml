@@ -54,8 +54,6 @@ services:
       - "8000:8000"
     environment:
       - DJANGO_CONFIGURATION
-      - DATABASE_URL=postgresql://postgres@db/postgres
-      - DJANGO_ES_URLS=http://elasticsearch:9200
       - DEVELOPMENT=1
     volumes:
       - $PWD:/app
