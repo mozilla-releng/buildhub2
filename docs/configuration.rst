@@ -80,7 +80,7 @@ and ``AWS_ACCESS_KEY_ID`` but to read the SQS queue these need to be set up.
     AWS_SECRET_ACCESS_KEY=....
 
 
-.. note:: The access key ID and secret access key is *not* prefixed with ``DJANGO_``.
+.. note:: The access key ID and secret access keys are *not* prefixed with ``DJANGO_``.
 
 Gunicorn
 ========

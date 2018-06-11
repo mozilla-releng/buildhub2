@@ -30,24 +30,22 @@ The four pillars of Buildhub are:
 Flow
 ====
 
-1. TaskCluster builds a ``Firefox-79-installer.exe`` and a ``buildhub.json``
-2. A sub-task in TaskCluster uploads these files into S3.
+1. TaskCluster builds a, for example, ``Firefox-79-installer.exe`` and a ``buildhub.json``
+2. TaskCluster uploads these files into S3.
 3. An S3 configuration triggers an SQS event that puts this S3-write into the queue.
 4. This service notices the new file.
 5. Downloads the ``buildhub.json`` file from S3 using Python ``boto3``.
-6. Reads its payload and checks the JSON Schema validation
+6. Reads its payload and checks the JSON Schema validation.
 7. Inserts the JSON into PostgreSQL using the Django ORM.
-8. That JSON inserted into PosgreSQL is noticed by the Django ORM signals and sends a
-   copy of the JSON into Elasticsearch.
+8. That JSON inserted into PosgreSQL is also inserted into Elasticsearch.
 
 Validation
 ==========
 
 The validation step before storing anything is to check that the data in the
-``buildhub.json`` file matches the ``schema.yaml`` file.
-
-Since TaskCluster builds the ``buildhub.json`` file and this service picks it up
-asynchronous and delayed, there is at the moment no easy way to know an invalid
+``buildhub.json`` file matches the ``schema.yaml`` file. Since TaskCluster builds
+the ``buildhub.json`` file and this service picks it up asynchronous
+and delayed, there is at the moment no easy way to know an invalid
 ``buildhub.json`` file was built.
 
 If you want to change the ``schema.yaml`` make sure it matches the schema used

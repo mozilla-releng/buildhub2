@@ -76,7 +76,7 @@ lintfix: .env .docker-build
 	docker-compose run ui lintfix
 
 docs: .env .docker-build
-	docker-compose run -u 0 web ./bin/build_docs.sh
+	docker-compose run docs
 
 tag:
 	@bin/make-tag.py

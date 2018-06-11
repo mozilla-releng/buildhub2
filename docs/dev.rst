@@ -5,30 +5,46 @@ Developer Documentation
 Code
 ====
 
+License preamble
+----------------
+
 All code files need to start with the MPLv2 header::
 
     # This Source Code Form is subject to the terms of the Mozilla Public
     # License, v. 2.0. If a copy of the MPL was not distributed with this
     # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-To check if any file is lacking a license preamble, run:
+Black
+-----
+
+All Pythoncode is expected to be formatted exactly as
+`black <https://github.com/ambv/black>`_ wants it formatted. The version of ``black``
+is dictated by the ``requirements.txt``. Make sure your IDE matches that.
+
+The CI job will check that all code needs *no* formatted or else the CI build fails.
+
+To make sure the code you write is ``black`` compatible run:
 
 .. code-block:: shell
 
-    $ ./bin/sanspreamble.sh
+    $ docker-compose run web blackfix
 
-It will exit non-zero if there are files lacking the preamble. It only
-checks git checked in files.
+Flake8
+------
 
-PEP8 is nice. All files are expected to be PEP8 and pyflakes compliant
-and the PEP8 rules (and exceptions) are defined in ``setup.cfg`` under
-the ``[flake8]`` heading.
+``black`` will take care of nit-style formatting such as quotation marks and
+indentation but the code also needs to be ``flake8`` perfect. This is also tested
+in CI. It relies on the ``.flake8`` file whose ``max-line-length`` matches
+the configuration for ``black`` and it's **88 characters**.
 
-The tests use ``py.test`` with a plugin called ``flake8`` which will
-check files according to the flake8 rules as it runs tests.
+There is no automated tool to fix ``flake8`` errors but since ``black`` takes care
+of most formatting, ``flake8`` is usually checking for unused imports and such.
 
-If you hit issues, instead of re-writing the rules consider
-appending a comment on the end of the line that says ``# noqa``.
+To check that your code is ``flake8`` perfect, run:
+
+.. code-block:: shell
+
+    $ docker-compose run web lintcheck
 
 Local development
 =================

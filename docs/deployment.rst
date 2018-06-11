@@ -9,19 +9,13 @@ Environments
 
 Mozilla Symbol Server is deployed in 3 different environments:
 
-1. Production (https://symbols.mozilla.org SOON!)
+1. Production (To Be Decided)
 
-2. Stage (https://symbols.stage.mozaws.net)
+2. Stage (To Be Decided)
 
-3. Dev (https://symbols.dev.mozaws.net)
+The stage environments is updated on every new tag created.
 
-The stage and production environments are only updated at manual and
-discrete points by the team. The dev environment is always up-to-date
-with the latest version (i.e. master on GitHub).
-
-All (manual) testing of features is expected to be done on the
-dev environment.
-
+The prod environment requires a tag and a manual task by CloudOps.
 
 Tagging
 =======
@@ -58,4 +52,3 @@ and it will guide you through create a git tag and having that pushed.
 
 Stage and production deployment requires that the development team
 communicates the desired git tag name to the Cloud OPs team.
-(MORE DETAILS ABOUT THIS TO COME)
