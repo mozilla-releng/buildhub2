@@ -2,7 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distribute this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
 import os
+import subprocess
 
 from configurations import Configuration, values
 from dockerflow.version import get_version
@@ -247,17 +249,20 @@ class Localdev(Base):
 
     @property
     def VERSION(self):
-        import subprocess
-
-        output = subprocess.check_output(
-            # Use the absolute path of 'git' here to avoid 'git'
-            # not being the git we expect in Docker.
-            ["/usr/bin/git", "describe", "--tags", "--always", "--abbrev=0"]
-        )  # nosec
-        if output:
-            return {"version": output.decode().strip()}
-        else:
-            return {}
+        fn = os.path.join(self.BASE_DIR, "version.json")
+        try:
+            with open(fn) as f:
+                return json.load(f)
+        except FileNotFoundError:
+            output = subprocess.check_output(
+                # Use the absolute path of 'git' here to avoid 'git'
+                # not being the git we expect in Docker.
+                ["/usr/bin/git", "describe", "--tags", "--always", "--abbrev=0"]
+            )  # nosec
+            if output:
+                return {"version": output.decode().strip()}
+            else:
+                return {}
 
 
 class Test(Base):

@@ -24,7 +24,7 @@ def pytest_configure():
 
     # This makes sure we never actually use the Elasticsearch index
     # we use for development.
-    settings.ES_BUILD_INDEX = "test_index"
+    settings.ES_BUILD_INDEX = "test_buildhub2"
 
     # Make sure we can ping the Elasticsearch
     response = requests.get(settings.ES_URLS[0])
