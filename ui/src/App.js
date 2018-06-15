@@ -183,10 +183,6 @@ class ProjectInfo extends React.PureComponent {
                 "contributeJson",
                 JSON.stringify(this.state.contributeJson)
               );
-              console.log(
-                "Store this in sessionStorage?",
-                this.state.contributeJson
-              );
             });
           });
         } else {
