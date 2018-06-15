@@ -78,8 +78,6 @@ jobs:
       - run:
           name: Docs should build without error
           command: |
-            # Does this work without running
-            # `docker-compose -f docker-compose.ci.yml build docs` first??
             docker-compose -f docker-compose.ci.yml run docs
 
       - run:
