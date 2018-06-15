@@ -16,9 +16,7 @@ help:
 	@echo "  stop             Stops the docker containers"
 	@echo "  django-shell     Django integrative shell"
 	@echo "  psql             Open the psql cli"
-	# @echo "  lint-frontend    Runs a linting check on the frontend"
-	# @echo "  lint-frontend-ci Runs a linting check on the frontend in CI"
-	# @echo "  build-frontend   Builds the frontend static files"
+	@echo "  daemon           Start the SQS daemon"
 	@echo "\n"
 
 # Dev configuration steps
@@ -76,16 +74,10 @@ lintfix: .env .docker-build
 	docker-compose run ui lintfix
 
 docs: .env .docker-build
-	docker-compose run -u 0 web ./bin/build_docs.sh
+	docker-compose run docs
 
 tag:
 	@bin/make-tag.py
 
-# lint-frontend:
-# 	docker-compose run frontend lint
-
-# lint-frontend-ci:
-# 	docker-compose run frontend-ci lint
-
-# build-frontend:
-# 	docker-compose run -u 0 -e CI base ./bin/build_frontend.sh
+daemon: .env
+	docker-compose run web python manage.py daemon
