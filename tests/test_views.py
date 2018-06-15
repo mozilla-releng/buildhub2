@@ -4,6 +4,8 @@
 
 import os
 
+from django.urls import reverse
+
 
 def test_always_index_html(client, temp_static_root, settings):
     with open(os.path.join(temp_static_root, "index.html"), "w") as f:
@@ -86,3 +88,9 @@ def test_contribute_json(client):
     # the view would Internal Server Error if the ./contribute.json
     # file on disk is invalid.
     assert response["Content-type"] == "application/json"
+
+
+def test_legacy_search_redirect(client):
+    response = client.get("/v1/buckets/build-hub/collections/releases/search")
+    assert response.status_code == 301
+    assert response["location"] == reverse("api:search")

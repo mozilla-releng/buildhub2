@@ -9,6 +9,7 @@ from django import http
 from django.conf import settings
 from django.conf.urls import url, include
 from django.views.static import serve as django_serve
+from django.views.generic import RedirectView
 
 import buildhub.api.urls
 
@@ -36,6 +37,12 @@ def serve(request, **kwargs):
 
 
 urlpatterns = [
+    # This is a legacy redirect. If someone is using the old mozilla-services/buildhub
+    # elasticsearch-kinto URL, then that should continue to work.
+    url(
+        r"^v1/buckets/build-hub/collections/releases/search",
+        RedirectView.as_view(url="/api/search", permanent=True),
+    ),
     url(r"^api/", include(buildhub.api.urls, namespace="api")),
     url(r"", serve, {"document_root": settings.STATIC_ROOT}),
 ]
