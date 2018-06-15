@@ -7,7 +7,6 @@
     "filesize": "3.5.10",
     "react": "15.5.4",
     "react-dom": "15.5.4",
-    "rimraf": "2.6.1",
     "searchkit": "2.3.0"
   },
   "devDependencies": {
