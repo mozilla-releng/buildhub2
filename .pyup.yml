@@ -1,0 +1,6 @@
+search: False
+label_prs: update
+requirements:
+  - requirements.txt
+  - docs/requirements.txt:
+    pin: False
