@@ -46,7 +46,7 @@ def check_elasticsearch(app_configs, **kwargs):
                     id="buildhub.health.E002",
                 )
             )
-    except connection_exceptions as exception:
+    except connection_exceptions:
         errors.append(
             checks.Error(
                 f"Unable to connect to Elasticsearch on {settings.ES_URLS[0]}",
