@@ -2,6 +2,12 @@
 
 [![CircleCI](https://circleci.com/gh/mozilla/buildhub2.svg?style=svg)](https://circleci.com/gh/mozilla/buildhub2)
 [![Code style](https://img.shields.io/badge/Code%20style-black-000000.svg)](https://github.com/ambv/black)
+[![Documentation Status](https://readthedocs.org/projects/buildhub2/badge/?version=latest)](https://buildhub2.readthedocs.io/en/latest/?badge=latest)
+ 
+
+Please use the documentation on: [buildhub2.readthedocs.io](https://buildhub2.readthedocs.io/)
+
+## Overview
 
 Every time [Taskcluster](https://tools.taskcluster.net/) builds a version of
 Firefox, Fennec, etc. the built files are put into an S3 bucket. One of the files
