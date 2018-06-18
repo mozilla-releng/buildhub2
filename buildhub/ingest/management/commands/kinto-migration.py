@@ -14,6 +14,7 @@ a blob of JSON. That's
 import logging
 import time
 
+import markus
 import requests
 import backoff
 
@@ -23,6 +24,7 @@ from buildhub.main.models import Build
 
 
 logger = logging.getLogger("buildhub")
+metrics = markus.get_metrics("tecken")
 
 
 @backoff.on_exception(
@@ -84,6 +86,8 @@ class Command(BaseCommand):
                 metadata={"kinto-migration": True},
             )
             t1 = time.time()
+            metrics.incr("kinto_migrated", value=len(builds))
+            metrics.incr("kinto_inserted", value=len(inserted))
             done += len(batch)
             logger.info(
                 "Inserted {} new out of {} in "
