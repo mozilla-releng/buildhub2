@@ -82,6 +82,23 @@ and ``AWS_ACCESS_KEY_ID`` but to read the SQS queue these need to be set up.
 
 .. note:: The access key ID and secret access keys are *not* prefixed with ``DJANGO_``.
 
+SQS
+===
+
+The writes to S3 needs to be configured to send to an SQS. That name of that queue
+needs to be set in two places:
+
+1. In the S3 configuration
+2. In this server under the name ``DJANGO_SQS_QUEUE_URL``.
+
+The *name* of the queue is drawn from the URL. So is the region. The default
+value for this is:
+
+.. code-block:: shell
+
+    DJANGO_SQS_QUEUE_URL=https://sqs.us-west-2.amazonaws.com/927034868273/buildhub-s3-events
+
+
 Gunicorn
 ========
 
@@ -113,7 +130,6 @@ long as it can scale up in the future it doesn't need to be big.
 
     Similar to the AWS access ID and AWS secret access key, this one is
     not prefixed with ``DJANGO_``.
-
 
 
 Metrics
