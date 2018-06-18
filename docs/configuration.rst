@@ -116,8 +116,12 @@ long as it can scale up in the future it doesn't need to be big.
 
 
 
-StatsD
-======
+Metrics
+=======
+
+The default configuration for all metrics is to send ``statsd`` calls to
+``localhost:8125`` which is intended to be picked up by a local Datadog daemon
+that buffers metrics to be sent to ``datadoghq.com``.
 
 The three environment variables to control the statsd are as follows
 (with their defaults):
@@ -127,3 +131,6 @@ The three environment variables to control the statsd are as follows
 2. ``DJANGO_STATSD_PORT`` (*8125*)
 
 3. ``DJANGO_STATSD_NAMESPACE`` (*''* (empty string))
+
+The configuration is, by default, to log all metrics measures when doing local
+development.

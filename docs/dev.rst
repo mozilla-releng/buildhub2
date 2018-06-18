@@ -194,6 +194,22 @@ after ``--`` like this:
   > ptw -- -x --other-option
 
 
+Metrics Logging
+===============
+
+The default configuration for metrics logging is that every ``Markus`` metrics
+event is piped to the logging using ``markus.backends.logging.LoggingMetrics``.
+If the output of this is distracting on the foreground, you can add this to your
+``.env`` file:
+
+.. code-block:: shell
+
+   DJANGO_MARKUS_BACKENDS=
+
+That will effectively set that there are no backends of ``Markus`` and thus
+no logging messages about metrics.
+
+
 Python Requirements
 ===================
 

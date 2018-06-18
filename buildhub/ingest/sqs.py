@@ -11,6 +11,7 @@ import itertools
 from urllib.parse import urlparse
 
 import boto3
+import markus
 from jsonschema import ValidationError
 from botocore.exceptions import ClientError
 
@@ -18,6 +19,7 @@ from buildhub.main.models import Build
 
 
 logger = logging.getLogger("buildhub")
+metrics = markus.get_metrics("tecken")
 
 
 def start(
@@ -37,9 +39,8 @@ def start(
     queue = sqs.get_queue_by_name(QueueName=queue_name)
 
     # This is a mutable that will be included in every callback.
-    # It's intended as cheap state so that things like S3 client
-    # configuration and connection can be reused without having to
-    # be bootstrapped in vain.
+    # It's intended as cheap state so that things like S3 client configuration
+    # and connection can be reused without having to be bootstrapped in vain.
     config = {"region_name": region_name}
 
     # By default, we receive 1 message per call to `queue.receive_messages()`
@@ -55,14 +56,11 @@ def start(
             MaxNumberOfMessages=max_number_of_messages,
         ):
             logger.debug(f"About to process message number {count}")
+            metrics.incr("sqs_messages")
             process_event(config, json.loads(message.body))
             count += 1
             message.delete()
             logger.debug(f"Processed event number {count} (loops={loops + 1})")
-
-        # if loops>=10:raise Exception#during testing
-        # if loops > 40:
-        #     raise Exception
 
 
 def process_event(config, body):
@@ -75,11 +73,14 @@ def process_event(config, body):
         # Only bother if the filename is exactly "buildhub.json"
         if not os.path.basename(s3["object"]["key"]) == "buildhub.json":
             logger.debug(f"Ignoring S3 key {s3['object']['key']}")
+            metrics.incr("sqs_not_key_matched")
             continue
 
+        metrics.incr("sqs_key_matched")
         process_buildhub_json_key(config, s3)
 
 
+@metrics.timer_decorator("sqs_process_buildhub_json_key")
 def process_buildhub_json_key(config, s3):
     logger.debug(f"S3 buildhub.json key {s3!r}")
     key_name = s3["object"]["key"]
@@ -127,6 +128,8 @@ def process_buildhub_json_key(config, s3):
         )
         raise
     if inserted:
+        metrics.incr("sqs_inserted")
         logger.info(f"Inserted {key_name} as a valid Build ({inserted.build_hash})")
     else:
+        metrics.incr("sqs_not_inserted")
         logger.info(f"Did not insert {key_name} because we already had it")

@@ -16,6 +16,7 @@ Contents
    deployment
    dev
    ui
+   metrics
 
 
 Indices and tables

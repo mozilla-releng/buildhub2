@@ -9,13 +9,16 @@ import io
 from urllib.parse import urlparse
 
 import boto3
+import markus
 from django.db import transaction
 from buildhub.main.models import Build
 
 
 logger = logging.getLogger("buildhub")
+metrics = markus.get_metrics("tecken")
 
 
+@metrics.timer_decorator("backfill")
 def backfill(s3_url, region_name=None):
     def download_and_insert(obj, maybe=False):
         key = obj["Key"]
@@ -33,9 +36,10 @@ def backfill(s3_url, region_name=None):
         )
         if inserted:
             logger.info(f"New Build inserted from backfill ({key})")
+            metrics.incr("backfill_inserted")
         else:
             logger.info(f"Key downloaded but not inserted again ({key})")
-        print((maybe, inserted))
+            metrics.incr("backfill_not_inserted")
         if maybe and not inserted:
             # If this happens, it means that the build exists exactly with
             # this build_hash already but the ETag isn't matching.
@@ -52,11 +56,10 @@ def backfill(s3_url, region_name=None):
             etag2 = etag2[1:-1]
         return etag1 == etag2
 
-    # Prepare a massive dict every existing known Build by their
-    # s3_object_key
+    # Prepare a massive dict every existing known Build by their 's3_object_key'.
     existing = get_builds_existing_map()
     existing_set = set(existing.keys())
-    logger.info(f"We currently have {len(existing_set)} s3_object_keys")
+    logger.info(f"We currently have {len(existing_set)} s3_object_keys in our database")
     bucket_name = urlparse(s3_url).path.split("/")[-1]
     if not region_name:
         region_name = re.findall(r"s3[\.-](.*?)\.amazonaws\.com", s3_url)[0]
@@ -111,11 +114,13 @@ def get_matching_s3_objs(s3_client, bucket, prefix="", suffix="", max_keys=1000)
     loops = 0
     while True:
         resp = s3_client.list_objects_v2(**kwargs)
+        metrics.incr("backfill_listed", len(resp["Contents"]))
         matched = [
             obj for obj in resp["Contents"] if not suffix or obj["Key"].endswith(suffix)
         ]
         logger.info(f"Found {len(matched)} S3 keys on page {loops + 1}")
         if matched:
+            metrics.incr("backfill_matched", len(matched))
             yield matched
         try:
             kwargs["ContinuationToken"] = resp["NextContinuationToken"]

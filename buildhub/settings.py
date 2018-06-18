@@ -265,9 +265,27 @@ class Localdev(Base):
             else:
                 return {}
 
+    @property
+    def LOGGING(self):
+        LOGGING = super().LOGGING
+        # Add django.server (useful for local dev) and
+        # unset the request.summary.
+        LOGGING["loggers"]["django.server"] = {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        }
+        LOGGING["loggers"]["request.summary"]["level"] = "ERROR"
+        return LOGGING
+
+    MARKUS_BACKENDS = values.ListValue(
+        [{"class": "markus.backends.logging.LoggingMetrics"}]
+    )
+
 
 class Test(Base):
-    """Configuration to be used during testing"""
+    """Configurat
+    ion to be used during testing"""
 
     DEBUG = False
     ES_BUILD_INDEX = "test_buildhub2"
@@ -276,3 +294,64 @@ class Test(Base):
     S3_BUCKET_URL = "https://s3-eu-south-1.amazonaws.com/buildhubses"
     VERSION = {"version": "Testing"}
     STATIC_ROOT = "/tmp/test_buildhub2"
+
+    MARKUS_BACKENDS = []
+
+
+class Stage(Base):
+    """Configuration for the Stage server."""
+
+    # Defaulting to 'localhost' here because that's where the Datadog
+    # agent is expected to run in production.
+    STATSD_HOST = values.Value("localhost")
+    STATSD_PORT = values.Value(8125)
+    STATSD_NAMESPACE = values.Value("")
+
+    @property
+    def MARKUS_BACKENDS(self):
+        return [
+            {
+                "class": "markus.backends.datadog.DatadogMetrics",
+                "options": {
+                    "statsd_host": self.STATSD_HOST,
+                    "statsd_port": self.STATSD_PORT,
+                    "statsd_namespace": self.STATSD_NAMESPACE,
+                },
+            }
+        ]
+
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+    @property
+    def DATABASES(self):
+        "require encrypted connections to Postgres"
+        DATABASES = super().DATABASES.value.copy()
+        DATABASES["default"].setdefault("OPTIONS", {})["sslmode"] = "require"
+        return DATABASES
+
+    # Sentry setup
+    SENTRY_DSN = values.Value(environ_prefix=None)
+
+    MIDDLEWARE = [
+        "raven.contrib.django.raven_compat.middleware"
+        ".SentryResponseErrorIdMiddleware"
+    ] + Base.MIDDLEWARE
+
+    INSTALLED_APPS = Base.INSTALLED_APPS + ["raven.contrib.django.raven_compat"]
+
+    @property
+    def RAVEN_CONFIG(self):
+        config = {
+            "dsn": self.SENTRY_DSN,
+            # "transport": RequestsHTTPTransport
+        }
+        if self.VERSION:
+            config["release"] = (
+                self.VERSION.get("version") or self.VERSION.get("commit") or ""
+            )
+        return config
+
+
+class Prod(Stage):
+    """Configuration to be used in prod environment"""
