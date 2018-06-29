@@ -48,6 +48,8 @@ def test_backfill_happy_path(
             build["download"]["mimetype"] = key_name
         elif key_name == "three/buildhub.json":
             build["download"]["mimetype"] = key_name
+        elif key_name == "three/Firefox-99-buildhub.json":
+            build["download"]["mimetype"] = key_name
         else:
             raise NotImplementedError(key_name)
         f.write(json.dumps(build).encode("utf-8"))
@@ -62,6 +64,7 @@ def test_backfill_happy_path(
                 "Contents": [
                     {"Key": "one/buildhub.json", "ETag": "abc123"},
                     {"Key": "two/buildhub.json", "ETag": "def234"},
+                    {"Key": "three/Firefox-99-buildhub.json", "ETag": "xyz987"},
                 ],
                 "NextContinuationToken": "nextpageplease",
             }
@@ -69,13 +72,16 @@ def test_backfill_happy_path(
     mocked_s3_client.list_objects_v2.side_effect = mocked_list_objects
     backfill(settings.S3_BUCKET_URL)
 
-    # We had 2 before, this should have created 1 new and edited 1
-    assert Build.objects.all().count() == 3
+    # We had 2 before, this should have created 2 new and edited 1
+    assert Build.objects.all().count() == 4
     # The second one should have had its etag updated
     assert not Build.objects.filter(
         s3_object_key="two/buildhub.json", s3_object_etag="somethingdifferent"
     )
     assert Build.objects.get(s3_object_key="two/buildhub.json", s3_object_etag="def234")
+    assert Build.objects.get(
+        s3_object_key="three/Firefox-99-buildhub.json", s3_object_etag="xyz987"
+    )
 
 
 @pytest.mark.django_db

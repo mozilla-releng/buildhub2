@@ -66,7 +66,7 @@ def backfill(s3_url, region_name=None):
     s3_client = boto3.client("s3", region_name)
     count = 0
     for objs in get_matching_s3_objs(
-        s3_client, bucket_name, suffix="/buildhub.json", max_keys=100
+        s3_client, bucket_name, suffix="buildhub.json", max_keys=100
     ):
         keys = {x["Key"]: x for x in objs}
         keys_set = set(keys.keys())
