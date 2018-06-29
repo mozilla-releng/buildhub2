@@ -71,7 +71,7 @@ def process_event(config, body):
             logger.debug(f"Ignoring record because it's not S3")
             continue
         # Only bother if the filename is exactly "buildhub.json"
-        if not os.path.basename(s3["object"]["key"]) == "buildhub.json":
+        if not os.path.basename(s3["object"]["key"]).endswith("buildhub.json"):
             logger.debug(f"Ignoring S3 key {s3['object']['key']}")
             metrics.incr("sqs_not_key_matched")
             continue
@@ -84,7 +84,7 @@ def process_event(config, body):
 def process_buildhub_json_key(config, s3):
     logger.debug(f"S3 buildhub.json key {s3!r}")
     key_name = s3["object"]["key"]
-    assert os.path.basename(key_name) == "buildhub.json", key_name
+    assert os.path.basename(key_name).endswith("buildhub.json"), key_name
     bucket_name = s3["bucket"]["name"]
     # We need a S3 connection client to be able to download this one.
     if bucket_name not in config:
