@@ -99,6 +99,19 @@ value for this is:
     DJANGO_SQS_QUEUE_URL=https://sqs.us-west-2.amazonaws.com/927034868273/buildhub-s3-events
 
 
+Elasticsearch
+=============
+
+The only thing you need to configure Elasticsearch is to set an environment
+variable called ``DJANGO_ES_URLS``. It can be a list with a comma separator.
+For example:
+
+.. code-block:: shell
+
+    DJANGO_SQS_QUEUE_URL=http://elasticsearch.node1:9200,http://elasticsearch.node2:9200
+
+The default value is ``http://localhost:9200``.
+
 Gunicorn
 ========
 
