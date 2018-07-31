@@ -356,6 +356,11 @@ someone else, or multiple people, such as one of the following:
     bors r= @alex
     bors r= @bob, @carol
 
+If a PR should not be merged, for example because it is a work-in-progress,
+then add the label ``bors-dont-merge`` to the PR. This will prevent bors from
+merging the PR, even if it is ``r+``ed. To allow bors to merge the PR again,
+remove the label and say ``bors r+`` again.
+
 It is possible to temporarily delegate permission to a user to approve a
 particular PR. For example, if the PR is documentation for the ops team, you
 could grant merge access to the ops engineer reviewing the documentation.
