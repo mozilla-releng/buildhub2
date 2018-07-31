@@ -340,18 +340,14 @@ All PRs should be merged via the `bors merge bot <https://bors.tech>`_. Bors
 will automate that the requirements for a PR have been met, and will then
 merge the PR in an orderly fashion.
 
-Only users with write acces to the repository may use bors. Other users will
+Only users with write access to the repository may use bors. Other users will
 get an error message. To use bors to merge a PR, leave a comment that
-includes a line such as:
-
-.. code-block::
+includes a line such as::
 
     bors r+
 
 Alternatively, you can list the user that approved the PR, which could be
-someone else, or multiple people, such as one of the following:
-
-.. code-block::
+someone else, or multiple people, such as one of the following::
 
     bors r= @alex
     bors r= @bob, @carol
@@ -365,17 +361,13 @@ It is possible to temporarily delegate permission to a user to approve a
 particular PR. For example, if the PR is documentation for the ops team, you
 could grant merge access to the ops engineer reviewing the documentation.
 Note that delegating to a use that already has permission (such as an admin
-of the repo) has no affect. To do so, use a command such as:
-
-.. code-block::
+of the repo) has no affect. To do so, use a command such as::
 
     bors delegate= @ops-dave
 
 If a PR failed to merge for an intermittent reason, such as network failure,
 you can instruct bors to try to merge the same commit with the same approver
-again with the command:
-
-.. code-block::
+again with the command::
 
     bors retry
 
