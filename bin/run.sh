@@ -34,7 +34,7 @@ case $1 in
     ${CMD_PREFIX_PYTHON:-python} manage.py migrate --noinput
     ;;
   web)
-    ${CMD_PREFIX_PYTHON:-python} gunicorn buildhub.wsgi:application -b 0.0.0.0:${PORT} --timeout ${GUNICORN_TIMEOUT} --workers ${GUNICORN_WORKERS} --access-logfile -
+    ${CMD_PREFIX_GUNICORN:-gunicorn} buildhub.wsgi:application -b 0.0.0.0:${PORT} --timeout ${GUNICORN_TIMEOUT} --workers ${GUNICORN_WORKERS} --access-logfile -
     ;;
   web-dev)
     ${CMD_PREFIX_PYTHON:-python} manage.py migrate --noinput
