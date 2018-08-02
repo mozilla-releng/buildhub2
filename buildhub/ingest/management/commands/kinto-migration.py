@@ -24,7 +24,7 @@ from buildhub.main.models import Build
 
 
 logger = logging.getLogger("buildhub")
-metrics = markus.get_metrics("tecken")
+metrics = markus.get_metrics("buildhub2")
 
 
 @backoff.on_exception(

@@ -36,8 +36,8 @@ made on the same date, append a hyphen and a number. For example::
 
     git tag -s -a 2017.04.17-2 -m "Fix for sudden problem"
 
-.. _CircleCI: https://circleci.com/gh/mozilla-services/tecken
-.. _`Docker Hub`: https://hub.docker.com/r/mozilla/tecken/
+.. _CircleCI: https://circleci.com/gh/mozilla/buildhub2
+.. _`Docker Hub`: https://hub.docker.com/r/mozilla/buildhub2/
 
 Automation
 ==========

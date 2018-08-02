@@ -12,7 +12,7 @@ from buildhub.main.search import BuildDoc
 
 
 logger = logging.getLogger("buildhub")
-metrics = markus.get_metrics("tecken")
+metrics = markus.get_metrics("buildhub2")
 
 
 @metrics.timer_decorator("api_search")
