@@ -1,7 +1,7 @@
 .PHONY: build clean migrate redis-cache-cli redis-store-cli revision shell currentshell stop test run django-shell docs psql build-frontend
 
 help:
-	@echo "Welcome to the tecken\n"
+	@echo "Welcome to the buildhub\n"
 	@echo "The list of commands for local development:\n"
 	@echo "  build            Builds the docker images for the docker-compose setup"
 	@echo "  clean            Stops and removes all docker containers"

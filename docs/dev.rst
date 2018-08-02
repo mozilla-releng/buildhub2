@@ -278,7 +278,7 @@ Now run Gunicorn:
 
 .. code-block:: shell
 
-    $ python -m memory_profiler  `which gunicorn` tecken.wsgi:application -b 0.0.0.0:8000 --timeout 60 --workers 1 --access-logfile -
+    $ python -m memory_profiler  `which gunicorn` buildhub.wsgi:application -b 0.0.0.0:8000 --timeout 60 --workers 1 --access-logfile -
 
 
 Python warnings
