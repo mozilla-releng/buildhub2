@@ -326,7 +326,7 @@ class Stage(Base):
     @property
     def DATABASES(self):
         "require encrypted connections to Postgres"
-        DATABASES = super().DATABASES.value.copy()
+        DATABASES = super().DATABASES.copy()
         DATABASES["default"].setdefault("OPTIONS", {})["sslmode"] = "require"
         return DATABASES
 

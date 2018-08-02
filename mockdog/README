@@ -1,0 +1,11 @@
+Simple Mock Datadog Server
+==========================
+
+Copied from https://github.com/KyleJamesWalker/mockdog
+
+Use this when you need a datadog server on 8125.
+
+Usage
+-----
+
+python mockdog/mockdog.py
