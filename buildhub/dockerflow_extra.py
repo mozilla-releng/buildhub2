@@ -36,7 +36,10 @@ def fetch(url):
 
 def check_elasticsearch(app_configs, **kwargs):
     errors = []
-    url = f"{settings.ES_URLS[0]}/_cluster/health/{settings.ES_BUILD_INDEX}"
+    # The reason we're not checking the health of the index is because of the
+    # chicken-and-egg problem that the index hasn't been created the very
+    # first time we start the service.
+    url = f"{settings.ES_URLS[0]}/_cluster/health"
     try:
         health = fetch(url)["status"]
         if not (health in ("yellow", "green")):
