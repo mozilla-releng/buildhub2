@@ -108,7 +108,7 @@ For example:
 
 .. code-block:: shell
 
-    DJANGO_SQS_QUEUE_URL=http://elasticsearch.node1:9200,http://elasticsearch.node2:9200
+    DJANGO_ES_URLS=http://elasticsearch.node1:9200,http://elasticsearch.node2:9200
 
 The default value is ``http://localhost:9200``.
 
