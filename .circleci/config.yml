@@ -8,17 +8,17 @@
 
 version: 2
 jobs:
-  build:
+  build_test_publish:
     docker:
       - image: ubuntu:18.04
     working_directory: ~/buildhub2
     steps:
-      - checkout
-
       - run:
           name: Install essential packages
           command: |
-            apt-get update && apt-get install -y ca-certificates curl
+            apt-get update && apt-get install -y ca-certificates curl git openssh-client
+
+      - checkout
 
       - run:
           name: Install Docker client
@@ -34,9 +34,9 @@ jobs:
       - run:
           name: Install Docker Compose
           command: |
-             curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-             chmod +x ~/docker-compose
-             mv ~/docker-compose /usr/local/bin/docker-compose
+            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            mv ~/docker-compose /usr/local/bin/docker-compose
 
       - setup_remote_docker:
           version: 17.09.0-ce
@@ -76,11 +76,6 @@ jobs:
           path: ui/build
 
       - run:
-          name: Docs should build without error
-          command: |
-            docker-compose -f docker-compose.ci.yml run docs
-
-      - run:
           name: Push to Dockerhub
           command: |
             # set DOCKER_DEPLOY=true in Circle UI to push to Dockerhub
@@ -91,3 +86,45 @@ jobs:
             if [ -n "${CIRCLE_TAG}" ]; then
               ./bin/deploy-dockerhub.sh "$CIRCLE_TAG"
             fi
+
+  docs:
+    docker:
+      - image: circleci/python:3.6
+
+    working_directory: ~/buildhub2
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "docs/requirements.txt" }}
+
+      - run:
+          name: Create virtualenv
+          command: |
+            python3 -m venv ~/venv
+            echo "source ~/venv/bin/activate" >> $BASH_ENV
+      - run:
+          name: Install requirements
+          command: pip install -r docs/requirements.txt
+
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "docs/requirements.txt" }}
+          paths:
+            - "~/venv"
+
+      - run:
+          name: Build docs
+          command: |
+            cd docs
+            make html
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build_test_publish:
+          filters:
+            tags:
+              only: /.*/
+      - docs
