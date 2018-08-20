@@ -1,4 +1,4 @@
-status = ["ci/circleci"]
+status = ["ci/circleci: build_test_publish", "ci/circleci: docs"]
 cut_body_after = "<details>" # Avoid including verbose details from PyUp in commit messages
 block_labels = ["bors-dont-merge"]
 # At the moment, this project is a single-developer project.
