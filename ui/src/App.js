@@ -35,10 +35,7 @@ import {
 
 import "searchkit/release/theme.css";
 
-// XXX This needs to change to the Prod default.
-const defaultCollectionURL = "http://localhost:8000/api/";
-const COLLECTION_URL =
-  process.env.REACT_APP_COLLECTION_URL || defaultCollectionURL;
+const COLLECTION_URL = process.env.REACT_APP_COLLECTION_URL || "/api/";
 
 const searchkit = new SearchkitManager(COLLECTION_URL, {
   searchUrlPath: "search"
