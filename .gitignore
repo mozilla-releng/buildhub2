@@ -9,3 +9,4 @@ version.json
 /build/
 docs/_build/
 docs/.bash_history
+docsvenv/

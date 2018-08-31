@@ -52,3 +52,9 @@ and it will guide you through create a git tag and having that pushed.
 
 Stage and production deployment requires that the development team
 communicates the desired git tag name to the Cloud OPs team.
+
+Bootstrapping
+=============
+
+See the :ref:`Bootstrapping <bootstrapping>` documentation for how to prepare the
+databases for the very first time.
