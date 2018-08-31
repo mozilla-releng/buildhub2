@@ -87,7 +87,7 @@ class Command(BaseCommand):
             )
             t1 = time.time()
             metrics.incr("kinto_migrated", value=len(builds))
-            metrics.incr("kinto_inserted", value=len(inserted))
+            metrics.incr("kinto_inserted", value=inserted)
             done += len(batch)
             logger.info(
                 "Inserted {} new out of {} in "
