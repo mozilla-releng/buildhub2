@@ -17,6 +17,7 @@ Contents
    dev
    ui
    metrics
+   bootstrapping
 
 
 Indices and tables
