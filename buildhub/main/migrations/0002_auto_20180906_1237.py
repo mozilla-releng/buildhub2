@@ -6,14 +6,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('main', '0001_initial'),
-    ]
+    dependencies = [("main", "0001_initial")]
 
     operations = [
         migrations.AlterField(
-            model_name='build',
-            name='metadata',
+            model_name="build",
+            name="metadata",
             field=django.contrib.postgres.fields.jsonb.JSONField(default=dict),
-        ),
+        )
     ]
