@@ -3,10 +3,7 @@
   "description": "Mozilla Build Metadata Service",
   "participate": {
     "irc": "irc://irc.mozilla.org/#storage-team",
-    "irc-contacts": [
-      "peterbe",
-      "mostlygeek"
-    ],
+    "irc-contacts": ["peterbe", "mostlygeek"],
     "docs": "https://buildhub2.readthedocs.io/en/latest/"
   },
   "repository": {
@@ -18,7 +15,7 @@
     "report": "https://github.com/mozilla/buildhub2/issues/new"
   },
   "urls": {
-    "prod": "tobedecided",
-    "stage": "tbd"
+    "prod": "tbd",
+    "stage": "https://buildhub2.stage.mozaws.net/"
   }
 }
