@@ -30,3 +30,8 @@ We deploy what we ship to [Docker Hub](https://hub.docker.com/r/mozilla/buildhub
 ## Licence
 
 [MPL 2.0](http://www.mozilla.org/MPL/2.0/)
+
+## Whatsdeployed
+
+Check out https://whatsdeployed.io/s-S94
+
