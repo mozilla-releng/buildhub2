@@ -83,6 +83,7 @@ class Core(Configuration, AWS, CORS):
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "dockerflow.django.middleware.DockerflowMiddleware",
         "buildhub.whitenoise_extra.BuildhubWhiteNoiseMiddleware",
+        "buildhub.middleware.StatsMiddleware",
     ]
 
     ROOT_URLCONF = "buildhub.urls"
