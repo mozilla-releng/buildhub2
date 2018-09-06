@@ -28,7 +28,7 @@ with open(os.path.join(settings.BASE_DIR, "schema.yaml")) as f:
 class Build(models.Model):
     build_hash = models.CharField(max_length=45, unique=True)
     build = JSONField()
-    metadata = JSONField(default={})
+    metadata = JSONField(default=dict)
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Every time we insert a build from an S3 key, we write these
