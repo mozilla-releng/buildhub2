@@ -75,7 +75,7 @@ def test_search_aggregations(valid_build, json_poster, elasticsearch):
     ]
 
     # This time filter more
-    search["aggs"][agg_key]["aggs"]["target.version"]["terms"]["include"] = "60\.0.*"
+    search["aggs"][agg_key]["aggs"]["target.version"]["terms"]["include"] = "60.0.*"
     response = json_poster(url, search)
     assert response.status_code == 200
     result = response.json()
