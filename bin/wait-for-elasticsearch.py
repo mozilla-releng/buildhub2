@@ -42,10 +42,12 @@ def fetch(url):
 
 
 def run(hostname, port=None):
+    assert hostname, "hostname must be set"
     if "http://" in hostname:
         hostname = hostname.replace("http://", "")
     if port is None:
-        hostname, port = hostname.split(":")
+        assert ":" in hostname, hostname
+        hostname, port = hostname.split(":", 1)
     url = f"http://{hostname}:{port}"
 
     try:
