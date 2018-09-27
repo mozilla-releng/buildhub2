@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   db:
@@ -26,14 +26,7 @@ services:
 
     # I don't think this healthcheck is ever used
     healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:9200"]
-        # # test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
-        # # test: ["CMD", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
-        # test: curl -f localhost:9200/_cluster/health || exit 100
-        # # interval: 3s
-        # interval: 10s
-        # timeout: 30s
-        # retries: 10
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
 
   # Web container is a prod-like fully-functioning container.
   web:
@@ -53,6 +46,7 @@ services:
       - "8000:8000"
     environment:
       - DJANGO_CONFIGURATION
+      - DJANGO_ES_URLS=http://elasticsearch:9200
       - DEVELOPMENT=1
     volumes:
       - $PWD:/app
@@ -79,7 +73,6 @@ services:
     volumes:
       - $PWD/docs:/app
     command: build
-
 
 volumes:
   esdata:

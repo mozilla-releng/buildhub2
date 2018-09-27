@@ -30,12 +30,12 @@ class Command(BaseCommand):
         response.raise_for_status()
 
         es = connections.get_connection()
-        report_every = 1_000
+        report_every = 1000
         count = 0
 
         qs = Build.objects.all().order_by("created_at")
         total_count = qs.count()
-        iterator = qs.iterator(chunk_size=10_000)
+        iterator = qs.iterator(chunk_size=10000)
         for success, doc in streaming_bulk(
             es,
             (m.to_search().to_dict(True) for m in iterator),

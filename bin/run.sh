@@ -45,7 +45,7 @@ case $1 in
     ;;
   lintcheck)
     flake8 buildhub tests
-    black --check buildhub tests
+    black --check --diff buildhub tests
     ;;
   test)
     pytest
