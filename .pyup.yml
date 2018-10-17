@@ -1,5 +1,6 @@
 search: False
 label_prs: update
+schedule: "every week"
 requirements:
   - requirements.txt
   - docs/requirements.txt:
