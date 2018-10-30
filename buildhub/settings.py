@@ -4,6 +4,7 @@
 
 import json
 import os
+import re
 import subprocess
 
 from configurations import Configuration, values
@@ -53,7 +54,25 @@ class CORS:
     CORS_ORIGIN_ALLOW_ALL = True
 
 
-class Core(Configuration, AWS, CORS):
+class Whitenoise:
+
+    # The default is that Whitenoise sets `Access-Control-Allow-Origin: *` for
+    # static assets. We don't need that because we don't intend to serve the
+    # static assets via a CDN.
+    WHITENOISE_ALLOW_ALL_ORIGINS = False
+
+    # We serve all the static files that are built from the "ui" create-react-app.
+    # These files are things like ui/build/static/css/main.8741ee2b.css.
+    # For these make sure we set full caching.
+    def WHITENOISE_IMMUTABLE_FILE_TEST(self):
+        def inner(path, url):
+            # Match with built static assets from create-react-app.
+            return re.search(r"\b[a-f0-9]{8}\b", url)
+
+        return inner
+
+
+class Core(Configuration, AWS, CORS, Whitenoise):
     """Settings that will never change per-environment."""
 
     # THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -82,7 +101,7 @@ class Core(Configuration, AWS, CORS):
         "django.middleware.common.CommonMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "dockerflow.django.middleware.DockerflowMiddleware",
-        "buildhub.whitenoise_extra.BuildhubWhiteNoiseMiddleware",
+        "whitenoise.middleware.WhiteNoiseMiddleware",
         "buildhub.middleware.StatsMiddleware",
     ]
 
@@ -104,11 +123,6 @@ class Core(Configuration, AWS, CORS):
         "dockerflow.django.checks.check_migrations_applied",
         "buildhub.dockerflow_extra.check_elasticsearch",
     ]
-
-    # The default is that Whitenoise sets `Access-Control-Allow-Origin: *` for
-    # static assets. We don't need that because we don't intend to serve the
-    # static assets via a CDN.
-    WHITENOISE_ALLOW_ALL_ORIGINS = False
 
 
 class Elasticsearch:
