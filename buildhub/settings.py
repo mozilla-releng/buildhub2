@@ -308,7 +308,12 @@ class Test(Base):
     SQS_QUEUE_URL = "https://sqs.ca-north-2.amazonaws.com/123/buildhub-s3-events"
     S3_BUCKET_URL = "https://s3-eu-south-1.amazonaws.com/buildhubses"
     VERSION = {"version": "Testing"}
-    STATIC_ROOT = "/tmp/test_buildhub2"
+
+    def STATIC_ROOT(self):
+        path = "/tmp/test_buildhub2"
+        if not os.path.isdir(path):
+            os.mkdir(path)
+        return path
 
     MARKUS_BACKENDS = []
 
