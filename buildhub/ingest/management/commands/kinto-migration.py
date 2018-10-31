@@ -11,6 +11,7 @@ published to the S3 bucket. All that scrutinzing resulted in that we save
 a blob of JSON. That's
 """
 
+import os
 import logging
 import time
 
@@ -30,9 +31,9 @@ metrics = markus.get_metrics("buildhub2")
 @backoff.on_exception(
     backoff.constant, requests.exceptions.RequestException, max_tries=3
 )
-def fetch(session, url):
+def fetch(session, url, timeout=300):
     logger.debug(f"Fetching {url}")
-    return session.get(url)
+    return session.get(url, timeout=timeout)
 
 
 class Command(BaseCommand):
@@ -52,20 +53,34 @@ class Command(BaseCommand):
                 "can skip the validation of each and every record."
             ),
         )
+        parser.add_argument(
+            "--continue",
+            default=False,
+            action="store_true",
+            help=(
+                "If a HTTP request to kinto has failed, and if there is a log of "
+                "the last successful URL used, then use this."
+            ),
+        )
 
     def handle(self, *args, **options):
-        # Ping it first
-        kinto_url = options["kinto-url"]
-        r = requests.get(kinto_url)
-        r.raise_for_status()
-        assert r.json()["project_name"] == "kinto", r.json()
+        if options["continue"]:
+            with open(self.next_url_log_file) as f:
+                url = f.read().strip()
+            logger.info(f"Continuing with URL {url}")
+        else:
+            # Ping it first
+            kinto_url = options["kinto-url"]
+            r = requests.get(kinto_url)
+            r.raise_for_status()
+            assert r.json()["project_name"] == "kinto", r.json()
 
-        if kinto_url.endswith("/"):
-            kinto_url = kinto_url[:-1]
-        url = (
-            f"{kinto_url}/buckets/build-hub/collections/releases/records"
-            "?_limit=10000"
-        )
+            if kinto_url.endswith("/"):
+                kinto_url = kinto_url[:-1]
+            url = (
+                f"{kinto_url}/buckets/build-hub/collections/releases/records"
+                "?_limit=10000"
+            )
         pages = 0
         session = requests.Session()
         done = 0
@@ -103,6 +118,10 @@ class Command(BaseCommand):
 
             pages += 1
 
+    @property
+    def next_url_log_file(self):
+        return os.path.join(os.path.dirname(__file__), ".kinto-migration-last-url")
+
     def iterator(self, session, url):
         total_records = None
         while True:
@@ -116,5 +135,9 @@ class Command(BaseCommand):
                 if not next_page:
                     raise KeyError("exists but empty value")
                 url = next_page
+                logger.info(f"Next URL: {url}")
+                with open(self.next_url_log_file, "w") as f:
+                    f.write(url)
+                    f.write("\n")
             except KeyError:
                 break

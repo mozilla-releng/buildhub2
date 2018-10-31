@@ -29,8 +29,8 @@ Check that this created the index by visiting ``http://localhost:9200/buildhub2`
 where the base URL needs to match what you set ``DJANGO_ES_URLS`` to.
 
 
-Migrating from Kinto
-====================
+Migrating from Kinto (over HTTP)
+================================
 
 If you intend to migrate from the old Buildhub's Kinto database you need to run:
 
@@ -65,3 +65,23 @@ you can run this command repeatedly and it will continue where it left off.
 
     If you have populated a previously empty PostgreSQL from records from the Kinto
     database, you have to run ``./manage.py reindex-elasticsearch`` **again**.
+
+
+Migrating from Kinto (by PostgreSQL)
+====================================
+
+A much faster way to migrate from Kinto (legacy Buildhub) is to have a dedicated
+PostgreSQL connection. See the :ref:`PostgreSQLforKinto` section for setting up an
+explicit connection just for the Kinto database.
+
+Once that's configured you simply run:
+
+.. code-block:: shell
+
+   $ ./manage.py kinto-database-migration --skip-validation
+
+It will migrate **every single** record in one sweep (but broken up into batches
+of 10,000 rows at a time). If it fails, you can most likely just try again.
+
+Also, see the note about about the need to run ``./manage.py reindex-elasticsearch``
+afterwards.
