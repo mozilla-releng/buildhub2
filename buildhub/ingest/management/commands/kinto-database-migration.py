@@ -59,7 +59,8 @@ class Command(BaseCommand):
         pages = 0
         done = 0
         skip_validation = options["skip_validation"]
-        for builds, total_records in self.iterator(options):
+        for batch, total_records in self.iterator(options):
+            builds = [x[0] for x in batch]
             count = len(builds)
             logger.info(f"Page {pages + 1} ({count} records)")
             t0 = time.time()
@@ -116,7 +117,7 @@ class Command(BaseCommand):
                 cursor.close()
                 raise
 
-            chunk_size = options["chunk_size"]
+            chunk_size = int(options["chunk_size"])
 
             for rows in cursor_iter(
                 cursor, connection.features.empty_fetchmany_value, None, chunk_size
