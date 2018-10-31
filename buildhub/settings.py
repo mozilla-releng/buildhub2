@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 
+import dj_database_url
 from configurations import Configuration, values
 from dockerflow.version import get_version
 
@@ -141,16 +142,25 @@ class Elasticsearch:
         return {"default": {"hosts": self.ES_URLS}}
 
 
+class OptionalDatabaseURLValue(values.DatabaseURLValue):
+    def caster(self, url, **options):
+        if not url:
+            return None
+        return dj_database_url.parse(url, **options)
+
+
 class Base(Core, Elasticsearch):
     """Settings that may change per-environment, som defaults."""
 
-    #
     # Django
     SECRET_KEY = values.SecretValue()
     DEBUG = values.BooleanValue(default=False)
     ALLOWED_HOSTS = values.ListValue([])
 
     _DATABASES = values.DatabaseURLValue("postgresql://localhost/buildhub2")
+    _KINTO_DATABASES = OptionalDatabaseURLValue(
+        default="", alias="kinto", environ_name="KINTO_DATABASE_URL"
+    )
     CONN_MAX_AGE = values.IntegerValue(60)
 
     @property
@@ -161,6 +171,8 @@ class Base(Core, Elasticsearch):
         DATABASES = self._DATABASES.value.copy()
         if self.CONN_MAX_AGE:
             DATABASES["default"]["CONN_MAX_AGE"] = self.CONN_MAX_AGE
+        if self._KINTO_DATABASES.value[self._KINTO_DATABASES.alias]:
+            DATABASES.update(self._KINTO_DATABASES.value)
         return DATABASES
 
     # Logging

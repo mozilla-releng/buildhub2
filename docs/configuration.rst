@@ -145,6 +145,23 @@ long as it can scale up in the future it doesn't need to be big.
     not prefixed with ``DJANGO_``.
 
 
+.. _PostgreSQLforKinto:
+
+PostgreSQL for Kinto
+====================
+
+When doing the migration from Kinto you can either rely on HTTP, or, you can
+connect directly to a Kinto database. The way this works is it, **optionally**,
+sets up a separate PostgreSQL connection. The ``kinto-migration`` script will
+then be able to talk directly to this database. It's disabled by default.
+
+To enable it, it's the same "rules" as for ``DATABASE_URL`` except it's called
+``KINTO_DATABASE_URL``. E.g.:
+
+.. code-block:: shell
+
+    KINTO_DATABASE_URL="postgres://username:password@hostname/kinto"
+
 Metrics
 =======
 
