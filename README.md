@@ -3,7 +3,7 @@
 [![CircleCI](https://circleci.com/gh/mozilla/buildhub2.svg?style=svg)](https://circleci.com/gh/mozilla/buildhub2)
 [![Code style](https://img.shields.io/badge/Code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![Documentation Status](https://readthedocs.org/projects/buildhub2/badge/?version=latest)](https://buildhub2.readthedocs.io/en/latest/?badge=latest)
-
+[![What's Deployed](https://img.shields.io/badge/whatsdeployed-stage-green.svg)](https://whatsdeployed.io/s-S94)
 
 Please use the documentation on: [buildhub2.readthedocs.io](https://buildhub2.readthedocs.io/)
 
@@ -34,4 +34,3 @@ We deploy what we ship to [Docker Hub](https://hub.docker.com/r/mozilla/buildhub
 ## Whatsdeployed
 
 Check out https://whatsdeployed.io/s-S94
-
