@@ -7,7 +7,7 @@ import hashlib
 import json
 
 import yaml
-from jsonschema import validate
+from jsonschema import validate, ValidationError
 
 from django.dispatch import receiver
 from django.db import models
@@ -109,7 +109,9 @@ class Build(models.Model):
             )
 
     @classmethod
-    def bulk_insert(cls, builds, metadata=None, skip_validation=False):
+    def bulk_insert(
+        cls, builds, metadata=None, skip_validation=False, skip_invalid=False
+    ):
         """Bulk insert that avoids potential conflict inserts by first
         checking for existances.
 
@@ -122,13 +124,25 @@ class Build(models.Model):
         Note! This method does NOT update Elasticsearch.
         """
         metadata = metadata or {}
-        if skip_validation:
+        if skip_invalid:
+            assert not skip_validation
+            # Forcing this because we're doing the validation first,
+            # and it mustn't be run again.
+            skip_validation = True
+        elif skip_validation:
             metadata["skip_validation"] = True
         metadata.update(settings.VERSION)
         # Note! Unfortunately, there is no easy way to do a bulk insert.
         # Not until https://code.djangoproject.com/ticket/28668 lands.
         hashes = {}
+        skipped = 0
         for build in builds:
+            if skip_invalid:
+                try:
+                    cls.validate_build(build)
+                except ValidationError:
+                    skipped += 1
+                    continue
             hashes[cls.get_build_hash(build)] = build
         for build_hash in cls.objects.filter(build_hash__in=hashes.keys()).values_list(
             "build_hash", flat=True
@@ -147,7 +161,7 @@ class Build(models.Model):
         cls.objects.bulk_create(
             [cls(build_hash=k, build=v, metadata=metadata) for k, v in hashes.items()]
         )
-        return len(hashes)
+        return len(hashes), skipped
 
 
 # @receiver(pre_save, sender=Build)
