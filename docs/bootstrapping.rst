@@ -78,7 +78,24 @@ Once that's configured you simply run:
 
 .. code-block:: shell
 
+   $ ./manage.py kinto-database-migration
+
+This will validate every single record and crash if any single record is invalid.
+If you're confident that all the records, about to be migrated, are valid, you can run:
+
+.. code-block:: shell
+
    $ ./manage.py kinto-database-migration --skip-validation
+
+Another option is to run the migration and run validation on each record, but
+instead of crashing, simply skip the invalid ones. In fact, this is the recommended
+way to migrate:
+
+.. code-block:: shell
+
+   $ ./manage.py kinto-database-migration --skip-invalid
+
+Keep an eye on the log output about the number of invalid records skipped.
 
 It will migrate **every single** record in one sweep (but broken up into batches
 of 10,000 rows at a time). If it fails, you can most likely just try again.

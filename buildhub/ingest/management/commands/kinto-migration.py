@@ -95,7 +95,7 @@ class Command(BaseCommand):
                 builds.append(record)
             # Skip validation most of the time
             t0 = time.time()
-            inserted = Build.bulk_insert(
+            inserted, _ = Build.bulk_insert(
                 builds,
                 skip_validation=skip_validation,
                 metadata={"kinto-migration": True},

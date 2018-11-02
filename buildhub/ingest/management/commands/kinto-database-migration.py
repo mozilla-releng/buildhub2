@@ -44,12 +44,21 @@ class Command(BaseCommand):
             ),
         )
         parser.add_argument(
+            "--skip-invalid",
+            default=False,
+            action="store_true",
+            help=(
+                "Will validate every Kinto record and if it's invalid, will skip it."
+            ),
+        )
+        parser.add_argument(
             "--parent-id", default="/buckets/build-hub/collections/releases", help=""
         )
         parser.add_argument("--collection-id", default="record", help="")
         parser.add_argument("--chunk-size", default=10000, help="")
 
     def handle(self, *args, **options):
+        # verbose = options["verbosity"] > 1
         if not settings.DATABASES.get("kinto"):
             raise ImproperlyConfigured(
                 "See configuration documentation about setting up "
@@ -59,18 +68,23 @@ class Command(BaseCommand):
         pages = 0
         done = 0
         skip_validation = options["skip_validation"]
+        skip_invalid = options["skip_invalid"]
+        skipped = 0
+        total_t0 = time.time()
         for batch, total_records in self.iterator(options):
             builds = [x[0] for x in batch]
             count = len(builds)
             logger.info(f"Page {pages + 1} ({count} records)")
             t0 = time.time()
-            inserted = Build.bulk_insert(
+            inserted, batch_skipped = Build.bulk_insert(
                 builds,
                 skip_validation=skip_validation,
+                skip_invalid=skip_invalid,
                 metadata={"kinto-migration": True},
             )
             t1 = time.time()
             done += count
+            skipped += batch_skipped
             logger.info(
                 "Inserted {} new out of {} in "
                 "{:.2f} seconds. {} of {} ({:.1f}%)".format(
@@ -82,8 +96,20 @@ class Command(BaseCommand):
                     100 * done / total_records,
                 )
             )
+            if batch_skipped:
+                logger.info(f"Skipped {batch_skipped} invalid records.")
 
             pages += 1
+        total_t1 = time.time()
+
+        if skipped:
+            logger.info(f"In total, skipped {skipped} invalid records.")
+
+        logger.info(
+            "The whole migration took {:.1f} minutes.".format(
+                (total_t1 - total_t0) / 60
+            )
+        )
 
     def iterator(self, options):
         with connections["kinto"].cursor() as cursor:

@@ -74,7 +74,8 @@ def test_bulk_insert(valid_build):
     two = valid_build()
     assert one == two
     assert one is not two
-    insert_count = Build.bulk_insert([one, two])
+    insert_count, skipped = Build.bulk_insert([one, two])
+    assert skipped == 0
     # Because they're *equal*
     assert insert_count == 1
     assert Build.objects.all().count() == 1
@@ -82,7 +83,8 @@ def test_bulk_insert(valid_build):
     two["download"]["size"] += 1
     three = valid_build()
     three["download"]["size"] += 2
-    insert_count = Build.bulk_insert([one, two, three])
+    insert_count, skipped = Build.bulk_insert([one, two, three])
+    assert skipped == 0
     assert insert_count == 2
     # Even though they're "inserted at the same time", their created_at
     # should be different.
@@ -91,7 +93,8 @@ def test_bulk_insert(valid_build):
     assert created_ats[1] != created_ats[2]
     assert Build.objects.all().count() == 3
 
-    insert_count = Build.bulk_insert([one, two, three])
+    insert_count, skipped = Build.bulk_insert([one, two, three])
+    assert skipped == 0
     assert insert_count == 0
 
 
@@ -105,3 +108,15 @@ def test_bulk_insert_invalid(valid_build):
     assert "'target' is a required property" in str(exception.value)
     # Even if the first one was valid, it won't be inserted.
     assert not Build.objects.exists()
+
+
+@pytest.mark.django_db
+def test_bulk_insert_invalid_skip_invalid(valid_build):
+    one = valid_build()
+    two = valid_build()
+    two.pop("target")
+
+    inserted, skipped = Build.bulk_insert([one, two], skip_invalid=True)
+    assert skipped == 1
+    # The first one would be inserted.
+    assert not Build.objects.count() == 1
