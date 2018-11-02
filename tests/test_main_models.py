@@ -117,6 +117,7 @@ def test_bulk_insert_invalid_skip_invalid(valid_build):
     two.pop("target")
 
     inserted, skipped = Build.bulk_insert([one, two], skip_invalid=True)
+    assert inserted == 1
     assert skipped == 1
     # The first one would be inserted.
-    assert not Build.objects.count() == 1
+    assert Build.objects.count() == 1
