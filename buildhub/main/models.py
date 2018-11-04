@@ -7,7 +7,8 @@ import hashlib
 import json
 
 import yaml
-from jsonschema import validate, ValidationError
+from jsonschema import ValidationError
+from jsonschema.validators import validator_for
 
 from django.dispatch import receiver
 from django.db import models
@@ -23,6 +24,9 @@ from buildhub.main.search import BuildDoc, es_retry
 
 with open(os.path.join(settings.BASE_DIR, "schema.yaml")) as f:
     SCHEMA = yaml.load(f)["schema"]
+_validator_class = validator_for(SCHEMA)
+_validator_class.check_schema(SCHEMA)
+validator = _validator_class(SCHEMA)
 
 
 class Build(models.Model):
@@ -57,8 +61,8 @@ class Build(models.Model):
         return f"{prefix}:{md5string}"
 
     @classmethod
-    def validate_build(cls, build, schema=SCHEMA):
-        validate(build, schema)
+    def validate_build(cls, build):
+        validator.validate(build)
 
     @classmethod
     def insert(cls, build, metadata=None, skip_validation=False, **kwargs):
