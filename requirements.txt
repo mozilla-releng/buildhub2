@@ -127,8 +127,6 @@ coverage==4.5.1 \
 pbr==5.1.0 \
     --hash=sha256:8fc938b1123902f5610b06756a31b1e6febf0d105ae393695b0c9d4244ed2910 \
     --hash=sha256:f20ec0abbf132471b68963bb34d9c78e603a5cf9e24473f14358e66551d47475
-pytest-sugar==0.9.1 \
-    --hash=sha256:ab8cc42faf121344a4e9b13f39a51257f26f410e416c52ea11078cdd00d98a2c
 termcolor==1.1.0 \
     --hash=sha256:1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b
 pytest-cov==2.6.0 \
