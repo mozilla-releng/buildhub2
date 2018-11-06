@@ -4,6 +4,7 @@ schema:
   type: object
   additionalProperties: false
   required:
+    - build
     - source
     - download
     - target
@@ -20,7 +21,7 @@ schema:
           type: string
           format: date-time
           title: Build date
-          description: 'i.e: 2017-04-13T21:49:00Z'
+          description: "i.e: 2017-04-13T21:49:00Z"
         number:
           type: integer
           title: Version
