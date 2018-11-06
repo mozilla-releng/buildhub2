@@ -11,7 +11,6 @@ published to the S3 bucket. All that scrutinzing resulted in that we save
 a blob of JSON. That's
 """
 
-import logging
 import time
 
 from django.conf import settings
@@ -21,8 +20,6 @@ from django.db import connection, connections
 from django.db.models.sql.compiler import cursor_iter
 
 from buildhub.main.models import Build
-
-logger = logging.getLogger("buildhub")
 
 
 class Command(BaseCommand):
@@ -70,11 +67,12 @@ class Command(BaseCommand):
         skip_validation = options["skip_validation"]
         skip_invalid = options["skip_invalid"]
         skipped = 0
+        inserted_total = 0
         total_t0 = time.time()
         for batch, total_records in self.iterator(options):
-            builds = [x[0] for x in batch]
+            builds = [x[0] for x in batch if not skip_invalid or "build" in x[0]]
             count = len(builds)
-            logger.info(f"Page {pages + 1} ({count} records)")
+            print(f"Page {pages + 1} ({count} records)")
             t0 = time.time()
             inserted, batch_skipped = Build.bulk_insert(
                 builds,
@@ -85,7 +83,8 @@ class Command(BaseCommand):
             t1 = time.time()
             done += count
             skipped += batch_skipped
-            logger.info(
+            inserted_total += inserted
+            print(
                 "Inserted {} new out of {} in "
                 "{:.2f} seconds. {} of {} ({:.1f}%)".format(
                     format(inserted, ","),
@@ -97,15 +96,16 @@ class Command(BaseCommand):
                 )
             )
             if batch_skipped:
-                logger.info(f"Skipped {batch_skipped} invalid records.")
+                print(f"Skipped {batch_skipped} invalid records.")
 
             pages += 1
         total_t1 = time.time()
 
-        if skipped:
-            logger.info(f"In total, skipped {skipped} invalid records.")
+        print(f"In total, skipped {skipped} invalid records.")
+        print(f"In total, processed {done} valid records.")
+        print(f"In total, inserted {inserted_total} valid records.")
 
-        logger.info(
+        print(
             "The whole migration took {:.1f} minutes.".format(
                 (total_t1 - total_t0) / 60
             )
