@@ -85,3 +85,19 @@ def test_search_aggregations(valid_build, json_poster, elasticsearch):
         {"key": "60.0.2", "doc_count": 1},
         {"key": "60.0.1", "doc_count": 1},
     ]
+
+
+@pytest.mark.django_db
+def test_happy_path_records(valid_build, client, elasticsearch):
+    url = reverse("api:records")
+    response = client.get(url)
+    assert response.status_code == 200
+    result = response.json()
+    assert result["builds"]["total"] == 0
+
+    build = valid_build()
+    Build.insert(build)
+    response = client.get(url)
+    assert response.status_code == 200
+    result = response.json()
+    assert result["builds"]["total"] == 1
