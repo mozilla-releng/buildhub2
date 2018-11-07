@@ -57,6 +57,7 @@ def start(
         ):
             logger.debug(f"About to process message number {count}")
             metrics.incr("sqs_messages")
+            logger.debug("Incoming SQS message body: %s", message.body)
             process_event(config, json.loads(message.body))
             count += 1
             message.delete()
