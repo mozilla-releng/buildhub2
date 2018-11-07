@@ -8,6 +8,7 @@ import logging
 import markus
 from django import http
 
+from buildhub.main.models import Build
 from buildhub.main.search import BuildDoc
 
 
@@ -31,3 +32,8 @@ def search(request):
     response_dict = response.to_dict()
     http_response = http.JsonResponse(response_dict)
     return http_response
+
+
+def records(request):
+    context = {"builds": {"total": Build.objects.all().count()}}
+    return http.JsonResponse(context)

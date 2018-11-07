@@ -8,4 +8,7 @@ from . import views
 
 app_name = "api"
 
-urlpatterns = [url(r"^search$", views.search, name="search")]
+urlpatterns = [
+    url(r"^search$", views.search, name="search"),
+    url(r"^records$", views.records, name="records"),
+]
