@@ -27,6 +27,10 @@ See the [Developer documentation](https://buildhub2.readthedocs.io/en/latest/dev
 
 We deploy what we ship to [Docker Hub](https://hub.docker.com/r/mozilla/buildhub2/).
 
+## Datadog
+
+[Buildhub2 Performance](https://app.datadoghq.com/dash/978415/buildhub2-performance)
+
 ## Licence
 
 [MPL 2.0](http://www.mozilla.org/MPL/2.0/)
