@@ -360,9 +360,39 @@ class App extends Component {
             </LayoutBody>
           </Layout>
         </SearchkitProvider>
+        <NoticeAboutL10nRepacks />
       </div>
     );
   }
 }
 
 export default App;
+
+function NoticeAboutL10nRepacks() {
+  return (
+    <div className="notice-about-l10n-builds">
+      <h4>
+        A note about{" "}
+        <b>
+          <i>non</i>-en-US
+        </b>{" "}
+        builds!
+      </h4>
+      <p>
+        At the moment, Buildhub only includes new <code>en-US</code> builds. To
+        get involved in all L10N builds please see{" "}
+        <a
+          href="https://bugzilla.mozilla.org/show_bug.cgi?id=1459302"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Bug #1459302
+        </a>.
+      </p>
+      <p>
+        The <i>non</i>-en-US builds that currently appear a from migration of
+        the older version of Buildhub.
+      </p>
+    </div>
+  );
+}
