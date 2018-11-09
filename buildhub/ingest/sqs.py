@@ -57,7 +57,10 @@ def start(
         ):
             logger.debug(f"About to process message number {count}")
             metrics.incr("sqs_messages")
-            logger.debug("Incoming SQS message body: %s", message.body)
+            # That last little extra whitespace is due to a bug in
+            # python-dockerflow's JSON logging handler.
+            # See https://github.com/mozilla-services/python-dockerflow/issues/29
+            logger.debug(f"Incoming SQS message body: {message.body} ")
             process_event(config, json.loads(message.body))
             count += 1
             message.delete()
