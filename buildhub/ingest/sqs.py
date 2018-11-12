@@ -68,7 +68,16 @@ def start(
 
 
 def process_event(config, body):
-    for record in body.get("Records", []):
+    try:
+        message = body["Message"]
+        assert isinstance(message, str), type(message)
+        records = json.loads(message).get("Records", [])
+    except KeyError:
+        if "Records" in body:
+            records = body["Records"]
+        else:
+            raise
+    for record in records:
         s3 = record.get("s3")
         if not s3:
             # If it's not an S3 event, we don't care.
