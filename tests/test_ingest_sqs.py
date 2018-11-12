@@ -19,6 +19,70 @@ from buildhub.ingest.sqs import start
 @mock.patch("buildhub.ingest.sqs.boto3")
 def test_start_happy_path(mocked_boto3, settings, valid_build, itertools_count, mocker):
     mocked_message = mocker.MagicMock()
+    # See
+    # https://gist.github.com/peterbe/f739b91c0674d36a1526ccb43b6844c3#file-stage-json
+    # for a real life example of a SQS message.
+    message = {
+        "Message": json.dumps(
+            {
+                "Records": [
+                    {"foot": "here"},
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "some/path/to/buildhub.json",
+                                "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
+                    },
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "not/a/buildhub.json/file",
+                                "eTag": "77e09ba7e37836c2cf0ce59e1e8361ab",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
+                    },
+                ]
+            }
+        )
+    }
+    mocked_message.body = json.dumps(message)
+    mocked_queue = mocker.MagicMock()
+    mocked_queue.receive_messages().__iter__.return_value = [mocked_message]
+    mocked_boto3.resource().get_queue_by_name.return_value = mocked_queue
+
+    mocked_s3_client = mocker.MagicMock()
+    mocked_boto3.client.return_value = mocked_s3_client
+
+    def mocked_download_fileobj(bucket_name, key_name, f):
+        # Sanity checks that the mocking is right
+        assert bucket_name == "buildhubses"
+        assert key_name == "some/path/to/buildhub.json"
+        f.write(json.dumps(valid_build()).encode("utf-8"))
+
+    mocked_s3_client.download_fileobj.side_effect = mocked_download_fileobj
+    start(settings.SQS_QUEUE_URL)
+    mocked_boto3.resource().get_queue_by_name.assert_called_with(
+        QueueName="buildhub-s3-events"
+    )
+    # It should have created 1 Build
+    assert Build.objects.get()
+
+
+@pytest.mark.django_db
+@mock.patch("buildhub.ingest.sqs.boto3")
+def test_records_legacy_message(
+    mocked_boto3, settings, valid_build, itertools_count, mocker
+):
+    """In production, in Buildhub2, the messages from S3 and routed through SNS.
+    So the list of "Records" in a JSON string inside the "Message" key.
+    However, if you have S3 events go straight to SQS, the list of "Records" is
+    part of the main object and a top-level key.
+    """
+    mocked_message = mocker.MagicMock()
     mocked_message.body = json.dumps(
         {
             "Records": [
@@ -70,22 +134,25 @@ def test_start_happy_path(mocked_boto3, settings, valid_build, itertools_count, 
 @mock.patch("buildhub.ingest.sqs.boto3")
 def test_suffix_match(mocked_boto3, settings, valid_build, itertools_count, mocker):
     mocked_message = mocker.MagicMock()
-    mocked_message.body = json.dumps(
-        {
-            "Records": [
-                {"foot": "here"},
-                {
-                    "s3": {
-                        "object": {
-                            "key": "firefox-99-buildhub.json",
-                            "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
-                        },
-                        "bucket": {"name": "buildhubses"},
-                    }
-                },
-            ]
-        }
-    )
+    message = {
+        "Message": json.dumps(
+            {
+                "Records": [
+                    {"foot": "here"},
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "firefox-99-buildhub.json",
+                                "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
+                    },
+                ]
+            }
+        )
+    }
+    mocked_message.body = json.dumps(message)
     mocked_queue = mocker.MagicMock()
     mocked_queue.receive_messages().__iter__.return_value = [mocked_message]
     mocked_boto3.resource().get_queue_by_name.return_value = mocked_queue
@@ -114,21 +181,25 @@ def test_ingest_idempotently(
     mocked_boto3, settings, valid_build, itertools_count, mocker
 ):
     mocked_message = mocker.MagicMock()
-    mocked_message.body = json.dumps(
-        {
-            "Records": [
-                {
-                    "s3": {
-                        "object": {
-                            "key": "some/path/to/buildhub.json",
-                            "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
-                        },
-                        "bucket": {"name": "buildhubses"},
+    message = {
+        "Message": json.dumps(
+            {
+                "Records": [
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "some/path/to/buildhub.json",
+                                "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
                     }
-                }
-            ]
-        }
-    )
+                ]
+            }
+        )
+    }
+
+    mocked_message.body = json.dumps(message)
     mocked_queue = mocker.MagicMock()
     mocked_queue.receive_messages().__iter__.return_value = [mocked_message]
     mocked_boto3.resource().get_queue_by_name.return_value = mocked_queue
@@ -160,21 +231,26 @@ def test_start_file_not_found(
     mocked_boto3, settings, valid_build, itertools_count, mocker
 ):
     mocked_message = mocker.MagicMock()
-    mocked_message.body = json.dumps(
-        {
-            "Records": [
-                {
-                    "s3": {
-                        "object": {
-                            "key": "some/path/to/buildhub.json",
-                            "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
-                        },
-                        "bucket": {"name": "buildhubses"},
+
+    message = {
+        "Message": json.dumps(
+            {
+                "Records": [
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "some/path/to/buildhub.json",
+                                "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
                     }
-                }
-            ]
-        }
-    )
+                ]
+            }
+        )
+    }
+
+    mocked_message.body = json.dumps(message)
     mocked_queue = mocker.MagicMock()
     mocked_queue.receive_messages().__iter__.return_value = [mocked_message]
     mocked_boto3.resource().get_queue_by_name.return_value = mocked_queue
@@ -204,21 +280,24 @@ def test_bad_client_errors(
     mocked_boto3, settings, valid_build, itertools_count, mocker
 ):
     mocked_message = mocker.MagicMock()
-    mocked_message.body = json.dumps(
-        {
-            "Records": [
-                {
-                    "s3": {
-                        "object": {
-                            "key": "some/path/to/buildhub.json",
-                            "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
-                        },
-                        "bucket": {"name": "buildhubses"},
+    message = {
+        "Message": json.dumps(
+            {
+                "Records": [
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "some/path/to/buildhub.json",
+                                "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
                     }
-                }
-            ]
-        }
-    )
+                ]
+            }
+        )
+    }
+    mocked_message.body = json.dumps(message)
     mocked_queue = mocker.MagicMock()
     mocked_queue.receive_messages().__iter__.return_value = [mocked_message]
     mocked_boto3.resource().get_queue_by_name.return_value = mocked_queue
@@ -245,21 +324,24 @@ def test_not_valid_buildhub_json(
     mocked_boto3, settings, valid_build, itertools_count, mocker
 ):
     mocked_message = mocker.MagicMock()
-    mocked_message.body = json.dumps(
-        {
-            "Records": [
-                {
-                    "s3": {
-                        "object": {
-                            "key": "some/path/to/buildhub.json",
-                            "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
-                        },
-                        "bucket": {"name": "buildhubses"},
+    message = {
+        "Message": json.dumps(
+            {
+                "Records": [
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "some/path/to/buildhub.json",
+                                "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
                     }
-                }
-            ]
-        }
-    )
+                ]
+            }
+        )
+    }
+    mocked_message.body = json.dumps(message)
     mocked_queue = mocker.MagicMock()
     mocked_queue.receive_messages().__iter__.return_value = [mocked_message]
     mocked_boto3.resource().get_queue_by_name.return_value = mocked_queue
