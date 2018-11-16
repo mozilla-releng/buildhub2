@@ -57,6 +57,14 @@ class AWS:
     #  https://s3.amazonaws.com/net-mozaws-prod-delivery-firefox
     SQS_S3_BUCKET_URL = values.URLValue()
 
+    # If, the S3 bucket that SQS mentioned by name is a public you can connect
+    # to is with an unsigned client. If you don't do this, the request might
+    # fail with:
+    #   "An error occurred (403) when calling the HeadObject operation: Forbidden"
+    # If however, like during local development, you use a non-public bucket this
+    # need to be set to false.
+    UNSIGNED_SQS_S3_CLIENT = values.BooleanValue(True)
+
 
 class CORS:
     # Note-to-self; By default 'corsheaders.middleware.CorsMiddleware'
@@ -321,6 +329,10 @@ class Localdev(Base):
     MARKUS_BACKENDS = values.ListValue(
         [{"class": "markus.backends.logging.LoggingMetrics"}]
     )
+
+    # The default Dev bucket ("buildhub-sqs-test") is not public so you need to
+    # use credentials to download from it.
+    UNSIGNED_SQS_S3_CLIENT = values.BooleanValue(False)  # reverses what was in Base.
 
 
 class Test(Base):

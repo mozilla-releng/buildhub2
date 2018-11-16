@@ -2,17 +2,17 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
-import json
-import mock
 import io
+import json
 
+import mock
 import pytest
 from botocore.exceptions import ClientError
-from jsonschema import ValidationError
 from django.core.management import call_command
+from jsonschema import ValidationError
 
-from buildhub.main.models import Build
 from buildhub.ingest.sqs import start
+from buildhub.main.models import Build
 
 
 @pytest.mark.django_db
@@ -70,6 +70,8 @@ def test_start_happy_path(mocked_boto3, settings, valid_build, itertools_count, 
     )
     # It should have created 1 Build
     assert Build.objects.get()
+
+    mocked_boto3.client.assert_called_with("s3", "ca-north-2", config=mock.ANY)
 
 
 @pytest.mark.django_db
@@ -173,6 +175,53 @@ def test_suffix_match(mocked_boto3, settings, valid_build, itertools_count, mock
     )
     # It should have created 1 Build
     assert Build.objects.get()
+
+
+@pytest.mark.django_db
+@mock.patch("buildhub.ingest.sqs.boto3")
+def test_signed_s3_bucket(mocked_boto3, settings, valid_build, itertools_count, mocker):
+    settings.UNSIGNED_SQS_S3_CLIENT = False
+    mocked_message = mocker.MagicMock()
+    message = {
+        "Message": json.dumps(
+            {
+                "Records": [
+                    {"foot": "here"},
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "firefox-99-buildhub.json",
+                                "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
+                    },
+                ]
+            }
+        )
+    }
+    mocked_message.body = json.dumps(message)
+    mocked_queue = mocker.MagicMock()
+    mocked_queue.receive_messages().__iter__.return_value = [mocked_message]
+    mocked_boto3.resource().get_queue_by_name.return_value = mocked_queue
+
+    mocked_s3_client = mocker.MagicMock()
+    mocked_boto3.client.return_value = mocked_s3_client
+
+    def mocked_download_fileobj(bucket_name, key_name, f):
+        # Sanity checks that the mocking is right
+        assert bucket_name == "buildhubses"
+        assert key_name == "firefox-99-buildhub.json"
+        f.write(json.dumps(valid_build()).encode("utf-8"))
+
+    mocked_s3_client.download_fileobj.side_effect = mocked_download_fileobj
+    start(settings.SQS_QUEUE_URL)
+    mocked_boto3.resource().get_queue_by_name.assert_called_with(
+        QueueName="buildhub-s3-events"
+    )
+    # It should have created 1 Build
+    assert Build.objects.get()
+    mocked_boto3.client.assert_called_with("s3", "ca-north-2")
 
 
 @pytest.mark.django_db

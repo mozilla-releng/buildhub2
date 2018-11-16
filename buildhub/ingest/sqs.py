@@ -2,21 +2,23 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
-import json
-import logging
-import re
-import os
 import io
 import itertools
+import json
+import logging
+import os
+import re
 from urllib.parse import urlparse
 
 import boto3
 import markus
-from jsonschema import ValidationError
+from botocore import UNSIGNED
+from botocore.client import Config
 from botocore.exceptions import ClientError
+from jsonschema import ValidationError
+from django.conf import settings
 
 from buildhub.main.models import Build
-
 
 logger = logging.getLogger("buildhub")
 metrics = markus.get_metrics("buildhub2")
@@ -102,7 +104,12 @@ def process_buildhub_json_key(config, s3):
     # We need a S3 connection client to be able to download this one.
     if bucket_name not in config:
         logger.debug("Creating a new BOTO3 S3 CLIENT")
-        config[bucket_name] = boto3.client("s3", config["region_name"])
+        if settings.UNSIGNED_SQS_S3_CLIENT:
+            config[bucket_name] = boto3.client(
+                "s3", config["region_name"], config=Config(signature_version=UNSIGNED)
+            )
+        else:
+            config[bucket_name] = boto3.client("s3", config["region_name"])
 
     with io.BytesIO() as f:
         try:

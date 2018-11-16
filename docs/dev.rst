@@ -372,3 +372,14 @@ again with the command::
     bors retry
 
 For more details, see `the bors reference docs <https://bors.tech/documentation/>`_
+
+
+pytest with coverage
+====================
+
+First, ``pip install pytest-cov`` then you can run:
+
+.. code-block:: shell
+
+    pytest --cov=buildhub --cov-report=html
+    open htmlcov/index.html

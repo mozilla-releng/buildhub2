@@ -110,6 +110,17 @@ value for this is:
 
     DJANGO_SQS_QUEUE_URL=https://sqs.us-west-2.amazonaws.com/927034868273/buildhub-s3-events
 
+Note that when the SQS message contains a payload referring to a key and bucket
+we try to download that as a file. If you know that bucket is public you can
+use a client connection that does not require the connection to be signed. This is
+on by default. If you want to disable it, you can set:
+
+.. code-block:: shell
+
+    DJANGO_UNSIGNED_SQS_S3_CLIENT=false
+
+That means that when it does download from S3 the credentials, that ``boto3`` pick up
+by default, need to match the access for that bucket.
 
 Elasticsearch
 =============
