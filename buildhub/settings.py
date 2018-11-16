@@ -46,6 +46,17 @@ class AWS:
     # Valid values are 1 to 10. Default is 1.
     SQS_QUEUE_MAX_NUMBER_OF_MESSAGES = values.IntegerValue(1)
 
+    # When we ingest the SQS queue we get a payload that contains an S3 key and
+    # a S3 bucket name. We then assume that we can use our boto client to connect
+    # to that bucket to read the key to download its file. That S3 bucket name
+    # comes at runtime so it depends on the payloads which aren't know yet.
+    # However, if you *do* know the bucket set this variable in advance so access
+    # to it can be healthchecked.
+    # Note that it's optional! Unset by default.
+    # In real product it should probably be:
+    #  https://s3.amazonaws.com/net-mozaws-prod-delivery-firefox
+    SQS_S3_BUCKET_URL = values.URLValue()
+
 
 class CORS:
     # Note-to-self; By default 'corsheaders.middleware.CorsMiddleware'
@@ -123,6 +134,8 @@ class Core(Configuration, AWS, CORS, Whitenoise):
         "dockerflow.django.checks.check_database_connected",
         "dockerflow.django.checks.check_migrations_applied",
         "buildhub.dockerflow_extra.check_elasticsearch",
+        "buildhub.dockerflow_extra.check_s3_bucket_url",
+        "buildhub.dockerflow_extra.check_sqs_s3_bucket_url",
     ]
 
 

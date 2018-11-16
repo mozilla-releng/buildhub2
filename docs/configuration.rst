@@ -60,16 +60,28 @@ need the public key called ``SENTRY_PUBLIC_DSN``. For example:
 AWS
 ===
 
-The service needs to talk to the publicly availble S3 bucket where releases
-are uploaded. That bucket is ``net-mozaws-prod-delivery-inventory-us-east-1``
-in ``us-east-1``.
+We talk to S3 in two different capacities. When we get a payload in SQS about a new
+``buildhub.json`` key, we go and download that. When we download it, we use the
+bucket name mentioned in the SQS message payload.
 
-To override the name of the bucket set (for example):
+Also, we have a backfill script that you can use that will connect to S3 and download
+a list of every single ``buildhub.json`` file. That bucket is called
+``net-mozaws-prod-delivery-inventory-us-east-1`` in ``us-east-1``. It's left
+as default in the configuration. *If* you need to override it set, for example:
 
 .. code-block:: shell
 
     DJANGO_S3_BUCKET_URL=https://s3-us-west-2.amazonaws.com/buildhub-sqs-test
 
+If you know, in advance, what the S3 bucket that is mentioned in the SQS payloads is,
+you can set that up with:
+
+.. code-block:: shell
+
+    DJANGO_SQS_S3_BUCKET_URL=https://s3-us-west-2.amazonaws.com/mothership
+
+If either of these are set, they are tested during startup to make sure you have
+relevant read access.
 
 Reading the S3 bucket is public and doesn't require ``AWS_ACCESS_KEY_ID``
 and ``AWS_ACCESS_KEY_ID`` but to read the SQS queue these need to be set up.
