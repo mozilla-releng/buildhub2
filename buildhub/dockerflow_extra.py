@@ -3,13 +3,15 @@
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
 import logging
+import re
+from urllib.parse import urlparse
 
 import backoff
+import boto3
 import requests
-
-from django.core import checks
+from botocore.exceptions import ClientError
 from django.conf import settings
-
+from django.core import checks
 
 logger = logging.getLogger("buildhub")
 
@@ -56,4 +58,51 @@ def check_elasticsearch(app_configs, **kwargs):
                 id="buildhub.health.E001",
             )
         )
+    return errors
+
+
+def check_s3_bucket_url(app_configs, **kwargs):
+    """Iff settings.S3_BUCKET_URL is set, check that we can access it."""
+    s3_url = settings.S3_BUCKET_URL
+    if not s3_url:
+        return []
+    return _check_s3_bucket_url(s3_url, region_name=kwargs.get("region_name"))
+
+
+def check_sqs_s3_bucket_url(app_configs, **kwargs):
+    """Iff settings.SQS_S3_BUCKET_URL is set, check that we can access it."""
+    s3_url = settings.SQS_S3_BUCKET_URL
+    if not s3_url:
+        return []
+    return _check_s3_bucket_url(s3_url, region_name=kwargs.get("region_name"))
+
+
+def _check_s3_bucket_url(s3_url, region_name=None):
+    errors = []
+    bucket_name = urlparse(s3_url).path.split("/")[-1]
+    if not region_name:
+        try:
+            region_name = re.findall(r"s3[\.-](.*?)\.amazonaws\.com", s3_url)[0]
+        except IndexError:
+            region_name = None
+    s3_client = boto3.client("s3", region_name)
+    try:
+        s3_client.head_bucket(Bucket=bucket_name)
+    except ClientError as exception:
+        if exception.response["Error"]["Code"] == "404":
+            errors.append(
+                checks.Error(
+                    f"The bucket {bucket_name} can not be found. From {s3_url}",
+                    id="buildhub.health.E002",
+                )
+            )
+        elif exception.response["Error"]["Code"] == "403":
+            errors.append(
+                checks.Error(
+                    f"You do not have access to read {bucket_name}. From {s3_url}",
+                    id="buildhub.health.E003",
+                )
+            )
+        else:
+            raise
     return errors
