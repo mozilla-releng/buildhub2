@@ -62,7 +62,10 @@ def backfill(s3_url, region_name=None):
     logger.info(f"We currently have {len(existing_set)} s3_object_keys in our database")
     bucket_name = urlparse(s3_url).path.split("/")[-1]
     if not region_name:
-        region_name = re.findall(r"s3[\.-](.*?)\.amazonaws\.com", s3_url)[0]
+        try:
+            region_name = re.findall(r"s3[\.-](.*?)\.amazonaws\.com", s3_url)[0]
+        except IndexError:
+            region_name = None
     s3_client = boto3.client("s3", region_name)
     count = 0
     for objs in get_matching_s3_objs(
