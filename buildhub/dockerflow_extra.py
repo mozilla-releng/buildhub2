@@ -8,6 +8,8 @@ from urllib.parse import urlparse
 
 import backoff
 import boto3
+from botocore import UNSIGNED
+from botocore.client import Config
 import requests
 from botocore.exceptions import ClientError
 from django.conf import settings
@@ -85,7 +87,12 @@ def _check_s3_bucket_url(s3_url, region_name=None):
             region_name = re.findall(r"s3[\.-](.*?)\.amazonaws\.com", s3_url)[0]
         except IndexError:
             region_name = None
-    s3_client = boto3.client("s3", region_name)
+    if settings.UNSIGNED_SQS_S3_CLIENT:
+        s3_client = boto3.client(
+            "s3", region_name, config=Config(signature_version=UNSIGNED)
+        )
+    else:
+        s3_client = boto3.client("s3", region_name)
     try:
         s3_client.head_bucket(Bucket=bucket_name)
     except ClientError as exception:

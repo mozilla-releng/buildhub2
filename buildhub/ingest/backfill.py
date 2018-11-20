@@ -9,8 +9,11 @@ import io
 from urllib.parse import urlparse
 
 import boto3
+from botocore import UNSIGNED
+from botocore.client import Config
 import markus
 from django.db import transaction
+from django.conf import settings
 from buildhub.main.models import Build
 
 
@@ -63,7 +66,12 @@ def backfill(s3_url, region_name=None):
     bucket_name = urlparse(s3_url).path.split("/")[-1]
     if not region_name:
         region_name = re.findall(r"s3[\.-](.*?)\.amazonaws\.com", s3_url)[0]
-    s3_client = boto3.client("s3", region_name)
+    if settings.UNSIGNED_SQS_S3_CLIENT:
+        s3_client = boto3.client(
+            "s3", region_name, config=Config(signature_version=UNSIGNED)
+        )
+    else:
+        s3_client = boto3.client("s3", region_name)
     count = 0
     for objs in get_matching_s3_objs(
         s3_client, bucket_name, suffix="buildhub.json", max_keys=100
