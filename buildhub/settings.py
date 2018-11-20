@@ -24,8 +24,7 @@ class AWS:
         "https://sqs.us-west-2.amazonaws.com/927034868273/buildhub-s3-events"
     )
     S3_BUCKET_URL = values.URLValue(
-        "https://s3-us-east-1.amazonaws.com/"
-        "net-mozaws-prod-delivery-inventory-us-east-1"
+        "https://s3-us-east-1.amazonaws.com/net-mozaws-prod-delivery-firefox"
     )
 
     # For more details, see:
@@ -92,7 +91,14 @@ class Whitenoise:
         return inner
 
 
-class Core(Configuration, AWS, CORS, Whitenoise):
+class Backfill:
+
+    # The backfill script will write down, to disk, the last successful key
+    # (and some metadata) when it iterates though the pages.
+    RESUME_DISK_LOG_FILE = values.Value("/tmp/backfill-last-successful-key.json")
+
+
+class Core(Configuration, AWS, CORS, Whitenoise, Backfill):
     """Settings that will never change per-environment."""
 
     # THIS_DIR = os.path.dirname(os.path.abspath(__file__))

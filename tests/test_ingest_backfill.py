@@ -99,4 +99,4 @@ def test_call_backfill_command(
     mocked_s3_client.list_objects_v2.side_effect = mocked_list_objects
     out = io.StringIO()
     call_command("backfill", stdout=out)
-    assert not out.getvalue()
+    assert "Been backfilling for 0:00" in out.getvalue()
