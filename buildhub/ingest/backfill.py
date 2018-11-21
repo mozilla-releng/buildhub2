@@ -5,13 +5,15 @@
 import io
 import json
 import logging
-import statistics
 import re
+import statistics
 import time
 from urllib.parse import urlparse
 
 import boto3
 import markus
+from botocore import UNSIGNED
+from botocore.client import Config
 from django.conf import settings
 from django.db import transaction
 
@@ -81,7 +83,10 @@ def backfill(s3_url, region_name=None, resume=False):
             region_name = re.findall(r"s3[\.-](.*?)\.amazonaws\.com", s3_url)[0]
         except IndexError:
             region_name = None
-    s3_client = boto3.client("s3", region_name)
+    connection_config = None
+    if settings.UNSIGNED_S3_CLIENT:
+        connection_config = Config(signature_version=UNSIGNED)
+    s3_client = boto3.client("s3", region_name, config=connection_config)
     count = 0
     for objs in get_matching_s3_objs(
         s3_client,

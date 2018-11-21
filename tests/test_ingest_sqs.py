@@ -180,7 +180,7 @@ def test_suffix_match(mocked_boto3, settings, valid_build, itertools_count, mock
 @pytest.mark.django_db
 @mock.patch("buildhub.ingest.sqs.boto3")
 def test_signed_s3_bucket(mocked_boto3, settings, valid_build, itertools_count, mocker):
-    settings.UNSIGNED_SQS_S3_CLIENT = False
+    settings.UNSIGNED_S3_CLIENT = False
     mocked_message = mocker.MagicMock()
     message = {
         "Message": json.dumps(
@@ -221,7 +221,7 @@ def test_signed_s3_bucket(mocked_boto3, settings, valid_build, itertools_count, 
     )
     # It should have created 1 Build
     assert Build.objects.get()
-    mocked_boto3.client.assert_called_with("s3", "ca-north-2")
+    mocked_boto3.client.assert_called_with("s3", "ca-north-2", config=None)
 
 
 @pytest.mark.django_db

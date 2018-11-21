@@ -104,12 +104,12 @@ def process_buildhub_json_key(config, s3):
     # We need a S3 connection client to be able to download this one.
     if bucket_name not in config:
         logger.debug("Creating a new BOTO3 S3 CLIENT")
-        if settings.UNSIGNED_SQS_S3_CLIENT:
-            config[bucket_name] = boto3.client(
-                "s3", config["region_name"], config=Config(signature_version=UNSIGNED)
-            )
-        else:
-            config[bucket_name] = boto3.client("s3", config["region_name"])
+        connection_config = None
+        if settings.UNSIGNED_S3_CLIENT:
+            connection_config = Config(signature_version=UNSIGNED)
+        config[bucket_name] = boto3.client(
+            "s3", config["region_name"], config=connection_config
+        )
 
     with io.BytesIO() as f:
         try:
