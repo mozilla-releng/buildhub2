@@ -27,6 +27,36 @@ The four pillars of Buildhub are:
 4. A ``create-react-app`` based React app for the UI which essentially runs
    `SearchKit <https://github.com/searchkit/searchkit>`_
 
+First Principles
+================
+
+**Buildhub will never modify, create, or remove build data** from the ``buildhub.json``
+files that are discovered and indexed.
+
+Meaning, the sole purpoose of Buildhub is to download, check, and store all and
+any ``buildhub.json`` file created by the Mozilla build architecture. Yes, internally
+it will download and *open* the ``.json`` files but it only does this for the
+purpose of doing a JSON Schema validation check.
+
+This means, as an example, if a certain Firefox build comes into existance
+but doesn't have a record in Buildhub the solution is not to change this code to
+make up that record. Instead the solution is to look to ``mozilla-central``
+(where most build step code run in TaskCluster exists) and make a change there.
+
+Another example is tricks of copying from, one channel to another, and releasing
+the same version but under a different channel. If that means the ``version`` field
+is not correct any more, the solution is to change the ``buildhub.json`` files
+instead.
+
+**Buildhub is immutable**. If a certain ``buildhub.json`` file is created, its
+primary key becomes a hash of its content. If, under the same URL, the
+``buildhub.json`` is modified, it will lead to **a new record in Buildhub**.
+
+.. note:: Some of this is different from "the old Buildhub" (aka. buildhub1) where
+          it attempted to create the build data by looking at the released files.
+          Especially the found executables and using various regular expressions
+          to guess the version name.
+
 Flow
 ====
 
