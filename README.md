@@ -19,6 +19,11 @@ which we consume with a daemon script.
 
 The UI is a static single-page-app that helps you make Elasticsearch queries.
 
+## First Principles
+
+Please read the [First Principles](https://buildhub2.readthedocs.io/en/latest/architecture.html#first-principles)
+section in the main documentation about some important basic rules about Buildhub2.
+
 ## Get going
 
 See the [Developer documentation](https://buildhub2.readthedocs.io/en/latest/dev.html).
