@@ -2,25 +2,21 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
-import os
 import hashlib
 import json
+import os
 
 import yaml
+from django.conf import settings
+from django.contrib.postgres.fields import JSONField
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.encoding import force_bytes
 from jsonschema import ValidationError
 from jsonschema.validators import validator_for
 
-from django.dispatch import receiver
-from django.db import models
-from django.conf import settings
-from django.contrib.postgres.fields import JSONField
-
-# from django.db.models.signals import pre_save
-from django.db.models.signals import post_save
-from django.utils.encoding import force_bytes
-
 from buildhub.main.search import BuildDoc, es_retry
-
 
 with open(os.path.join(settings.BASE_DIR, "schema.yaml")) as f:
     SCHEMA = yaml.load(f)["schema"]
@@ -66,51 +62,56 @@ class Build(models.Model):
 
     @classmethod
     def insert(cls, build, metadata=None, skip_validation=False, **kwargs):
-        """Optimized version that tries to insert but doesn't complain if
-        the build_hash is already there."""
+        """Insert and return inserted build or return None there's a conflict."""
         metadata = metadata or {}
         if skip_validation:
             metadata["skip_validation"] = True
         metadata.update(settings.VERSION)
 
-        # Two options for how to insert without raising conflict errors.
-        #
-        #   * Seek permission - Do a .exists() query first, then .create()
-        #   * Seek forgiveness - try:... except IntegrityError: pass
-        #
-        # Some numbers (doing it locally on a local Postgres)...
-        #
-        # Using 'Seek permission':
-        #
-        #  * 1,000 all new objects:
-        #    - MEAN   3.51ms
-        #    - MEDIAN 3.37ms
-        #  * 1,000 all existing objects
-        #    - MEAN   0.57ms
-        #    - MEDIAN 0.54ms
-        #  * 500 new, 500 existing
-        #    - MEAN   2.02ms
-        #    - MEDIAN 2.63ms
-        #
-        # Using 'Seek forgiveness':
-        #
-        #  * 1,000 all new objects:
-        #    - MEAN   9.25ms
-        #    - MEDIAN 9.08ms
-        #  * 1,000 all existing objects
-        #    - MEAN   2.33ms
-        #    - MEDIAN 2.26ms
-        #  * 500 new, 500 existing
-        #    - MEAN   7.04ms
-        #    - MEDIAN 4.40ms
-        #
         if not skip_validation:
             cls.validate_build(build)
         build_hash = cls.get_build_hash(build)
-        if not cls.objects.filter(build_hash=build_hash).exists():
-            return cls.objects.create(
-                build_hash=build_hash, build=build, metadata=metadata, **kwargs
-            )
+
+        # WHY THIS COMPLICATED BEAST??
+        # Short answer; because it's the only way to get a do low-level conflict
+        # resolution (in PostgreSQL) without having to do an "upsert".
+        # The big goal is to either insert it or do nothing.
+        # If we inserted it, we want to inform Elasticsearch too. If it was already
+        # there, based on the build_hash key, we don't want to do anything.
+        # No Elasticsearch updates, no updates and we want to be able to return
+        # None from this method so the user knows nothing got inserted.
+        #
+        # Also, you *can't* do this:
+        #
+        #     # Naive create-or-do-nothing
+        #     if not cls.objects.filter(build_hash=build_hash).exists():
+        #         cls.objects.create(build_hash=build_hash, build=build, ...)
+        #
+        # ...because it has a race-condition in it that not only will happen
+        # eventually, has actually been observed in production.
+        for build in Build.objects.raw(
+            """
+                INSERT INTO main_build (
+                    build_hash, build, metadata,
+                    s3_object_key, s3_object_etag, created_at
+                ) VALUES (
+                    %s, %s, %s, %s, %s, CLOCK_TIMESTAMP()
+                )
+                ON CONFLICT (build_hash) DO NOTHING
+                RETURNING *;
+                """,
+            (
+                build_hash,
+                # Hmm... I wonder how django.contrib.postgres does this?
+                json.dumps(build),
+                json.dumps(metadata),
+                kwargs.get("s3_object_key", ""),
+                kwargs.get("s3_object_etag", ""),
+            ),
+        ):
+            # If it returns something, it got created! Must inform Elasticsearch.
+            send_to_elasticsearch(cls, build)
+            return build
 
     @classmethod
     def bulk_insert(
@@ -166,15 +167,6 @@ class Build(models.Model):
             [cls(build_hash=k, build=v, metadata=metadata) for k, v in hashes.items()]
         )
         return len(hashes), skipped
-
-
-# @receiver(pre_save, sender=Build)
-# def prepare(sender, instance, **kwargs):
-#     assert instance.build
-#     assert instance.build_hash
-#     # if not instance.build_hash:
-#     #     assert instance.build
-#     #     instance.build_hash = sender.get_build_hash(instance.build)
 
 
 @receiver(post_save, sender=Build)
