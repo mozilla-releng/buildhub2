@@ -48,6 +48,9 @@ def start(
     # By default, we receive 1 message per call to `queue.receive_messages()`
     # but you can change that with settings.SQS_QUEUE_MAX_NUMBER_OF_MESSAGES.
     # If it's 1, the number of "loops" will be the same as the number "count".
+    # Note! Even if you change that number it doesn't guarantee that we will
+    # receive that many messages. Note how the parameter is
+    # called **Max**NnumberOfMessages.
     count = 0
     # Use `itertools.count()` instead of `while True` to be able to mock it in
     # tests.
