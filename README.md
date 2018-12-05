@@ -48,4 +48,4 @@ Stage: https://stage.buildhub2.nonprod.cloudops.mozgcp.net/
 
 ## Whatsdeployed
 
-Check out https://whatsdeployed.io/s-S94
+Check out https://whatsdeployed.io/s-3QC
