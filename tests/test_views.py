@@ -3,8 +3,25 @@
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+import random
+
+import pytest
+import mock
 
 from django.urls import reverse
+
+
+@pytest.mark.django_db
+@mock.patch("buildhub.dockerflow_extra.boto3")
+def test_heartbeat(mocked_boto3, client, settings):
+    settings.SECRET_KEY = str(random.random()) * 5
+    # This one doesn't make sense to enable for tests because we use the
+    # test client. So we just have to ignore it in tests.
+    settings.SILENCED_SYSTEM_CHECKS.append("security.W008")
+
+    response = client.get("/__heartbeat__")
+    assert response.status_code == 200
+    mocked_boto3.client().head_bucket.assert_called_with(Bucket="buildhubses")
 
 
 def test_always_index_html(client, temp_static_root, settings):

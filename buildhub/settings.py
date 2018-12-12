@@ -288,6 +288,29 @@ class Base(Core, Elasticsearch):
             },
         }
 
+    # Security related
+
+    SILENCED_SYSTEM_CHECKS = values.ListValue(
+        [
+            # This rule is about having "X-FRAME-OPTIONS" set to "DENY" which is
+            # not important for Buildhub2 because it's considered NOT dangerous to
+            # put any of this data inside an iframe.
+            "security.W019",
+            # There are no POST endpoints that *change* data that is exposed.
+            # I.e. you can't CSRF attack this site because there's no URL to do so
+            # with.
+            "security.W003",
+        ]
+    )
+
+    SECURE_SSL_REDIRECT = values.BooleanValue(True)
+    SECURE_HSTS_SECONDS = values.IntegerValue(3600)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = values.BooleanValue(True)
+    SECURE_HSTS_PRELOAD = values.BooleanValue(True)
+    SECURE_CONTENT_TYPE_NOSNIFF = values.BooleanValue(True)
+    SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
+    SECURE_SSL_REDIRECT = values.BooleanValue(True)
+
 
 class Localdev(Base):
     """Configuration to be used during local development and base class
@@ -333,6 +356,12 @@ class Localdev(Base):
         [{"class": "markus.backends.logging.LoggingMetrics"}]
     )
 
+    # When doing local development you don't need to redirect to HTTPS.
+    SECURE_SSL_REDIRECT = values.BooleanValue(False)
+    SECURE_HSTS_SECONDS = values.IntegerValue(0)
+    SECURE_HSTS_PRELOAD = values.BooleanValue(False)
+    SECURE_SSL_REDIRECT = values.BooleanValue(False)
+
 
 class Test(Base):
     """Configurat
@@ -352,6 +381,8 @@ class Test(Base):
         return path
 
     MARKUS_BACKENDS = []
+
+    SECURE_SSL_REDIRECT = False
 
 
 class Stage(Base):
@@ -407,6 +438,8 @@ class Stage(Base):
                 self.VERSION.get("version") or self.VERSION.get("commit") or ""
             )
         return config
+
+    SECURE_HSTS_SECONDS = values.IntegerValue(31536000)  # 1 year
 
 
 class Prod(Stage):
