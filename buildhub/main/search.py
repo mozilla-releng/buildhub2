@@ -6,14 +6,11 @@ import logging
 
 import backoff
 from elasticsearch.exceptions import TransportError
-from elasticsearch_dsl import Index, DocType, InnerDoc, Object, Long, Date, Keyword
+from elasticsearch_dsl import Document, InnerDoc, Object, Long, Date, Keyword
 from django.conf import settings
 
 
 logger = logging.getLogger("buildhub")
-
-build_index = Index(settings.ES_BUILD_INDEX)
-build_index.settings(**settings.ES_BUILD_INDEX_SETTINGS)
 
 
 @backoff.on_exception(
@@ -55,8 +52,7 @@ class _Download(InnerDoc):
     date = Date()
 
 
-@build_index.doc_type
-class BuildDoc(DocType):
+class BuildDoc(Document):
     id = Keyword(required=True)
     # Note! The reason for using Object() instead of Nested() is because
     # SearchKit doesn't work if it's nested. This works though.
@@ -64,6 +60,10 @@ class BuildDoc(DocType):
     source = Object(_Source)
     target = Object(_Target)
     download = Object(_Download)
+
+    class Index:
+        name = settings.ES_BUILD_INDEX
+        settings = settings.ES_BUILD_INDEX_SETTINGS
 
     @classmethod
     def create(cls, id, **doc):
