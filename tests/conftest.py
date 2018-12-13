@@ -12,10 +12,9 @@ import mock
 import requests
 import requests_mock
 
-# from markus.testing import MetricsMock
 from django.conf import settings
 
-from buildhub.main.search import build_index
+from buildhub.main.search import BuildDoc
 
 
 def pytest_configure():
@@ -68,6 +67,8 @@ def elasticsearch(request):
             assert something
 
     """
+
+    build_index = BuildDoc._index
     assert build_index._name.startswith("test_")
     build_index.delete(ignore=404)
     build_index.create()

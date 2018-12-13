@@ -8,7 +8,7 @@ from elasticsearch.helpers import streaming_bulk
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from buildhub.main.search import build_index
+from buildhub.main.search import BuildDoc
 from buildhub.main.models import Build
 
 
@@ -19,6 +19,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
+        build_index = BuildDoc._index
         build_index.delete(ignore=404)
         build_index.create()
         es_url = settings.ES_URLS[0]
