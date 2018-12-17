@@ -23,6 +23,9 @@ def test_happy_path(valid_build, client, elasticsearch):
     hit, = result["hits"]["hits"]
     assert hit["_source"]["target"]["version"] == build["target"]["version"]
 
+    # No CSP header for the API requests since they're always JSON.
+    assert not response.has_header("Content-Security-Policy")
+
 
 @pytest.mark.django_db
 def test_search_aggregations(valid_build, json_poster, elasticsearch):
