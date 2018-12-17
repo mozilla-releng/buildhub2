@@ -57,6 +57,14 @@ need the public key called ``SENTRY_PUBLIC_DSN``. For example:
     SENTRY_DSN=https://bb4e266xxx:d1c1eyyy@sentry.prod.mozaws.net/001
     SENTRY_PUBLIC_DSN=https://bb4e266xxx@sentry.prod.mozaws.net/001
 
+Content Security Policy (CSP) headers are on by default. To change the URL for
+where violations are sent you can change ``DJANGO_CSP_REPORT_URI``. By default
+it's set to ``''``. Meaning, unless set it won't be included as a header.
+See the `MDN documentation on report-uri <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri>`_ for
+more info.
+
+.. _report-uri: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri
+
 AWS
 ===
 

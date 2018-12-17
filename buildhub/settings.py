@@ -88,6 +88,19 @@ class Whitenoise:
         return inner
 
 
+class CSP:
+
+    CSP_DEFAULT_SRC = "'self'"
+    CSP_OBJECT_SRC = "'none'"  # not using <object>, <embed>, and <applet> elements
+    CSP_WORKER_SRC = "'none'"  # not using JS Worker, SharedWorker, or ServiceWorkers
+    CSP_FRAME_SRC = "'none'"  # not using frames or iframes
+    CSP_BLOCK_ALL_MIXED_CONTENT = True
+
+    CSP_REPORT_URI = values.Value(None)
+
+    CSP_EXCLUDE_URL_PREFIXES = ("/api",)
+
+
 class Backfill:
 
     # The backfill script will write down, to disk, the last successful key
@@ -95,7 +108,7 @@ class Backfill:
     RESUME_DISK_LOG_FILE = values.Value("/tmp/backfill-last-successful-key.json")
 
 
-class Core(Configuration, AWS, CORS, Whitenoise, Backfill):
+class Core(Configuration, AWS, CORS, Whitenoise, CSP, Backfill):
     """Settings that will never change per-environment."""
 
     # THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -124,6 +137,7 @@ class Core(Configuration, AWS, CORS, Whitenoise, Backfill):
         "django.middleware.common.CommonMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "dockerflow.django.middleware.DockerflowMiddleware",
+        "csp.middleware.CSPMiddleware",
         "whitenoise.middleware.WhiteNoiseMiddleware",
         "buildhub.middleware.StatsMiddleware",
     ]

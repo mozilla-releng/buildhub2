@@ -69,6 +69,13 @@ def test_always_index_html(client, temp_static_root, settings):
     assert response.status_code == 404
 
 
+def test_csp_header_present(client):
+    # Make sure the CSP header is present
+    response = client.get("/")
+    # Very limited testing since it's complex.
+    assert response.has_header("Content-Security-Policy")
+
+
 def test_custom_cache_control_whitenoise(client, temp_static_root, settings):
     with open(os.path.join(temp_static_root, "main.8741ee2b.js"), "w") as f:
         f.write("alert('Hi!)")
