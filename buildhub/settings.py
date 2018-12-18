@@ -314,16 +314,24 @@ class Base(Core, Elasticsearch):
             # I.e. you can't CSRF attack this site because there's no URL to do so
             # with.
             "security.W003",
+            # Don't require SECURE_SSL_REDIRECT to be true.
+            # Our load balancer talks to Django directly, via /__lbheartbeat__,
+            # and it will 301 redirect if you don't convince it that the request
+            # is HTTPS with `X-Forwarded-Proto: https` header. Basically, this
+            # header can't be set in the load balancer.
+            # If we disable the SECURE_SSL_REDIRECT (in other words omit setting it)
+            # the /__heartbeat__ will complain and thus we can't use that endpoint
+            # for our regular monitoring.
+            # See https://github.com/mozilla/buildhub2/issues/411
+            "security.W008",
         ]
     )
 
-    SECURE_SSL_REDIRECT = values.BooleanValue(True)
     SECURE_HSTS_SECONDS = values.IntegerValue(3600)
     SECURE_HSTS_INCLUDE_SUBDOMAINS = values.BooleanValue(True)
     SECURE_HSTS_PRELOAD = values.BooleanValue(True)
     SECURE_CONTENT_TYPE_NOSNIFF = values.BooleanValue(True)
     SECURE_BROWSER_XSS_FILTER = values.BooleanValue(True)
-    SECURE_SSL_REDIRECT = values.BooleanValue(True)
 
 
 class Localdev(Base):
@@ -371,10 +379,8 @@ class Localdev(Base):
     )
 
     # When doing local development you don't need to redirect to HTTPS.
-    SECURE_SSL_REDIRECT = values.BooleanValue(False)
     SECURE_HSTS_SECONDS = values.IntegerValue(0)
     SECURE_HSTS_PRELOAD = values.BooleanValue(False)
-    SECURE_SSL_REDIRECT = values.BooleanValue(False)
 
 
 class Test(Base):
@@ -395,8 +401,6 @@ class Test(Base):
         return path
 
     MARKUS_BACKENDS = []
-
-    SECURE_SSL_REDIRECT = False
 
 
 class Stage(Base):
