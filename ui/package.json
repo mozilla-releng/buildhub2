@@ -4,13 +4,13 @@
   "private": true,
   "dependencies": {
     "@searchkit/refinement-autosuggest": "0.0.1-6",
-    "filesize": "3.5.10",
+    "filesize": "3.6.1",
     "react": "15.5.4",
     "react-dom": "15.5.4",
     "searchkit": "2.3.0"
   },
   "devDependencies": {
-    "prettier": "1.11.1",
+    "prettier": "1.15.3",
     "react-scripts": "1.1.5"
   },
   "scripts": {
