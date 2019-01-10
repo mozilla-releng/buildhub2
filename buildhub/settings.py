@@ -91,6 +91,8 @@ class Whitenoise:
 class CSP:
 
     CSP_DEFAULT_SRC = "'self'"
+    CSP_STYLE_SRC = "'self' 'unsafe-inline'"
+    CSP_IMG_SRC = "'self' data:"
     CSP_OBJECT_SRC = "'none'"  # not using <object>, <embed>, and <applet> elements
     CSP_WORKER_SRC = "'none'"  # not using JS Worker, SharedWorker, or ServiceWorkers
     CSP_FRAME_SRC = "'none'"  # not using frames or iframes
