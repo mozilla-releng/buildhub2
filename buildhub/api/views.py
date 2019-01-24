@@ -7,6 +7,7 @@ import logging
 
 import markus
 from django import http
+from elasticsearch.exceptions import RequestError
 
 from buildhub.main.models import Build
 from buildhub.main.search import BuildDoc
@@ -26,7 +27,10 @@ def search(request):
         if arguments:
             search.update_from_dict(arguments)
     metrics.incr("api_search_requests", tags=[f"method:{request.method}"])
-    response = search.execute()
+    try:
+        response = search.execute()
+    except RequestError as exception:
+        return http.JsonResponse(exception.info, status=400)
     logger.info(f"Finding {format(response.hits.total, ',')} total records.")
     metrics.gauge("api_search_records", response.hits.total)
     response_dict = response.to_dict()
