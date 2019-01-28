@@ -35,9 +35,9 @@ psycopg2-binary==2.7.7 \
     --hash=sha256:a3bfcac727538ec11af304b5eccadbac952d4cca1a551a29b8fe554e3ad535dc \
     --hash=sha256:348b49dd737ff74cfb5e663e18cb069b44c64f77ec0523b5794efafbfa7df0b8 \
     --hash=sha256:b19e9f1b85c5d6136f5a0549abdc55dcbd63aba18b4f10d0d063eb65ef2c68b4
-jsonschema==3.0.0a5 \
-    --hash=sha256:a32131e60980cbf9077aa37ead88e952f903690c141eb722154c7d4c50d08487 \
-    --hash=sha256:c2480b09c6431a44d6c5948bd2a882b1c299e125af858725ae0edbe9588b858f
+jsonschema==3.0.0b3 \
+    --hash=sha256:683fe7ed58763ea0be572de5aad47cd3cc1297640916f9a8ccd222b287da7d2f \
+    --hash=sha256:b42d7a292addb57370e6260bcbadb77e00a899fe6ec998c453f45893c41c658b
 boto3==1.9.82 \
     --hash=sha256:542c27cdf5756155805665bc0307b1452a4f6c7a433c1f7d7891ade1b6c7bc91 \
     --hash=sha256:65fb08c87bc7fe144f9b74dd4e02ada8b7c2286cd8eb687fa0a249f628fefce2
