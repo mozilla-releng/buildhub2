@@ -100,6 +100,29 @@ def test_search_requesterror(valid_build, json_poster, elasticsearch):
 
 
 @pytest.mark.django_db
+def test_search_empty_filter(valid_build, json_poster, elasticsearch):
+    search = {
+        "query": {
+            "bool": {
+                "filter": [{}],
+                "must": [
+                    {"term": {"target.channel": "nightly"}},
+                    {"term": {"source.product": "firefox"}},
+                ],
+            }
+        },
+        "size": 2,
+    }
+    url = reverse("api:search")
+    response = json_poster(url, search)
+    assert response.status_code == 400
+    assert response.json()["error"] == (
+        'Q() can only accept dict with a single query ({"match": {...}}). '
+        "Instead it got ({})"
+    )
+
+
+@pytest.mark.django_db
 def test_happy_path_records(valid_build, client, elasticsearch):
     url = reverse("api:records")
     response = client.get(url)

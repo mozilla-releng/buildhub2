@@ -25,7 +25,10 @@ def search(request):
     if request.method in ("POST",):
         arguments = json.loads(request.body.decode("utf-8"))
         if arguments:
-            search.update_from_dict(arguments)
+            try:
+                search.update_from_dict(arguments)
+            except ValueError as exception:
+                return http.JsonResponse({"error": exception.args[0]}, status=400)
     metrics.incr("api_search_requests", tags=[f"method:{request.method}"])
     try:
         response = search.execute()
