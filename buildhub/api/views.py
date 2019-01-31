@@ -7,6 +7,7 @@ import logging
 
 import markus
 from django import http
+from django.conf import settings
 from elasticsearch.exceptions import RequestError
 
 from buildhub.main.models import Build
@@ -25,6 +26,11 @@ def search(request):
     if request.method in ("POST",):
         arguments = json.loads(request.body.decode("utf-8"))
         if arguments:
+            if arguments.get("size") and arguments["size"] > settings.MAX_SEARCH_SIZE:
+                return http.JsonResponse(
+                    {"error": f"Search size too large ({arguments['size']})"},
+                    status=400,
+                )
             try:
                 search.update_from_dict(arguments)
             except ValueError as exception:
