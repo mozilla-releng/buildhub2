@@ -123,6 +123,15 @@ def test_search_empty_filter(valid_build, json_poster, elasticsearch):
 
 
 @pytest.mark.django_db
+def test_search_unbound_size(valid_build, json_poster, elasticsearch, settings):
+    search = {"query": {"match_all": {}}, "size": settings.MAX_SEARCH_SIZE + 1}
+    url = reverse("api:search")
+    response = json_poster(url, search)
+    assert response.status_code == 400
+    assert response.json()["error"] == "Search size too large (1001)"
+
+
+@pytest.mark.django_db
 def test_happy_path_records(valid_build, client, elasticsearch):
     url = reverse("api:records")
     response = client.get(url)

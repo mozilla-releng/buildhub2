@@ -181,6 +181,9 @@ class Elasticsearch:
     def ES_CONNECTIONS(self):
         return {"default": {"hosts": self.ES_URLS}}
 
+    # To prevent the ES search query from being too big.
+    MAX_SEARCH_SIZE = values.IntegerValue(1000)
+
 
 class OptionalDatabaseURLValue(values.DatabaseURLValue):
     def caster(self, url, **options):
