@@ -62,6 +62,22 @@ class Command(BaseCommand):
                 "second the 'kinto' connection."
             )
 
+        current_count = Build.objects.all().count()
+        print(f"There are currently {current_count:,} in our existing database.")
+
+        with connections["kinto"].cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT COUNT(*)
+                FROM records
+                WHERE
+                    parent_id = %s AND collection_id = %s
+            """,
+                [options["parent_id"], options["collection_id"]],
+            )
+            total_records, = cursor.fetchone()
+            print(f"There are currently {total_records:,} in the Kinto database.")
+
         pages = 0
         done = 0
         skip_validation = options["skip_validation"]
@@ -69,10 +85,20 @@ class Command(BaseCommand):
         skipped = 0
         inserted_total = 0
         total_t0 = time.time()
-        for batch, total_records in self.iterator(options):
-            builds = [x[0] for x in batch if not skip_invalid or "build" in x[0]]
+        for batch in self.iterator(options):
+            # builds = [x[0] for x in batch if not skip_invalid or "build" in x[0]]
+            builds = []
+            for build in batch:
+                if not skip_invalid or "build" in build[0]:
+                    if build[0].get("schema"):
+                        # The one common thing in the old Kinto database is that each
+                        # build has a key 'schema' which is just a timestamp (integer).
+                        # Just pop it out so as to not get validation errors that
+                        # not actually critical.
+                        build[0].pop("schema")
+                    builds.append(build[0])
             count = len(builds)
-            print(f"Page {pages + 1} ({count} records)")
+            print(f"Page {pages + 1} ({count:,} records)")
             t0 = time.time()
             inserted, batch_skipped = Build.bulk_insert(
                 builds,
@@ -96,14 +122,14 @@ class Command(BaseCommand):
                 )
             )
             if batch_skipped:
-                print(f"Skipped {batch_skipped} invalid records.")
+                print(f"Skipped {batch_skipped:,} invalid records.")
 
             pages += 1
         total_t1 = time.time()
 
-        print(f"In total, skipped {skipped} invalid records.")
-        print(f"In total, processed {done} valid records.")
-        print(f"In total, inserted {inserted_total} valid records.")
+        print(f"In total, skipped {skipped:,} invalid records.")
+        print(f"In total, processed {done:,} valid records.")
+        print(f"In total, inserted {inserted_total:,} valid records.")
 
         print(
             "The whole migration took {:.1f} minutes.".format(
@@ -113,22 +139,6 @@ class Command(BaseCommand):
 
     def iterator(self, options):
         with connections["kinto"].cursor() as cursor:
-
-            try:
-                cursor.execute(
-                    """
-                    SELECT COUNT(*)
-                    FROM records
-                    WHERE
-                        parent_id = %s AND collection_id = %s
-                """,
-                    [options["parent_id"], options["collection_id"]],
-                )
-            except Exception:
-                cursor.close()
-                raise
-            total_records, = cursor.fetchone()
-
             try:
                 cursor.execute(
                     """
@@ -148,4 +158,4 @@ class Command(BaseCommand):
             for rows in cursor_iter(
                 cursor, connection.features.empty_fetchmany_value, None, chunk_size
             ):
-                yield rows, total_records
+                yield rows
