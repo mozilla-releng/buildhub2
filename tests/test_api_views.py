@@ -123,8 +123,26 @@ def test_search_empty_filter(valid_build, json_poster, elasticsearch):
 
 
 @pytest.mark.django_db
+def test_bad_aggregation_keys(valid_build, json_poster, elasticsearch):
+    # This search is taken verbatim from a real search that came in
+    # and caused a Internal Server Error.
+    search = {
+        "aggs": {
+            "aggregations": {"date": {"terms": {"field": "download.date"}}},
+            "uniq_revisions": {"terms": {"field": "source.revision"}},
+        },
+        "size": "0",
+    }
+    url = reverse("api:search")
+    response = json_poster(url, search)
+    assert response.status_code == 400
+    assert response.json()["error"] == "DSL class `date` does not exist in agg."
+
+
+@pytest.mark.django_db
 def test_search_unbound_size(valid_build, json_poster, elasticsearch, settings):
-    search = {"query": {"match_all": {}}, "size": settings.MAX_SEARCH_SIZE + 1}
+    # Make it a string just make it slightly harder
+    search = {"query": {"match_all": {}}, "size": str(settings.MAX_SEARCH_SIZE + 1)}
     url = reverse("api:search")
     response = json_poster(url, search)
     assert response.status_code == 400
