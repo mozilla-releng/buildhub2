@@ -100,6 +100,14 @@ def test_search_requesterror(valid_build, json_poster, elasticsearch):
 
 
 @pytest.mark.django_db
+def test_search_invalid_json_requesterror(valid_build, client, elasticsearch):
+    url = reverse("api:search")
+    response = client.post(url, "}not valid JSON{", content_type="application/json")
+    assert response.status_code == 400
+    assert response.json()["error"] == "Expecting value: line 1 column 1 (char 0)"
+
+
+@pytest.mark.django_db
 def test_search_empty_filter(valid_build, json_poster, elasticsearch):
     search = {
         "query": {

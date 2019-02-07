@@ -25,7 +25,10 @@ def search(request):
     search = BuildDoc.search()
     arguments = None
     if request.method in ("POST",):
-        arguments = json.loads(request.body.decode("utf-8"))
+        try:
+            arguments = json.loads(request.body.decode("utf-8"))
+        except json.JSONDecodeError as exception:
+            return http.JsonResponse({"error": str(exception)}, status=400)
         if arguments:
             size = int(arguments.get("size", 0))
             if size and size > settings.MAX_SEARCH_SIZE:

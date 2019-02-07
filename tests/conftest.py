@@ -95,26 +95,6 @@ def json_poster(client):
     return inner
 
 
-# @pytest.fixture
-# def metricsmock():
-#     """Returns a MetricsMock context to record metrics records
-#     Usage::
-#         def test_something(metricsmock):
-#             # do test stuff...
-#
-#             mm.print_records()  # debugging tests
-#
-#             assert mm.has_record(
-#                 stat='some.stat',
-#                 kwargs_contains={
-#                     'something': 1
-#                 }
-#             )
-#     """
-#     with MetricsMock() as mm:
-#         yield mm
-
-
 @pytest.fixture
 def requestsmock():
     """Return a context where requests are all mocked.
