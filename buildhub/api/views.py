@@ -9,6 +9,7 @@ import markus
 from django import http
 from django.conf import settings
 from elasticsearch.exceptions import RequestError
+from elasticsearch_dsl.exceptions import UnknownDslObject
 
 from buildhub.main.models import Build
 from buildhub.main.search import BuildDoc
@@ -26,14 +27,15 @@ def search(request):
     if request.method in ("POST",):
         arguments = json.loads(request.body.decode("utf-8"))
         if arguments:
-            if arguments.get("size") and arguments["size"] > settings.MAX_SEARCH_SIZE:
+            size = int(arguments.get("size", 0))
+            if size and size > settings.MAX_SEARCH_SIZE:
                 return http.JsonResponse(
                     {"error": f"Search size too large ({arguments['size']})"},
                     status=400,
                 )
             try:
                 search.update_from_dict(arguments)
-            except ValueError as exception:
+            except (UnknownDslObject, ValueError) as exception:
                 return http.JsonResponse({"error": exception.args[0]}, status=400)
     metrics.incr("api_search_requests", tags=[f"method:{request.method}"])
     try:
