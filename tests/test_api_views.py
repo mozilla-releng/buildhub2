@@ -169,10 +169,6 @@ def test_invalid_from_plus_size(valid_build, json_poster, elasticsearch):
     url = reverse("api:search")
     response = json_poster(url, search)
     assert response.status_code == 400
-    print("JSON")
-    from pprint import pprint
-
-    pprint(response.json())
     assert (
         "Result window is too large, from + size must be less than or equal to: "
     ) in response.json()["error"]
