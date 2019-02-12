@@ -148,6 +148,37 @@ def test_bad_aggregation_keys(valid_build, json_poster, elasticsearch):
 
 
 @pytest.mark.django_db
+def test_invalid_from_plus_size(valid_build, json_poster, elasticsearch):
+    # This search is taken verbatim from a real search that came in
+    # and caused a Internal Server Error.
+    search = {
+        "from": 10000,
+        "query": {
+            "bool": {
+                "filter": [
+                    {"term": {"source.product": "firefox"}},
+                    {"term": {"target.channel": "release"}},
+                    {"range": {"target.version": {"gte": "63"}}},
+                    {"term": {"target.locale": "en-US"}},
+                    {"term": {"target.platform": "win64"}},
+                ]
+            }
+        },
+        "size": 1000,
+    }
+    url = reverse("api:search")
+    response = json_poster(url, search)
+    assert response.status_code == 400
+    print("JSON")
+    from pprint import pprint
+
+    pprint(response.json())
+    assert (
+        "Result window is too large, from + size must be less than or equal to: "
+    ) in response.json()["error"]
+
+
+@pytest.mark.django_db
 def test_search_unbound_size(valid_build, json_poster, elasticsearch, settings):
     # Make it a string just make it slightly harder
     search = {"query": {"match_all": {}}, "size": str(settings.MAX_SEARCH_SIZE + 1)}
