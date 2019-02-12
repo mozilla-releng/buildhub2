@@ -8,7 +8,7 @@ import logging
 import markus
 from django import http
 from django.conf import settings
-from elasticsearch.exceptions import RequestError
+from elasticsearch.exceptions import RequestError, TransportError
 from elasticsearch_dsl.exceptions import UnknownDslObject
 
 from buildhub.main.models import Build
@@ -45,6 +45,10 @@ def search(request):
         response = search.execute()
     except RequestError as exception:
         return http.JsonResponse(exception.info, status=400)
+    except TransportError as exception:
+        return http.JsonResponse(
+            {"error": exception.info["error"]["root_cause"][0]["reason"]}, status=400
+        )
     logger.info(f"Finding {format(response.hits.total, ',')} total records.")
     metrics.gauge("api_search_records", response.hits.total)
     response_dict = response.to_dict()
