@@ -20,7 +20,7 @@ RUN bin/build-ui.sh
 
 # Next, all the things for building the Python web service
 
-FROM python:3.7-slim@sha256:8a125f6e8b3ef47daa4cf1ae461e5cdd3acce5935c2a4fdd7b3d5be3846d6d0d
+FROM python:3.7-slim@sha256:d00a4d0dba471f1404341ba2b86819653f4bf9419313a25edf541b51bc16cbd2
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app/
