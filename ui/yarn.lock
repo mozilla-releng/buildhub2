@@ -2792,9 +2792,9 @@ filesize@3.5.11:
   version "3.5.11"
   resolved "https://registry.yarnpkg.com/filesize/-/filesize-3.5.11.tgz#1919326749433bb3cf77368bd158caabcc19e9ee"
 
-filesize@4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/filesize/-/filesize-4.1.1.tgz#03d7f25e7e2998e3098c5965137ded3a20220689"
+filesize@4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/filesize/-/filesize-4.1.2.tgz#fcd570af1353cea97897be64f56183adb995994b"
 
 fill-range@^2.1.0:
   version "2.2.4"
