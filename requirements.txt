@@ -59,8 +59,8 @@ docutils==0.14 \
 python-dateutil==2.8.0 \
     --hash=sha256:7e6584c74aeed623791615e26efd690f29817a27c73085b78e4bad02493df2fb \
     --hash=sha256:c89805f6f4d64db21ed966fda138f8a5ed7a4fdbc1a8ee329ce1b74e3c74da9e
-pySqsListener==0.8.5 \
-    --hash=sha256:14132630711de69ec43c807ebd70ea820b87cad30b793ce248bf9ca197dcaa40
+pySqsListener==0.8.6 \
+    --hash=sha256:bcb2c02d5c2158d304c5465f64eb1b88b067ef8e0178d589c0b910483f88ac96
 dockerflow==2018.4.0 \
     --hash=sha256:2ea52a904abfda3430ff4f1effc164863b30d2b69f7ecbf92dd672860b0ec423 \
     --hash=sha256:388d02c557968e6957140f7b82f669eac70adf5f570bc7705aa749d220a2e535
