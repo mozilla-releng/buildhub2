@@ -2,7 +2,7 @@ version: "3"
 
 services:
   db:
-    image: postgres:9.6@sha256:3572da147d8f1ecca91ff5cfc9f6b9e29e127e29f8497242d0df763a125c9e7c
+    image: postgres:9.6@sha256:cbf0c8aec56a506edef454969700919f9824bb9cb32a0629a9beef010173da3a
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 1s
