@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@searchkit/refinement-autosuggest@0.0.1-6":
-  version "0.0.1-6"
-  resolved "https://registry.yarnpkg.com/@searchkit/refinement-autosuggest/-/refinement-autosuggest-0.0.1-6.tgz#175ffa021db4859692d3b247150bb9cf49c3f989"
-  integrity sha512-5OGb0XRV5pZzc+cth5YjAMFRQzMcI3RrRkKMNJrKcB8N78RGe7cW5Vd75nJEiTtfI8wiXnfnZm/zhiHNEjpNTA==
+"@searchkit/refinement-autosuggest@0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@searchkit/refinement-autosuggest/-/refinement-autosuggest-0.1.3.tgz#2e70972c8a08c6a86cfe91590fb8f77ab6363a33"
+  integrity sha512-D9GGMjsSxi+v9SbiFsIAqC5OMi/KakSAjjimtOPnI5LGDvD9ROJzddTnue61H+f3JT7LQ9U+0wyPHDtkqC2Prw==
   dependencies:
     "@types/react-select" "^1.0.59"
     lodash "^4.17.4"
