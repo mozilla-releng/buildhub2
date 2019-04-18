@@ -327,7 +327,7 @@ class Base(Core, Elasticsearch):
             # If we disable the SECURE_SSL_REDIRECT (in other words omit setting it)
             # the /__heartbeat__ will complain and thus we can't use that endpoint
             # for our regular monitoring.
-            # See https://github.com/mozilla/buildhub2/issues/411
+            # See https://github.com/mozilla-services/buildhub2/issues/411
             "security.W008",
         ]
     )

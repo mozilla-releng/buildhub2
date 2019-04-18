@@ -1,11 +1,13 @@
 # buildhub2
 
-[![CircleCI](https://circleci.com/gh/mozilla/buildhub2.svg?style=svg)](https://circleci.com/gh/mozilla/buildhub2)
+[![CircleCI](https://circleci.com/gh/mozilla-services/buildhub2.svg?style=svg)](https://circleci.com/gh/mozilla-services/buildhub2)
 [![Code style](https://img.shields.io/badge/Code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![Documentation Status](https://readthedocs.org/projects/buildhub2/badge/?version=latest)](https://buildhub2.readthedocs.io/en/latest/?badge=latest)
 [![What's Deployed](https://img.shields.io/badge/whatsdeployed-stage,prod-green.svg)](https://whatsdeployed.io/s-3QC)
 
 Please use the documentation on: [buildhub2.readthedocs.io](https://buildhub2.readthedocs.io/)
+
+Service: https://buildhub.moz.tools/
 
 ## Overview
 
@@ -32,17 +34,15 @@ See the [Developer documentation](https://buildhub2.readthedocs.io/en/latest/dev
 
 We deploy what we ship to [Docker Hub](https://hub.docker.com/r/mozilla/buildhub2/).
 
-## Deployments
+## Environments and deployments
 
-Prod: https://buildhub.moz.tools
-
-Stage: https://stage.buildhub2.nonprod.cloudops.mozgcp.net/
+See the [Deploy documentation](https://buildhub2.readthedocs.io/en/latest/deployments.html).
 
 ## Datadog
 
 [Buildhub2 Performance](https://app.datadoghq.com/dash/978415/buildhub2-performance)
 
-## Licence
+## License
 
 [MPL 2.0](http://www.mozilla.org/MPL/2.0/)
 
