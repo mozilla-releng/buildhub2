@@ -387,7 +387,8 @@ function NoticeAboutL10nRepacks() {
           rel="noopener noreferrer"
         >
           Bug #1459302
-        </a>.
+        </a>
+        .
       </p>
       <p>
         The <i>non</i>-en-US builds that currently appear a from migration of
