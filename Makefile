@@ -41,7 +41,7 @@ migrate: .env
 
 shell: .env .docker-build
 	# Use `-u 0` to automatically become root in the shell
-	docker-compose run --user 0 web bash
+	docker-compose run --user 0 --service-ports web bash
 
 currentshell: .env .docker-build
 	# Use `-u 0` to automatically become root in the shell
