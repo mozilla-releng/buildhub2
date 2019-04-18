@@ -5,11 +5,11 @@
 import json
 import os
 import re
-import subprocess
 
-import dj_database_url
 from configurations import Configuration, values
+import dj_database_url
 from dockerflow.version import get_version
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -352,19 +352,10 @@ class Localdev(Base):
     @property
     def VERSION(self):
         fn = os.path.join(self.BASE_DIR, "version.json")
-        try:
-            with open(fn) as f:
-                return json.load(f)
-        except FileNotFoundError:
-            output = subprocess.check_output(
-                # Use the absolute path of 'git' here to avoid 'git'
-                # not being the git we expect in Docker.
-                ["/usr/bin/git", "describe", "--tags", "--always", "--abbrev=0"]
-            )  # nosec
-            if output:
-                return {"version": output.decode().strip()}
-            else:
-                return {}
+        if os.path.exists(fn):
+            with open(fn) as fp:
+                return json.load(fp)
+        return {}
 
     @property
     def LOGGING(self):
