@@ -165,9 +165,9 @@ pytest-cov==2.6.1 \
 elasticsearch==7.0.0 \
     --hash=sha256:c621f2272bb2f000d228dc7016d058a1f90f15babdc938240b9f2d13690222db \
     --hash=sha256:cf6cf834b6d0172dac5e704c398a11d1917cf61f15d32b79b1ddad4cd673c4b1
-elasticsearch-dsl==6.3.1 \
-    --hash=sha256:5f43196a3fd91b2eac90f7345e99f92c66004d85a1fd803cdecf756430827231 \
-    --hash=sha256:5f80b3b4a6e61db5d273bc57c32a80b2ddbc555afcc122c62c20440c355008be
+elasticsearch-dsl==7.0.0 \
+    --hash=sha256:2aedc2a4dbba9870249a57d1798ec29e44404619bded66ac920f5d6a1cbb6f22 \
+    --hash=sha256:763fb28add254f2c3a1d071cd114466d8a27f640e02a874afba7b8a04147c094
 ipaddress==1.0.22 \
     --hash=sha256:64b28eec5e78e7510698f6d4da08800a5c575caa4a286c93d651c5d3ff7b6794 \
     --hash=sha256:b146c751ea45cad6188dd6cf2d9b757f6f4f8d6ffb96a023e6f2e26eea02a72c
