@@ -134,11 +134,11 @@ class Core(Configuration, AWS, CORS, Whitenoise, CSP, Backfill):
     ]
 
     MIDDLEWARE = [
+        "dockerflow.django.middleware.DockerflowMiddleware",
         "django.middleware.security.SecurityMiddleware",
         "corsheaders.middleware.CorsMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        "dockerflow.django.middleware.DockerflowMiddleware",
         "csp.middleware.CSPMiddleware",
         "whitenoise.middleware.WhiteNoiseMiddleware",
         "buildhub.middleware.StatsMiddleware",
