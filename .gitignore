@@ -11,3 +11,4 @@ docs/_build/
 docs/.bash_history
 docsvenv/
 buildhub/ingest/management/commands/.kinto-migration-last-url
+.env

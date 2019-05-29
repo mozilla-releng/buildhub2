@@ -4,9 +4,9 @@
 
 import os
 import random
+from unittest import mock
 
 import pytest
-import mock
 
 from django.urls import reverse
 

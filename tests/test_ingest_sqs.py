@@ -4,8 +4,8 @@
 
 import io
 import json
+from unittest import mock
 
-import mock
 import pytest
 from botocore.exceptions import ClientError
 from django.core.management import call_command
