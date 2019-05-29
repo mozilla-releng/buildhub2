@@ -40,17 +40,11 @@ Code is pushed to GitHub. On every push, CircleCI_ builds a
 "latest" build to `Docker Hub`_ as well as one based on the CircleCI
 build number and one based on any git tags.
 
-Git tagging is done manually by the team. The expected format is something
-like this::
+Git tagging is done manually by the team. Do this::
 
-    git tag -s -a 2017.04.17 -m "Message about this release"
+    $ make tag
 
-The tag format isn't particularly important but it's useful to make it
-chronological in nature so it's easy to compare tags without having
-to dig deeper. The format is a date, but if there are more tags
-made on the same date, append a hyphen and a number. For example::
-
-    git tag -s -a 2017.04.17-2 -m "Fix for sudden problem"
+That will build the tag with the right name and message.
 
 .. _CircleCI: https://circleci.com/gh/mozilla-services/buildhub2
 .. _`Docker Hub`: https://hub.docker.com/r/mozilla/buildhub2/
