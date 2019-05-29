@@ -8,7 +8,7 @@ import shutil
 from functools import partial
 
 import pytest
-import mock
+from unittest import mock
 import requests
 import requests_mock
 

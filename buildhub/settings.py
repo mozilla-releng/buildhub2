@@ -5,11 +5,11 @@
 import json
 import os
 import re
-import subprocess
 
-import dj_database_url
 from configurations import Configuration, values
+import dj_database_url
 from dockerflow.version import get_version
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -134,11 +134,11 @@ class Core(Configuration, AWS, CORS, Whitenoise, CSP, Backfill):
     ]
 
     MIDDLEWARE = [
+        "dockerflow.django.middleware.DockerflowMiddleware",
         "django.middleware.security.SecurityMiddleware",
         "corsheaders.middleware.CorsMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
-        "dockerflow.django.middleware.DockerflowMiddleware",
         "csp.middleware.CSPMiddleware",
         "whitenoise.middleware.WhiteNoiseMiddleware",
         "buildhub.middleware.StatsMiddleware",
@@ -327,7 +327,7 @@ class Base(Core, Elasticsearch):
             # If we disable the SECURE_SSL_REDIRECT (in other words omit setting it)
             # the /__heartbeat__ will complain and thus we can't use that endpoint
             # for our regular monitoring.
-            # See https://github.com/mozilla/buildhub2/issues/411
+            # See https://github.com/mozilla-services/buildhub2/issues/411
             "security.W008",
         ]
     )
@@ -352,19 +352,10 @@ class Localdev(Base):
     @property
     def VERSION(self):
         fn = os.path.join(self.BASE_DIR, "version.json")
-        try:
-            with open(fn) as f:
-                return json.load(f)
-        except FileNotFoundError:
-            output = subprocess.check_output(
-                # Use the absolute path of 'git' here to avoid 'git'
-                # not being the git we expect in Docker.
-                ["/usr/bin/git", "describe", "--tags", "--always", "--abbrev=0"]
-            )  # nosec
-            if output:
-                return {"version": output.decode().strip()}
-            else:
-                return {}
+        if os.path.exists(fn):
+            with open(fn) as fp:
+                return json.load(fp)
+        return {}
 
     @property
     def LOGGING(self):

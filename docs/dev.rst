@@ -14,37 +14,31 @@ All code files need to start with the MPLv2 header::
     # License, v. 2.0. If a copy of the MPL was not distributed with this
     # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-Black
------
+Linting
+-------
 
-All Pythoncode is expected to be formatted exactly as
-`black <https://github.com/ambv/black>`_ wants it formatted. The version of ``black``
-is dictated by the ``requirements.txt``. Make sure your IDE matches that.
+We use `flake8 <http://flake8.pycqa.org/>`_ for linting Python code. See
+https://github.com/mozilla-services/buildhub2/blob/master/.flake8 for rules.
 
-The CI job will check that all code needs *no* formatted or else the CI build fails.
+We use `black <https://github.com/ambv/black>`_ for fixing Python code
+formatting. The specific version is in ``requirements.txt`` so use that one in
+your IDE.
 
-To make sure the code you write is ``black`` compatible run:
+We use `prettier <https://prettier.io/>`_ for linting and fixing JS code.
 
-.. code-block:: shell
+CI will fail if linting raises any errors.
 
-    $ docker-compose run web blackfix
-
-Flake8
-------
-
-``black`` will take care of nit-style formatting such as quotation marks and
-indentation but the code also needs to be ``flake8`` perfect. This is also tested
-in CI. It relies on the ``.flake8`` file whose ``max-line-length`` matches
-the configuration for ``black`` and it's **88 characters**.
-
-There is no automated tool to fix ``flake8`` errors but since ``black`` takes care
-of most formatting, ``flake8`` is usually checking for unused imports and such.
-
-To check that your code is ``flake8`` perfect, run:
+To run linting tasks on Python and JS files:
 
 .. code-block:: shell
 
-    $ docker-compose run web lintcheck
+   $ make lintcheck
+
+To run lint-based fixing tasks on Python and JS files:
+
+.. code-block:: shell
+
+   $ make lintfix
 
 Local development
 =================
@@ -53,8 +47,8 @@ You run everything in Docker with:
 
 .. code-block:: shell
 
-    $ make build  # only needed once
-    $ make run
+   $ make build  # only needed once
+   $ make run
 
 This will start a server that is exposed on port ``8000`` so now you can
 reach ``http://localhost:8000`` with your browser or curl.
@@ -66,7 +60,7 @@ Lastly, you need to start the SQS daemon. This is started with:
 
 .. code-block:: shell
 
-    $ make daemon
+   $ make daemon
 
 This will run until an unexpected error happens or until you kill it with ``Ctrl-C``.
 
@@ -82,12 +76,12 @@ run `s3-file-maker`_. To do that run, on your host:
 
 .. code-block:: shell
 
-    cd "$GOPATH/src"
-    git clone https://github.com/mostlygeek/s3-file-maker.git
-    cd s3-file-maker
-    dep ensure
-    go build main.go
-    ./main [--help]
+   cd "$GOPATH/src"
+   git clone https://github.com/mostlygeek/s3-file-maker.git
+   cd s3-file-maker
+   dep ensure
+   go build main.go
+   ./main [--help]
 
 .. note:: This SQS queue can only be consumed by one person at a time.
 
@@ -103,23 +97,11 @@ To build the docs, run this:
 
 .. code-block:: shell
 
-    $ make docs
-
-This is the same as running:
-
-.. code-block:: shell
-
-    $ docker-compose run docs
+   $ make docs
 
 To iterate on writing docs and testing that what you type compiles correctly,
 run the above mentioned command on every save and then open the file
-``docs/_build/html/index.html``. E.g.
-
-.. code-block:: shell
-
-    # the 'open' command is for OSX
-    $ open docs/_build/html/index.html
-
+``docs/_build/html/index.html`` in a browser.
 
 .. _Sphinx: http://www.sphinx-doc.org/en/stable/
 
@@ -134,15 +116,14 @@ minimum needed.
 
    $ docker-compose run docs bash
 
-Now, you can run the command manually with just...:
+Now, you can run the command manually with this:
 
 .. code-block:: shell
 
-   > make html
+   app@...:~$ make html
 
 And keep an browser open to the file ``docs/_build/html/index.html`` in
 the host environment.
-
 
 Testing
 =======
@@ -153,35 +134,28 @@ To run the tests, run this:
 
    $ make test
 
-This is the same as running:
-
-.. code-block:: shell
-
-   $ docker-compose run web test
-
 If you need to run specific tests or pass in different arguments, you can run
-bash in the base container and then run ``py.test`` with whatever args you
-want. For example:
+bash in the base container and then run ``pytest`` with whatever args you want.
+For example:
 
 .. code-block:: shell
 
    $ make shell
-   > pytest
+   root@...:/app# pytest
 
    <pytest output>
-
 
 Hyperactive Test Running
 ========================
 
-If you want to make tests run as soon as you save a file you have to
-enter a shell and run ``ptw`` which is a Python package that is
-automatically installed when you enter the shell. For example:
+If you want to make tests run as soon as you save a file you have to enter a
+shell and run ``ptw`` which is a Python package that is automatically installed
+when you enter the shell. For example:
 
 .. code-block:: shell
 
    $ make shell
-   > pip install pytest-watch
+   root@...:/app# pip install pytest-watch
 
 That will re-run ``pytest`` as soon as any of the files change.
 If you want to pass any other regular options to ``pytest`` you can
@@ -189,10 +163,9 @@ after ``--`` like this:
 
 .. code-block:: shell
 
-  $ make shell
-  > pip install pytest-watch
-  > ptw -- -x --other-option
-
+   $ make shell
+   root@...:/app# pip install pytest-watch
+   root@...:/app# ptw -- -x --other-option
 
 Metrics Logging
 ===============
@@ -209,15 +182,13 @@ If the output of this is distracting on the foreground, you can add this to your
 That will effectively set that there are no backends of ``Markus`` and thus
 no logging messages about metrics.
 
-
 Python Requirements
 ===================
 
 All Python requirements needed for development and production needs to be
 listed in ``requirements.txt`` with sha256 hashes.
 
-The most convenient way to modify this is to run ``hashin`` in a shell.
-For example:
+The most convenient way to modify this is to run ``hashin``. For example:
 
 .. code-block:: shell
 
@@ -237,18 +208,17 @@ To check which Python packages are outdated, use `piprot`_ in a shell:
 .. code-block:: shell
 
    $ make shell
-   > pip install piprot
-   > piprot -o
+   root@...:/app# pip install piprot
+   root@...:/app# piprot -o requirements.txt
 
 The ``-o`` flag means it only lists requirements that are *out of date*.
 
 .. note:: A good idea is to install ``hashin`` and ``piprot`` globally
    on your computer instead. It doesn't require a virtual environment if
-   you use `pipsi`_.
+   you use `pipx`_.
 
 .. _piprot: https://github.com/sesh/piprot
-.. _pipsi: https://github.com/mitsuhiko/pipsi
-
+.. _pipx: https://pypi.org/project/pipx/
 
 How to Memory Profile Python
 ============================
@@ -259,27 +229,25 @@ shell and install it there:
 
 .. code-block:: shell
 
-    $ docker-compose run --service-ports --user 0  web bash
-    # pip install memory_profiler psutil
+   $ make shell
+   root@...:/app# pip install memory_profiler psutil
 
 Now, to see memory reports of running functions, add some code to the
 relevant functions you want to memory profile:
 
 .. code-block:: python
 
+   from memory_profiler import profile
 
-    from memory_profiler import profile
-
-    @profile
-    def some_view(request):
-        ...
+   @profile
+   def some_view(request):
+       ...
 
 Now run Gunicorn:
 
 .. code-block:: shell
 
-    $ python -m memory_profiler  `which gunicorn` buildhub.wsgi:application -b 0.0.0.0:8000 --timeout 60 --workers 1 --access-logfile -
-
+   $ python -m memory_profiler  `which gunicorn` buildhub.wsgi:application -b 0.0.0.0:8000 --timeout 60 --workers 1 --access-logfile -
 
 Python warnings
 ===============
@@ -289,14 +257,8 @@ Django with the ``PYTHONWARNINGS`` environment variable.
 
 .. code-block:: shell
 
-    $ docker-compose run --service-ports --user 0  web bash
-
-Then when you're in bash of the web container:
-
-.. code-block:: shell
-
-    # PYTHONWARNINGS=d ./manage.py runserver 0.0.0.0:8000
-
+   $ make shell
+   root@....:/app# PYTHONWARNINGS=d ./manage.py runserver 0.0.0.0:8000
 
 How to ``psql``
 ===============
@@ -305,17 +267,14 @@ The simplest way is to use the shortcut in the ``Makefile``
 
 .. code-block:: shell
 
-    $ make psql
+   $ make psql
 
 If you have a ``.sql`` file you want to send into ``psql`` you can do that
 too with:
 
 .. code-block:: shell
 
-    $ docker-compose run db psql -h db -U postgres < stats-queries.sql
-
-...for example.
-
+   $ docker-compose run db psql -h db -U postgres < stats-queries.sql
 
 Running Elasticsearch locally
 =============================
@@ -328,58 +287,25 @@ On macOS you can set, in your ``.env``:
 
 .. code-block:: shell
 
-    DJANGO_ES_URLS=http://docker.for.mac.host.internal:9200
+   DJANGO_ES_URLS=http://docker.for.mac.host.internal:9200
 
 Now, the Python inside Docker will connect to the Elasticsearch running on your host.
-
-
-Bors
-====
-
-All PRs should be merged via the `bors merge bot <https://bors.tech>`_. Bors
-will automate that the requirements for a PR have been met, and will then
-merge the PR in an orderly fashion.
-
-Only users with write access to the repository may use bors. Other users will
-get an error message. To use bors to merge a PR, leave a comment that
-includes a line such as::
-
-    bors r+
-
-Alternatively, you can list the user that approved the PR, which could be
-someone else, or multiple people, such as one of the following::
-
-    bors r= @alex
-    bors r= @bob, @carol
-
-If a PR should not be merged, for example because it is a work-in-progress,
-then add the label ``bors-dont-merge`` to the PR. This will prevent bors from
-merging the PR, even if it is ``r+``ed. To allow bors to merge the PR again,
-remove the label and say ``bors r+`` again.
-
-It is possible to temporarily delegate permission to a user to approve a
-particular PR. For example, if the PR is documentation for the ops team, you
-could grant merge access to the ops engineer reviewing the documentation.
-Note that delegating to a use that already has permission (such as an admin
-of the repo) has no affect. To do so, use a command such as::
-
-    bors delegate= @ops-dave
-
-If a PR failed to merge for an intermittent reason, such as network failure,
-you can instruct bors to try to merge the same commit with the same approver
-again with the command::
-
-    bors retry
-
-For more details, see `the bors reference docs <https://bors.tech/documentation/>`_
-
 
 pytest with coverage
 ====================
 
-First, ``pip install pytest-cov`` then you can run:
+You can run pytest with coverage like this:
 
 .. code-block:: shell
 
-    pytest --cov=buildhub --cov-report=html
-    open htmlcov/index.html
+   $ make shell
+   root@...:/app# pytest --cov=buildhub
+
+You can make it produce an HTML report:
+
+.. code-block:: shell
+
+   $ make shell
+   root@...:/app# pytest --cov=buildhub --cov-report=html
+
+Then you can open ``htmlcov/index.html`` in your browser.

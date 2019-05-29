@@ -63,11 +63,11 @@ Flow
 1. TaskCluster builds a, for example, ``Firefox-79-installer.exe`` and a ``buildhub.json``
 2. TaskCluster uploads these files into S3.
 3. An S3 configuration triggers an SQS event that puts this S3-write into the queue.
-4. This service notices the new file.
-5. Downloads the ``buildhub.json`` file from S3 using Python ``boto3``.
-6. Reads its payload and checks the JSON Schema validation.
-7. Inserts the JSON into PostgreSQL using the Django ORM.
-8. That JSON inserted into PosgreSQL is also inserted into Elasticsearch.
+4. Buildhub2 processor daemon polls the SQS queue and gets the file creation event.
+5. Buildhub2 processor daemon downloads the ``buildhub.json`` file from S3 using Python ``boto3``.
+6. Buildhub2 processor daemon reads its payload and checks the JSON Schema validation.
+7. Buildhub2 processor daemon inserts the JSON into PostgreSQL using the Django ORM.
+8. The JSON is then inserted into Elasticsearch.
 
 Validation
 ==========
