@@ -54,6 +54,11 @@ def run():
     message = _check_output(
         "git log {last_tag}..HEAD --oneline".format(last_tag=last_tag).split()
     )
+    # Take out Merge commit lines
+    message = '\n'.join([
+        line for line in message.splitlines()
+        if not line[8:].startswith('Merge pull request')
+    ])
 
     # Next, come up with the next tag name.
     # Normally it's today's date in ISO format with dots.
