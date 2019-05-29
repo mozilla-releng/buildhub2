@@ -13,9 +13,9 @@ Thunderbird, and Fennec.
 * Dependencies: `pyup <https://pyup.io/repos/github/mozilla-services/buildhub2/>`_ |
   `Renovate <https://renovateapp.com/>`_
 * Code style: `Black <https://github.com/ambv/black>`_
+* Deploy status: `What's Deployed <https://whatsdeployed.io/s-3QC>`_
 
 Production server: https://buildhub.moz.tools/
-
 
 .. |circleci| image:: https://circleci.com/gh/mozilla-services/buildhub2.svg?style=svg
 .. |docsstatus| image:: https://readthedocs.org/projects/buildhub2/badge/?version=latest
