@@ -81,7 +81,7 @@ def run():
     # Create tag
     input(">>> Ready to tag? Ctrl-c to cancel")
     print(">>> Creating tag...")
-    subprocess.check_call(["git", "tag", "-s", "-a", tag_name, "-m", message])
+    subprocess.check_call(["git", "tag", "-s", tag_name, "-m", message])
 
     # Push
     input(">>> Ready to push to origin? Ctrl-c to cancel")
