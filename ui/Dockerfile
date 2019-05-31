@@ -2,7 +2,7 @@
 #   docker-compose build ui
 #
 
-FROM node:9
+FROM node:10.16.0-slim as ui
 
 ADD ui/package.json /package.json
 ADD ui/yarn.lock /yarn.lock
