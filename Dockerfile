@@ -1,5 +1,5 @@
 # First all the things for building the UI
-FROM node:9 AS ui
+FROM node:10.16.0-slim as ui
 
 ARG CI=false
 ENV CI=${CI}

@@ -8,6 +8,7 @@ services:
       interval: 1s
       timeout: 3s
       retries: 30
+
   elasticsearch:
     # Intent to always match
     # https://github.com/mozilla-services/cloudops-infra/blob/buildhub2/projects/buildhub2/k8s/charts/elasticsearch/values.yaml
