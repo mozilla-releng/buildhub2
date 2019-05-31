@@ -26,7 +26,6 @@ def serve(request, **kwargs):
     _, ext = os.path.splitext(request.path_info)
     if ext:
         return http.HttpResponseNotFound(request.path_info)
-    document_root = kwargs["document_root"]
 
     response = django_serve(request, "/index.html", **kwargs)
     if isinstance(response, http.FileResponse):
