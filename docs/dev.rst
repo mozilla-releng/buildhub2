@@ -2,6 +2,43 @@
 Developer Documentation
 =======================
 
+Setting up a development environment
+====================================
+
+You can set up a development environment with:
+
+.. code-block:: shell
+
+   # Builds Docker containers
+   $ make build
+
+   # Drops and recreates Postgres db and Elasticseach index
+   $ make setup
+
+
+Buildhub2 has two parts: a webapp and a daemon.
+
+To run the webapp, do:
+
+.. code-block:: shell
+
+   # Runs web and ui and required services
+   $ make run
+
+This will start a server that is exposed on port ``8000`` so now you can
+reach ``http://localhost:8000`` with your browser or curl.
+
+It will also start the ``create-react-app`` dev server on port ``3000``. That's
+the main URL to use.
+
+To run the daemon that polls SQS for events and generates build information:
+
+.. code-block:: shell
+
+   $ make daemon
+
+This will run until an unexpected error happens or until you kill it with ``Ctrl-C``.
+
 Code
 ====
 
@@ -39,30 +76,6 @@ To run lint-based fixing tasks on Python and JS files:
 .. code-block:: shell
 
    $ make lintfix
-
-Local development
-=================
-
-You run everything in Docker with:
-
-.. code-block:: shell
-
-   $ make build  # only needed once
-   $ make run
-
-This will start a server that is exposed on port ``8000`` so now you can
-reach ``http://localhost:8000`` with your browser or curl.
-
-It will also start the ``create-react-app`` dev server on port ``3000``. That's
-the main URL to use.
-
-Lastly, you need to start the SQS daemon. This is started with:
-
-.. code-block:: shell
-
-   $ make daemon
-
-This will run until an unexpected error happens or until you kill it with ``Ctrl-C``.
 
 SQS Functional testing
 ======================

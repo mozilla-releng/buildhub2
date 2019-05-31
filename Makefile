@@ -10,6 +10,7 @@ default:
 	@echo "Welcome to the buildhub\n"
 	@echo "The list of commands for local development:\n"
 	@echo "  build            Builds the docker images for the docker-compose setup"
+	@echo "  setup            Initializes and sets up Postgres and Elasticsearch services"
 	@echo "  run              Runs the whole stack, served on http://localhost:8000/"
 	@echo "  gunicorn         Runs the whole stack using gunicorn on http://localhost:8000/"
 	@echo "  daemon           Start the SQS daemon"
@@ -38,6 +39,10 @@ build: .env
 	docker-compose build
 	touch .docker-build
 
+.PHONY: setup
+setup: .env
+	docker-compose run web /app/bin/setup-services.sh
+
 .PHONY: clean
 clean: .env stop
 	docker-compose rm -f
@@ -46,7 +51,6 @@ clean: .env stop
 
 .PHONY: migrate
 migrate: .env
-	# docker-compose run web python manage.py migrate --run-syncdb
 	docker-compose run web python manage.py migrate
 
 .PHONY: shell
@@ -61,7 +65,7 @@ currentshell: .env .docker-build
 
 .PHONY: psql
 psql: .env .docker-build
-	docker-compose run db psql -h db -U postgres
+	docker-compose run db psql --host db --username postgres
 
 .PHONY: stop
 stop: .env
