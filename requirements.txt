@@ -264,9 +264,9 @@ entrypoints==0.3 \
 wcwidth==0.1.7 \
     --hash=sha256:3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e \
     --hash=sha256:f4ebe71925af7b40a864553f761ed559b43544f8f71746c2d756c7fe788ade7c
-importlib-metadata==0.15 \
-    --hash=sha256:027cfc6524613de726789072f95d2e4cc64dd1dee8096d42d13f2ead5bd302f5 \
-    --hash=sha256:0d05199e1f0b1a8707a1b9c46476d4a49807fb56cb1b0737db1d37feb42fe31d
+importlib-metadata==0.17 \
+    --hash=sha256:a9f185022cfa69e9ca5f7eabfd5a58b689894cb78a11e3c8c89398a8ccbb8e7f \
+    --hash=sha256:df1403cd3aebeb2b1dcd3515ca062eecb5bd3ea7611f18cba81130c68707e879
 zipp==0.5.1 \
     --hash=sha256:8c1019c6aad13642199fbe458275ad6a84907634cc9f0989877ccc4a2840139d \
     --hash=sha256:ca943a7e809cc12257001ccfb99e3563da9af99d52f261725e96dfe0f9275bc3
