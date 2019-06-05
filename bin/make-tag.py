@@ -5,10 +5,23 @@
 
 import datetime
 import subprocess
+import sys
 
 
 def _check_output(*args, **kwargs):
     return subprocess.check_output(*args, **kwargs).decode("utf-8").strip()
+
+
+def get_remote_name():
+    # Figure out remote to push tag to
+    remote_output = _check_output("git remote -v".split())
+
+    for line in remote_output.splitlines():
+        line = line.split("\t")
+        if "mozilla-services" in line[1]:
+            return line[0]
+
+    raise Exception("Can't figure out remote name for mozilla-services.")
 
 
 def run():
@@ -78,18 +91,18 @@ def run():
     print(message)
     print("=" * 80)
 
+    remote_name = get_remote_name()
+
     # Create tag
-    input(">>> Ready to tag? Ctrl-c to cancel")
+    input(">>> Ready to tag \"{}\"? Ctrl-c to cancel".format(tag_name))
     print(">>> Creating tag...")
     subprocess.check_call(["git", "tag", "-s", tag_name, "-m", message])
 
-    # Push
-    input(">>> Ready to push to origin? Ctrl-c to cancel")
+    # Push tag
+    input(">>> Ready to push to remote \"{}\"? Ctrl-c to cancel".format(remote_name))
     print(">>> Pushing...")
-    subprocess.check_call("git push origin master --tags".split())
+    subprocess.check_call(["git", "push", "--tags", remote_name, tag_name])
 
 
 if __name__ == "__main__":
-    import sys
-
     sys.exit(run())
