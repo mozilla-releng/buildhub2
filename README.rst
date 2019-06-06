@@ -1,4 +1,4 @@
-buildhub2
+Buildhub2
 =========
 
 Buildhub2 is an index of build information for Firefox, Firefox Dev Edition,
@@ -31,29 +31,29 @@ files that is always accompanied is a file called ``buildhub.json`` that we
 download, validate an index into a PostgreSQL database as well as
 Elasticsearch.
 
-The way we consume these is that every S3 write triggers its key into an SQS
-queue which we consume with a daemon script.
+When files are saved to the S3 bucket, the filename gets added to the SQS queue
+which is consumed by the daemon. The daemon looks at the filenames and indexes
+the ``buildhub.json`` ones into Buidlhub2.
 
-The UI is a static single-page-app that helps you make Elasticsearch queries.
+Buildhub2 has a webapp which is a single-page-app that helps you make Elasticsearch
+queries and displays the results.
+
+Buildhub2 has an API which you can use to query the data.
+
+For more on these, see the `user docs <https://buildhub2.readthedocs.io/en/latest/user.html>`_.
+
 
 First Principles
 ----------------
 
-Please read the
-`First Principles <https://buildhub2.readthedocs.io/en/latest/architecture.html#first-principles>`_
-section in the main documentation about some important basic rules about Buildhub2.
+**Buildhub2 reflects data on archive.mozilla.org.**
 
-Get going
----------
+Buildhub2 will never modify, create, or remove build data from the
+``buildhub.json`` files that are discovered and indexed. If the data is wrong,
+it needs to be fixed on archive.mozilla.org.
 
-`Developer documentation <https://buildhub2.readthedocs.io/en/latest/dev.html>`_.
+**Buildhub2 records are immutable.**
 
-Dockerhub
----------
-
-We deploy what we ship to `Docker Hub <https://hub.docker.com/r/mozilla/buildhub2/>`_.
-
-Environments and deployments
-----------------------------
-
-`Deploy documentation <https://buildhub2.readthedocs.io/en/latest/deployments.html>`_
+If a certain ``buildhub.json`` file is created, its primary key becomes a hash
+of its content. If, under the same URL, the ``buildhub.json`` is modified, it
+will lead to **a new record in Buildhub**.

@@ -99,7 +99,8 @@ lintfix: .env .docker-build
 
 .PHONY: docs
 docs: .env .docker-build
-	docker-compose run docs
+	# FIXME(willkg): Shouldn't be doing this as root
+	docker-compose run --no-deps --user 0 --rm web docs/build-docs.sh
 
 .PHONY: tag
 tag:

@@ -1,24 +1,16 @@
-==========================================
-Buildhub2 - Mozilla Build Metadata Service
-==========================================
-
-An index of every release built by Mozilla.
-
-
-Contents
-========
+Buildhub2
+=========
 
 .. toctree::
    :maxdepth: 2
+   :caption: Contents:
 
+   project
+   user
    architecture
-   configuration
-   deployment
-   dev
-   ui
-   metrics
-   bootstrapping
-   backfilling
+   devenv
+   devhowto
+   qa
 
 
 Indices and tables

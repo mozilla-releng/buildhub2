@@ -36,19 +36,24 @@ jobs:
             docker-compose -f docker-compose.ci.yml build
 
       - run:
-          name: Run web tests
-          command: |
-            docker-compose -f docker-compose.ci.yml run test
-
-      - run:
           name: Lint check Python code
           command: |
             docker-compose -f docker-compose.ci.yml run test lintcheck
 
       - run:
+          name: Run web tests
+          command: |
+            docker-compose -f docker-compose.ci.yml run test
+
+      - run:
           name: Run ui build
           command: |
             docker-compose -f docker-compose.ci.yml run ui
+
+      - run:
+          name: Build docs
+          command: |
+            docker-compose -f docker-compose.ci.yml run --no-deps test docs/build-docs.sh
 
       - store_artifacts:
           path: ui/build
@@ -64,38 +69,6 @@ jobs:
             if [ -n "${CIRCLE_TAG}" ]; then
               ./bin/deploy-dockerhub.sh "$CIRCLE_TAG"
             fi
-
-  docs:
-    docker:
-      - image: circleci/python:3.7
-
-    working_directory: ~/buildhub2
-
-    steps:
-      - checkout
-
-      - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "docs/requirements.txt" }}
-
-      - run:
-          name: Create virtualenv
-          command: |
-            python3 -m venv ~/venv
-            echo "source ~/venv/bin/activate" >> $BASH_ENV
-      - run:
-          name: Install requirements
-          command: pip install -r docs/requirements.txt
-
-      - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "docs/requirements.txt" }}
-          paths:
-            - "~/venv"
-
-      - run:
-          name: Build docs
-          command: |
-            cd docs
-            make html
 
 workflows:
   version: 2
