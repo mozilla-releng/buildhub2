@@ -78,4 +78,3 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - docs
