@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Build docs
           command: |
-            docker-compose -f docker-compose.ci.yml run --no-deps web docs/build-docs.sh
+            docker-compose -f docker-compose.ci.yml run --no-deps test docs/build-docs.sh
 
       - store_artifacts:
           path: ui/build
