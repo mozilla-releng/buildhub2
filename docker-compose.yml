@@ -69,14 +69,6 @@ services:
       - $PWD/ui:/app
     command: start
 
-  docs:
-    build:
-      context: .
-      dockerfile: docs/Dockerfile
-    volumes:
-      - $PWD/docs:/app
-    command: build
-
 volumes:
   esdata:
     driver: local
