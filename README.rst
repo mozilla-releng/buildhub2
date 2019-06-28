@@ -4,22 +4,27 @@ Buildhub2
 Buildhub2 is an index of build information for Firefox, Firefox Dev Edition,
 Thunderbird, and Fennec.
 
-|circleci| |docsstatus| |whatsdeployed|
+.. image:: https://circleci.com/gh/mozilla-services/buildhub2.svg?style=svg
+   :alt: Circle CI status
+   :target: https://circleci.com/gh/mozilla-services/buildhub2
+.. image:: https://pyup.io/repos/github/mozilla-services/buildhub2/shield.svg
+   :alt: pyup status
+   :target: https://pyup.io/repos/github/mozilla-services/buildhub2/
+.. image:: https://img.shields.io/badge/renovate-enabled-brightgreen.svg
+   :alt: rennovate status
+   :target: https://renovateapp.com/
+.. image:: https://img.shields.io/badge/whatsdeployed-dev,stage,prod-green.svg
+   :alt: What's Deployed
+   :target: https://whatsdeployed.io/s-3QC
+.. image:: https://readthedocs.org/projects/buildhub2/badge/?version=latest
+   :alt: ReadTheDocs status
+   :target: https://buildhub2.readthedocs.io/
 
 * License: MPLv2
-* Documentation: `<https://buildhub2.readthedocs.io/>`_
 * Community Participation Guidelines: `<https://github.com/mozilla-services/tecken/blob/master/CODE_OF_CONDUCT.md>`_
-* CI: `CircleCI <https://circleci.com/gh/mozilla-services/buildhub2>`_
-* Dependencies: `pyup <https://pyup.io/repos/github/mozilla-services/buildhub2/>`_ |
-  `Renovate <https://renovateapp.com/>`_
 * Code style: `Black <https://github.com/ambv/black>`_
-* Deploy status: `What's Deployed <https://whatsdeployed.io/s-3QC>`_
 
 Production server: https://buildhub.moz.tools/
-
-.. |circleci| image:: https://circleci.com/gh/mozilla-services/buildhub2.svg?style=svg
-.. |docsstatus| image:: https://readthedocs.org/projects/buildhub2/badge/?version=latest
-.. |whatsdeployed| image:: https://img.shields.io/badge/whatsdeployed-stage,prod-green.svg
 
 
 Overview
