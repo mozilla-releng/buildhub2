@@ -19,7 +19,7 @@ from jsonschema.validators import validator_for
 from buildhub.main.search import BuildDoc, es_retry
 
 with open(os.path.join(settings.BASE_DIR, "schema.yaml")) as f:
-    SCHEMA = yaml.load(f)["schema"]
+    SCHEMA = yaml.safe_load(f)["schema"]
 _validator_class = validator_for(SCHEMA)
 _validator_class.check_schema(SCHEMA)
 validator = _validator_class(SCHEMA)
