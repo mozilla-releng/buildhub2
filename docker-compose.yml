@@ -3,8 +3,14 @@ version: "3"
 services:
   db:
     image: postgres:9.6@sha256:78890d2b9c6a8eb312b1c4f4ee460da1d1d16d27f94312b910fbf43a30230ba4
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=buildhub2
+      - POSTGRES_PASSWORD=buildhub2
+      - POSTGRES_DB=buildhub2
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: ["CMD", "pg_isready", "-U", "buildhub2", "-d", "buildhub2"]
       interval: 1s
       timeout: 3s
       retries: 30
@@ -50,6 +56,7 @@ services:
     environment:
       - DJANGO_CONFIGURATION
       - DJANGO_ES_URLS=http://elasticsearch:9200
+      - BUILDHUB2_DATABASE_URL=postgres://buildhub2:buildhub2@db/buildhub2
       - DEVELOPMENT=1
     volumes:
       - $PWD:/app
@@ -72,3 +79,4 @@ services:
 volumes:
   esdata:
     driver: local
+  pgdata:
