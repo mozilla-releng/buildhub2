@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@hot-loader/react-dom": "^16.8.6",
     "@searchkit/refinement-autosuggest": "0.0.1-6",
     "filesize": "4.1.2",
     "react": "16.8.6",

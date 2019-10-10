@@ -1,7 +1,7 @@
 const DEFAULT_HOST = 'localhost';
 const DEFAULT_PORT = 3000;
 const port = process.env.PORT || DEFAULT_PORT;
-const REACT_APP_KINTO_COLLECTION_URL = process.env.REACT_APP_KINTO_COLLECTION_URL || http://localhost:8000/api
+const REACT_APP_KINTO_COLLECTION_URL = process.env.REACT_APP_KINTO_COLLECTION_URL || 'http://localhost:8000/api'
 
 module.exports = {
   options: {
@@ -44,6 +44,5 @@ module.exports = {
       neutrino.config.output.set('globalObject', 'this');
     },
     '@neutrinojs/jest',
-    '@neutrinojs/style-loader'
   ]
 };
