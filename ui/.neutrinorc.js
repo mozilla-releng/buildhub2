@@ -26,9 +26,6 @@ module.exports = {
             'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; always;',
           },
         },
-        html: {
-          template: 'src/index.html',
-        },
         env: {
           HOST: DEFAULT_HOST,
           PORT: DEFAULT_PORT,

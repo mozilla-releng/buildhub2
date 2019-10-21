@@ -67,6 +67,8 @@ services:
       context: .
       dockerfile: ui/Dockerfile
     environment:
+      - HOST=0.0.0.0
+      - PORT=3000
       - NODE_ENV=development
       - REACT_APP_KINTO_COLLECTION_URL=http://localhost:8000/api/
     ports:
