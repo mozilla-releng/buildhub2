@@ -1,7 +1,7 @@
 const DEFAULT_HOST = 'localhost';
 const DEFAULT_PORT = 3000;
 const port = process.env.PORT || DEFAULT_PORT;
-const REACT_APP_KINTO_COLLECTION_URL = process.env.REACT_APP_KINTO_COLLECTION_URL || 'http://localhost:8000/api'
+const REACT_APP_COLLECTION_URL = process.env.REACT_APP_COLLECTION_URL || 'http://localhost:8000/api'
 
 module.exports = {
   options: {
@@ -29,7 +29,7 @@ module.exports = {
         env: {
           HOST: DEFAULT_HOST,
           PORT: DEFAULT_PORT,
-          REACT_APP_KINTO_COLLECTION_URL,
+          REACT_APP_COLLECTION_URL,
         },
       }
     ],

@@ -70,7 +70,7 @@ services:
       - HOST=0.0.0.0
       - PORT=3000
       - NODE_ENV=development
-      - REACT_APP_KINTO_COLLECTION_URL=http://localhost:8000/api/
+      - REACT_APP_COLLECTION_URL=http://localhost:8000/api/
     ports:
       - "3000:3000"
       - "35729:35729"
