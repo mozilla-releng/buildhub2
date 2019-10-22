@@ -8,6 +8,7 @@ module.exports = {
     root: __dirname,
   },
   use: [
+    '@mozilla-frontend-infra/react-lint',
     [
       '@neutrinojs/react',
       {

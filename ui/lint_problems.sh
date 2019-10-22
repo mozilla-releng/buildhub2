@@ -34,7 +34,7 @@ done < "${1:-/dev/stdin}"
 $any && echo "
 If you're not interested in how they're different, consider running:
 
-  yarn run lint:prettierfix
+  yarn run lint
 "
 
 $any && exit 1 || exit 0

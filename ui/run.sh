@@ -32,10 +32,10 @@ case $1 in
     yarn outdated
     ;;
   lintcheck)
-    yarn run lint:prettier
+    yarn run lint
     ;;
   lintfix)
-    yarn run lint:prettierfix
+    yarn run lint --fix
     ;;
   *)
     exec "$@"

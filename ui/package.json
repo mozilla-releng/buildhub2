@@ -11,6 +11,7 @@
     "searchkit": "2.3.0"
   },
   "devDependencies": {
+    "@mozilla-frontend-infra/react-lint": "^1.2.2",
     "@neutrinojs/jest": "9.0.0-rc.0",
     "@neutrinojs/react": "9.0.0-rc.0",
     "dotenv": "^8.0.0",
@@ -35,6 +36,6 @@
     "build": "dotenv webpack -- --mode production",
     "start": "dotenv webpack-dev-server -- --mode development",
     "test": "jest",
-    "lint": "eslint --cache --format codeframe --ext mjs,jsx,js src test"
+    "lint": "eslint --cache --format codeframe --ext mjs,jsx,js src"
   }
 }

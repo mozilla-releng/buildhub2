@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import React, { Component } from "react";
-import "./App.css";
-import filesize from "filesize";
-
+import React, { Component } from 'react';
+import './App.css';
+import filesize from 'filesize';
 import {
   SearchBox,
   NoHits,
@@ -18,148 +17,140 @@ import {
   ResetFilters,
   SearchkitManager,
   SearchkitProvider,
-  Tabs
-} from "searchkit";
-
-import { RefinementAutosuggest } from "@searchkit/refinement-autosuggest";
-
-import {
+  Tabs,
   Layout,
   TopBar,
   LayoutBody,
   LayoutResults,
   ActionBar,
   ActionBarRow,
-  SideBar
-} from "searchkit";
+  SideBar,
+} from 'searchkit';
+import { RefinementAutosuggest } from '@searchkit/refinement-autosuggest';
+import 'searchkit/release/theme.css';
 
-import "searchkit/release/theme.css";
-
-const COLLECTION_URL = process.env.REACT_APP_COLLECTION_URL || "/api/";
-
+const COLLECTION_URL = process.env.REACT_APP_COLLECTION_URL || '/api/';
 const searchkit = new SearchkitManager(COLLECTION_URL, {
-  searchUrlPath: "search"
+  searchUrlPath: 'search',
 });
+const HitsTable = ({ hits }) => (
+  <div style={{ width: '100%', boxSizing: 'border-box', padding: 8 }}>
+    <table
+      className="sk-table sk-table-striped"
+      style={{ width: '100%', boxSizing: 'border-box' }}>
+      <thead>
+        <tr>
+          <th />
+          <th>Product</th>
+          <th>Version</th>
+          <th>platform</th>
+          <th>channel</th>
+          <th>locale</th>
+          <th>Tree</th>
+          <th>Size</th>
+          <th>Published on</th>
+          <th>Build ID</th>
+          <th>Revision</th>
+        </tr>
+      </thead>
+      <tbody>
+        {hits.map(
+          ({
+            _source: { build, download, source, target },
+            _id,
+            highlight,
+          }) => {
+            const recordUrl = `${COLLECTION_URL}records/${_id}`;
+            const revisionUrl = source.revision ? (
+              <a href={`${source.repository}/rev/${source.revision}`}>
+                {source.revision.substring(0, 6)}
+              </a>
+            ) : (
+              ''
+            );
+            const getHighlight = (title, value) => ({
+              __html: (highlight && highlight[title]) || value,
+            });
 
-const HitsTable = ({ hits }) => {
-  return (
-    <div style={{ width: "100%", boxSizing: "border-box", padding: 8 }}>
-      <table
-        className="sk-table sk-table-striped"
-        style={{ width: "100%", boxSizing: "border-box" }}
-      >
-        <thead>
-          <tr>
-            <th />
-            <th>Product</th>
-            <th>Version</th>
-            <th>platform</th>
-            <th>channel</th>
-            <th>locale</th>
-            <th>Tree</th>
-            <th>Size</th>
-            <th>Published on</th>
-            <th>Build ID</th>
-            <th>Revision</th>
-          </tr>
-        </thead>
-        <tbody>
-          {hits.map(
-            ({
-              _source: { build, download, source, target },
-              _id,
-              highlight
-            }) => {
-              const recordUrl = `${COLLECTION_URL}records/${_id}`;
-              const revisionUrl = source.revision ? (
-                <a href={`${source.repository}/rev/${source.revision}`}>
-                  {source.revision.substring(0, 6)}
-                </a>
-              ) : (
-                ""
-              );
-              const getHighlight = (title, value) => {
-                return { __html: (highlight && highlight[title]) || value };
-              };
-              return (
-                <tr key={_id} id={_id}>
-                  <td>
-                    <a href={`#${_id}`}>#</a>
-                  </td>
-                  <td
-                    dangerouslySetInnerHTML={getHighlight(
-                      "source.product",
-                      source.product
-                    )}
-                  />
-                  <td
-                    dangerouslySetInnerHTML={getHighlight(
-                      "target.version",
-                      target.version
-                    )}
-                  />
-                  <td
-                    dangerouslySetInnerHTML={getHighlight(
-                      "target.platform",
-                      target.platform
-                    )}
-                  />
-                  <td
-                    dangerouslySetInnerHTML={getHighlight(
-                      "target.channel",
-                      target.channel
-                    )}
-                  />
-                  <td
-                    dangerouslySetInnerHTML={getHighlight(
-                      "target.locale",
-                      target.locale
-                    )}
-                  />
-                  <td>{source.tree}</td>
-                  <td>
-                    <a href={download.url}>{filesize(download.size)}</a>
-                  </td>
-                  <td title={download.date}>
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={recordUrl}
-                    >
-                      <time dateTime={download.date}>{download.date}</time>
-                    </a>
-                  </td>
-                  <td
-                    dangerouslySetInnerHTML={getHighlight(
-                      "build.id",
-                      build && build.id
-                    )}
-                  />
-                  <td>{revisionUrl}</td>
-                </tr>
-              );
-            }
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-};
-
+            return (
+              <tr key={_id} id={_id}>
+                <td>
+                  <a href={`#${_id}`}>#</a>
+                </td>
+                <td
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={getHighlight(
+                    'source.product',
+                    source.product
+                  )}
+                />
+                <td
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={getHighlight(
+                    'target.version',
+                    target.version
+                  )}
+                />
+                <td
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={getHighlight(
+                    'target.platform',
+                    target.platform
+                  )}
+                />
+                <td
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={getHighlight(
+                    'target.channel',
+                    target.channel
+                  )}
+                />
+                <td
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={getHighlight(
+                    'target.locale',
+                    target.locale
+                  )}
+                />
+                <td>{source.tree}</td>
+                <td>
+                  <a href={download.url}>{filesize(download.size)}</a>
+                </td>
+                <td title={download.date}>
+                  <a target="_blank" rel="noopener noreferrer" href={recordUrl}>
+                    <time dateTime={download.date}>{download.date}</time>
+                  </a>
+                </td>
+                <td
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={getHighlight(
+                    'build.id',
+                    build && build.id
+                  )}
+                />
+                <td>{revisionUrl}</td>
+              </tr>
+            );
+          }
+        )}
+      </tbody>
+    </table>
+  </div>
+);
 const fullText = (query, options) => {
   if (!query) {
     return;
   }
+
   const fulltextQuery = query.startsWith("'")
     ? query.slice(1)
     : query
-        .split(" ")
-        .map(term => {
-          return `${term}*`;
-        })
-        .join(" ");
+        .split(' ')
+        .map(term => `${term}*`)
+        .join(' ');
+
   return {
-    query_string: Object.assign({ query: fulltextQuery }, options)
+    query_string: Object.assign({ query: fulltextQuery }, options),
   };
 };
 
@@ -167,23 +158,24 @@ class ProjectInfo extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      contributeJson: JSON.parse(sessionStorage.getItem("contributeJson"))
+      contributeJson: JSON.parse(sessionStorage.getItem('contributeJson')),
     };
   }
+
   componentDidMount() {
     if (!this.state.contributeJson) {
-      fetch("/contribute.json").then(r => {
+      fetch('/contribute.json').then(r => {
         if (r.status === 200) {
           r.json().then(response => {
             this.setState({ contributeJson: response }, () => {
               sessionStorage.setItem(
-                "contributeJson",
+                'contributeJson',
                 JSON.stringify(this.state.contributeJson)
               );
             });
           });
         } else {
-          console.warn(r);
+          // todo: something useful
         }
       });
     }
@@ -193,10 +185,11 @@ class ProjectInfo extends React.PureComponent {
     if (!this.state.contributeJson) {
       return null;
     }
+
     const {
       repository: { url: source, license },
       participate: { docs: documentation },
-      bugs: { report }
+      bugs: { report },
     } = this.state.contributeJson;
 
     return (
@@ -225,33 +218,32 @@ class App extends Component {
           <Layout>
             <TopBar>
               <SearchBox
-                autofocus={true}
-                searchOnChange={true}
+                autofocus
+                searchOnChange
                 placeholder="e.g. firefox 54 linux"
                 queryBuilder={fullText}
                 queryOptions={{
-                  analyzer: "standard",
-                  default_operator: "AND",
+                  analyzer: 'standard',
+                  default_operator: 'AND',
                   phrase_slop: 1,
                   auto_generate_phrase_queries: true,
                   analyze_wildcard: true,
                   lenient: true,
-                  split_on_whitespace: true
+                  split_on_whitespace: true,
                 }}
                 queryFields={[
-                  "source.product",
-                  "target.channel^1.2",
-                  "target.version^10",
-                  "target.locale^3",
-                  "target.platform^2",
-                  "build.id"
+                  'source.product',
+                  'target.channel^1.2',
+                  'target.version^10',
+                  'target.locale^3',
+                  'target.platform^2',
+                  'build.id',
                 ]}
               />
               <div className="elasticsearch-query-doc">
                 <a
                   href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax"
-                  title="You may use Elasticsearch query string syntax by prefixing it with a single quote"
-                >
+                  title="You may use Elasticsearch query string syntax by prefixing it with a single quote">
                   ?
                 </a>
               </div>
@@ -267,9 +259,9 @@ class App extends Component {
                   id="versions"
                   size={1000}
                   operator="OR"
-                  multi={true}
-                  orderKey={"_term"}
-                  orderDirection={"desc"}
+                  multi
+                  orderKey="_term"
+                  orderDirection="desc"
                 />
                 <RefinementAutosuggest
                   field="target.platform"
@@ -277,7 +269,7 @@ class App extends Component {
                   id="platform"
                   size={1000}
                   orderKey="_term"
-                  multi={true}
+                  multi
                 />
                 <RefinementAutosuggest
                   field="target.channel"
@@ -285,7 +277,7 @@ class App extends Component {
                   id="channel"
                   size={1000}
                   orderKey="_term"
-                  multi={true}
+                  multi
                 />
                 <RefinementAutosuggest
                   field="target.locale"
@@ -293,7 +285,7 @@ class App extends Component {
                   id="locale"
                   size={1000}
                   orderKey="_term"
-                  multi={true}
+                  multi
                 />
               </SideBar>
 
@@ -304,16 +296,16 @@ class App extends Component {
                     <SortingSelector
                       options={[
                         {
-                          label: "Published on",
-                          field: "download.date",
-                          order: "desc",
-                          defaultOption: true
+                          label: 'Published on',
+                          field: 'download.date',
+                          order: 'desc',
+                          defaultOption: true,
                         },
                         {
-                          label: "Build date",
-                          field: "build.date",
-                          order: "desc"
-                        }
+                          label: 'Build date',
+                          field: 'build.date',
+                          order: 'desc',
+                        },
                       ]}
                     />
                   </ActionBarRow>
@@ -328,7 +320,7 @@ class App extends Component {
                     title="Product"
                     id="products"
                     listComponent={Tabs}
-                    translations={{ All: "All products" }}
+                    translations={{ All: 'All products' }}
                   />
                 </ActionBar>
 
@@ -336,26 +328,26 @@ class App extends Component {
                   hitsPerPage={30}
                   listComponent={HitsTable}
                   highlightFields={[
-                    "source.product",
-                    "target.channel",
-                    "target.version",
-                    "target.locale",
-                    "target.platform",
-                    "build.id"
+                    'source.product',
+                    'target.channel',
+                    'target.version',
+                    'target.locale',
+                    'target.platform',
+                    'build.id',
                   ]}
                 />
                 <NoHits
                   translations={{
-                    "NoHits.NoResultsFound":
-                      "No release found were found for {query}",
-                    "NoHits.DidYouMean": "Search for {suggestion}",
-                    "NoHits.SearchWithoutFilters":
-                      "Search for {query} without filters"
+                    'NoHits.NoResultsFound':
+                      'No release found were found for {query}',
+                    'NoHits.DidYouMean': 'Search for {suggestion}',
+                    'NoHits.SearchWithoutFilters':
+                      'Search for {query} without filters',
                   }}
                   suggestionsField="target.version"
                 />
 
-                <Pagination showNumbers={true} />
+                <Pagination showNumbers />
               </LayoutResults>
             </LayoutBody>
           </Layout>
@@ -372,20 +364,19 @@ function NoticeAboutL10nRepacks() {
   return (
     <div className="notice-about-l10n-builds">
       <h4>
-        A note about{" "}
+        A note about{' '}
         <b>
           <i>non</i>-en-US
-        </b>{" "}
+        </b>{' '}
         builds!
       </h4>
       <p>
         At the moment, Buildhub only includes new <code>en-US</code> builds. To
-        get involved in all L10N builds please see{" "}
+        get involved in all L10N builds please see{' '}
         <a
           href="https://bugzilla.mozilla.org/show_bug.cgi?id=1459302"
           target="_blank"
-          rel="noopener noreferrer"
-        >
+          rel="noopener noreferrer">
           Bug #1459302
         </a>
         .
