@@ -26,7 +26,7 @@ We use `black <https://github.com/ambv/black>`_ for fixing Python code
 formatting. The specific version is in ``requirements.txt`` so use that one in
 your IDE.
 
-We use `prettier <https://prettier.io/>`_ for linting and fixing JS code.
+We use `eslint <https://eslint.org>`_ for linting and fixing JS code.
 
 CI will fail if linting raises any errors.
 
