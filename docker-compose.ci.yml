@@ -3,8 +3,14 @@ version: "3"
 services:
   db:
     image: postgres:9.6@sha256:78890d2b9c6a8eb312b1c4f4ee460da1d1d16d27f94312b910fbf43a30230ba4
+    volumes:
+      - testpgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=buildhub2
+      - POSTGRES_PASSWORD=buildhub2
+      - POSTGRES_DB=buildhub2
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: ["CMD", "pg_isready", "-U", "buildhub2", "-d", "buildhub2"]
       interval: 1s
       timeout: 3s
       retries: 30
@@ -19,6 +25,12 @@ services:
       - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - testesdata:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
 
@@ -37,7 +49,7 @@ services:
       # This tells run.sh to wait for databases to be fully up.
       - DEVELOPMENT=1
       - DJANGO_CONFIGURATION=Test
-      - DATABASE_URL=postgresql://postgres@db/postgres
+      - BUILDHUB2_DATABASE_URL=postgres://buildhub2:buildhub2@db/buildhub2
       - DJANGO_ES_URLS=http://elasticsearch:9200
     command: test
 
@@ -46,3 +58,7 @@ services:
       context: .
       dockerfile: ui/Dockerfile
     command: build
+volumes:
+  testesdata:
+    driver: local
+  testpgdata:

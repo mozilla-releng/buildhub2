@@ -12,8 +12,8 @@ usage() {
   echo "    start                         Start React dev server"
   echo "    build                         Build all static assets"
   echo "    outdated                      List npm packages that are outdated"
-  echo "    lintcheck                     Prettier check all the source files"
-  echo "    lintfix                       Let Prettier fix all source files"
+  echo "    lintcheck                     eslint check all the source files"
+  echo "    lintfix                       Let eslint fix all source files"
   echo ""
   exit 1
 }
@@ -32,10 +32,10 @@ case $1 in
     yarn outdated
     ;;
   lintcheck)
-    yarn run lint:prettier
+    yarn run lint
     ;;
   lintfix)
-    yarn run lint:prettierfix
+    yarn run lint --fix
     ;;
   *)
     exec "$@"

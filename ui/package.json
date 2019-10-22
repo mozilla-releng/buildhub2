@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@hot-loader/react-dom": "^16.8.6",
     "@searchkit/refinement-autosuggest": "0.0.1-6",
     "filesize": "4.1.2",
     "react": "16.8.6",
@@ -10,26 +11,31 @@
     "searchkit": "2.3.0"
   },
   "devDependencies": {
-    "prettier": "1.18.2",
-    "react-scripts": "1.1.5"
+    "@mozilla-frontend-infra/react-lint": "^1.2.2",
+    "@neutrinojs/jest": "9.0.0-rc.0",
+    "@neutrinojs/react": "9.0.0-rc.0",
+    "dotenv": "^8.0.0",
+    "dotenv-cli": "^2.0.0",
+    "eslint": "^5",
+    "jest": "^23",
+    "neutrino": "9.0.0-rc.0",
+    "webpack": "^4",
+    "webpack-cli": "^3",
+    "webpack-dev-server": "^3"
   },
   "resolutions": {
     "axios": ">=0.19.0",
     "braces": ">=2.3.1",
-    "eslint": ">=4.18.2",
     "handlebars": ">=4.1.2",
     "js-yaml": ">=3.13.1",
     "lodash": ">=4.17.13",
     "lodash.template": ">=4.5.0",
-    "mem": ">=4.0.0",
-    "webpack-dev-server": ">=3.1.11"
+    "mem": ">=4.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "lint:prettier": "prettier --list-different src/**/*.js | ./lint_problems.sh",
-    "lint:prettierfix": "prettier src/**/*.js --write"
-  },
-  "proxy": "http://web:8000"
+    "build": "dotenv webpack -- --mode production",
+    "start": "dotenv webpack-dev-server -- --mode development",
+    "test": "jest",
+    "lint": "eslint --cache --format codeframe --ext mjs,jsx,js src"
+  }
 }
