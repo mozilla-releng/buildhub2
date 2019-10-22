@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:9.6@sha256:78890d2b9c6a8eb312b1c4f4ee460da1d1d16d27f94312b910fbf43a30230ba4
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - testpgdata:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=buildhub2
       - POSTGRES_PASSWORD=buildhub2
@@ -30,7 +30,7 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - testesdata:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
 
@@ -59,6 +59,6 @@ services:
       dockerfile: ui/Dockerfile
     command: build
 volumes:
-  esdata:
+  testesdata:
     driver: local
-  pgdata:
+  testpgdata:
