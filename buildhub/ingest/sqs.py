@@ -143,6 +143,9 @@ def process_buildhub_json_key(config, s3):
             s3_object_etag=s3["object"]["eTag"],
         )
         inserted.append(ret)
+        # This is a hack to fix https://bugzilla.mozilla.org/show_bug.cgi?id=1470948
+        # In some future world we might be able to architecture buildhub in such a way
+        # where this sort of transformation isn't buried down deep in the code.
         if build["target"]["channel"] == "release":
             beta_build = deepcopy(build)
             beta_build["target"]["channel"] = "beta"
