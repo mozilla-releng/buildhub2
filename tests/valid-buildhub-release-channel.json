@@ -1,0 +1,30 @@
+{
+    "build": {
+        "as": "z:/task_1571244707/build/src/vs2017_15.8.4/VC/bin/HostX64/x64/ml64.exe",
+        "cc": "z:/task_1571244707/fetches/clang/bin/clang-cl.exe -Xclang -std=gnu99",
+        "cxx": "z:/task_1571244707/fetches/clang/bin/clang-cl.exe",
+        "date": "2019-10-16T16:19:57Z",
+        "host": "x86_64-pc-mingw32",
+        "id": "20191016161957",
+        "target": "x86_64-pc-mingw32"
+    },
+    "download": {
+        "date": "2019-10-16T21:24:22.032307+00:00",
+        "mimetype": "application/octet-stream",
+        "size": 51516392,
+        "url": "https://archive.mozilla.org/pub/firefox/candidates/70.0-candidates/build2/win64/en-US/Firefox%20Setup%2070.0.exe"
+    },
+    "source": {
+        "product": "firefox",
+        "repository": "https://hg.mozilla.org/releases/mozilla-release",
+        "revision": "990d9f90f0f5c02b8af12d784dc76ab40ea84781",
+        "tree": "mozilla-release"
+    },
+    "target": {
+        "channel": "release",
+        "locale": "en-US",
+        "os": "win",
+        "platform": "win64",
+        "version": "70.0"
+    }
+}

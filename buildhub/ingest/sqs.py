@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
+from copy import deepcopy
 import io
 import itertools
 import json
@@ -134,12 +135,24 @@ def process_buildhub_json_key(config, s3):
 
     # XXX Needs to deal with how to avoid corrupt buildhub.json S3 keys
     # never leaving the system.
+    inserted = []
     try:
-        inserted = Build.insert(
+        ret = Build.insert(
             build=build,
             s3_object_key=s3["object"]["key"],
             s3_object_etag=s3["object"]["eTag"],
         )
+        inserted.append(ret)
+        if build["target"]["channel"] == "release":
+            beta_build = deepcopy(build)
+            beta_build["target"]["channel"] = "beta"
+            ret = Build.insert(
+                build=beta_build,
+                s3_object_key=s3["object"]["key"],
+                s3_object_etag=s3["object"]["eTag"],
+            )
+            inserted.append(ret)
+
     except ValidationError as exc:
         # We're only doing a try:except ValidationError: here so we get a
         # chance to log a useful message about the S3 object and the
@@ -151,8 +164,9 @@ def process_buildhub_json_key(config, s3):
         )
         raise
     if inserted:
-        metrics.incr("sqs_inserted")
-        logger.info(f"Inserted {key_name} as a valid Build ({inserted.build_hash})")
+        for i in inserted:
+            metrics.incr("sqs_inserted")
+            logger.info(f"Inserted {key_name} as a valid Build ({i.build_hash})")
     else:
         metrics.incr("sqs_not_inserted")
         logger.info(f"Did not insert {key_name} because we already had it")

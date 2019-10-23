@@ -76,6 +76,66 @@ def test_start_happy_path(mocked_boto3, settings, valid_build, itertools_count, 
 
 @pytest.mark.django_db
 @mock.patch("buildhub.ingest.sqs.boto3")
+def test_start_happy_path_release_channel(mocked_boto3, settings, valid_build_release_channel, itertools_count, mocker):
+    mocked_message = mocker.MagicMock()
+    # See
+    # https://gist.github.com/peterbe/f739b91c0674d36a1526ccb43b6844c3#file-stage-json
+    # for a real life example of a SQS message.
+    message = {
+        "Message": json.dumps(
+            {
+                "Records": [
+                    {"foot": "here"},
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "some/path/to/buildhub.json",
+                                "eTag": "e4eb6609382efd6b3bc9deec616ad5c0",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
+                    },
+                    {
+                        "s3": {
+                            "object": {
+                                "key": "not/a/buildhub.json/file",
+                                "eTag": "77e09ba7e37836c2cf0ce59e1e8361ab",
+                            },
+                            "bucket": {"name": "buildhubses"},
+                        }
+                    },
+                ]
+            }
+        )
+    }
+    mocked_message.body = json.dumps(message)
+    mocked_queue = mocker.MagicMock()
+    mocked_queue.receive_messages().__iter__.return_value = [mocked_message]
+    mocked_boto3.resource().get_queue_by_name.return_value = mocked_queue
+
+    mocked_s3_client = mocker.MagicMock()
+    mocked_boto3.client.return_value = mocked_s3_client
+
+    def mocked_download_fileobj(bucket_name, key_name, f):
+        # Sanity checks that the mocking is right
+        assert bucket_name == "buildhubses"
+        assert key_name == "some/path/to/buildhub.json"
+        f.write(json.dumps(valid_build_release_channel()).encode("utf-8"))
+
+    mocked_s3_client.download_fileobj.side_effect = mocked_download_fileobj
+    start(settings.SQS_QUEUE_URL)
+    mocked_boto3.resource().get_queue_by_name.assert_called_with(
+        QueueName="buildhub-s3-events"
+    )
+    # It should have created 2 Builds
+    # TODO: verify channel on both objects
+    assert Build.objects.all().count() == 2
+
+    mocked_boto3.client.assert_called_with("s3", "ca-north-2", config=mock.ANY)
+
+
+@pytest.mark.django_db
+@mock.patch("buildhub.ingest.sqs.boto3")
 def test_records_legacy_message(
     mocked_boto3, settings, valid_build, itertools_count, mocker
 ):
