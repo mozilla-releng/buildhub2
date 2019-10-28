@@ -59,6 +59,11 @@ def valid_build_release_channel():
 
 
 @pytest.fixture
+def valid_build_fennec_release_channel():
+    return partial(_load, "valid-buildhub-fennec-release-channel.json")
+
+
+@pytest.fixture
 def elasticsearch(request):
     """Returns the index object for builds. But before, it re-creates the index.
     And after the index is deleted. All 404s ignored.
