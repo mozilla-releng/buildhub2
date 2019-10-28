@@ -166,7 +166,9 @@ def process_buildhub_json_key(config, s3):
             f"Validation error message: {exc.message}"
         )
         raise
-    if inserted:
+    # Build.insert() above can return None (for Builds that already exist).
+    # If anything was _actually_ inserted, log it.
+    if any(inserted):
         for i in inserted:
             metrics.incr("sqs_inserted")
             logger.info(f"Inserted {key_name} as a valid Build ({i.build_hash})")
