@@ -352,6 +352,8 @@ class Localdev(Base):
 
     LOGGING_USE_JSON = values.BooleanValue(False)
 
+    UNSIGNED_S3_CLIENT = values.BooleanValue(False)
+
     @property
     def VERSION(self):
         fn = os.path.join(self.BASE_DIR, "version.json")

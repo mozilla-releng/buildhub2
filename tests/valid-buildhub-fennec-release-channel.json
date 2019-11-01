@@ -1,0 +1,30 @@
+{
+    "build": {
+        "as": "/builds/worker/workspace/build/src/clang/bin/clang -std=gnu99 --target=x86_64-linux-android",
+        "cc": "/builds/worker/workspace/build/src/clang/bin/clang -std=gnu99 --target=x86_64-linux-android",
+        "cxx": "/builds/worker/workspace/build/src/clang/bin/clang++ --target=x86_64-linux-android",
+        "date": "2019-08-29T13:44:13Z",
+        "host": "x86_64-pc-linux-gnu",
+        "id": "20190829134413",
+        "target": "x86_64-pc-linux-android"
+    },
+    "download": {
+        "date": "2019-08-29T19:02:21.129666+00:00",
+        "mimetype": "application/octet-stream",
+        "size": 50637944,
+        "url": "https://archive.mozilla.org/pub/mobile/candidates/68.1-candidates/build1/android-x86_64/en-US/fennec-68.1.en-US.android-x86_64.apk"
+    },
+    "source": {
+        "product": "fennec",
+        "repository": "https://hg.mozilla.org/releases/mozilla-esr68",
+        "revision": "46d112299d475ffd9ef1c598f1ddb2ff3eec3360",
+        "tree": "mozilla-esr68"
+    },
+    "target": {
+        "channel": "release",
+        "locale": "en-US",
+        "os": "android",
+        "platform": "android-x86_64",
+        "version": "68.1"
+    }
+}
