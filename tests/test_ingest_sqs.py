@@ -76,7 +76,10 @@ def test_start_happy_path(mocked_boto3, settings, valid_build, itertools_count, 
 
 @pytest.mark.django_db
 @mock.patch("buildhub.ingest.sqs.boto3")
-def test_start_happy_path_release_channel(mocked_boto3, settings, valid_build_release_channel, itertools_count, mocker):
+def test_start_happy_path_release_channel(
+    mocked_boto3, settings, valid_build_release_channel, itertools_count, mocker
+):
+
     mocked_message = mocker.MagicMock()
     # See
     # https://gist.github.com/peterbe/f739b91c0674d36a1526ccb43b6844c3#file-stage-json
@@ -136,7 +139,10 @@ def test_start_happy_path_release_channel(mocked_boto3, settings, valid_build_re
 
 @pytest.mark.django_db
 @mock.patch("buildhub.ingest.sqs.boto3")
-def test_start_happy_path_fennec_release_channel(mocked_boto3, settings, valid_build_fennec_release_channel, itertools_count, mocker):
+def test_start_happy_path_fennec_release_channel(
+    mocked_boto3, settings, valid_build_fennec_release_channel, itertools_count, mocker
+):
+
     mocked_message = mocker.MagicMock()
     # See
     # https://gist.github.com/peterbe/f739b91c0674d36a1526ccb43b6844c3#file-stage-json
