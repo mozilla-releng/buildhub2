@@ -200,10 +200,7 @@ class Base(Core, Elasticsearch):
     DEBUG = values.BooleanValue(default=False)
     ALLOWED_HOSTS = values.ListValue([])
 
-    _DATABASES = values.DatabaseURLValue(
-        default="postgresql://localhost/buildhub2",
-        environ_name="BUILDHUB2_DATABASE_URL",
-    )
+    _DATABASES = values.DatabaseURLValue(default="postgresql://localhost/buildhub2")
     _KINTO_DATABASES = OptionalDatabaseURLValue(
         default="", alias="kinto", environ_name="KINTO_DATABASE_URL"
     )
