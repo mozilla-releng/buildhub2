@@ -1,7 +1,8 @@
 const DEFAULT_HOST = 'localhost';
 const DEFAULT_PORT = 3000;
 const port = process.env.PORT || DEFAULT_PORT;
-const REACT_APP_COLLECTION_URL = process.env.REACT_APP_COLLECTION_URL || 'http://localhost:8000/api'
+// This defaults to null because production relies on it being unset
+const REACT_APP_COLLECTION_URL = process.env.REACT_APP_COLLECTION_URL || null;
 
 module.exports = {
   options: {
