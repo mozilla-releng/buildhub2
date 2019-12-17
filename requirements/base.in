@@ -1,0 +1,16 @@
+backoff
+botocore
+boto3
+django
+django-configurations
+django-cors-headers
+dj-database-url
+dockerflow
+elasticsearch
+elasticsearch-dsl
+jsonschema
+markus
+psycopg2-binary
+pyyaml
+raven
+requests
