@@ -20,4 +20,4 @@ virtualenv==16.7.9 \
 
 # WARNING: The following packages were not pinned, but pip requires them to be
 # pinned when the requirements file includes hashes. Consider using the --allow-unsafe flag.
-# setuptools==42.0.2        # via jsonschema, sphinx
+# setuptools==42.0.2        # via gunicorn, jsonschema, sphinx
