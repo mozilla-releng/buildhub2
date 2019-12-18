@@ -57,7 +57,9 @@ def run():
             "refs/tags",
         ]
     )
-    last_tag_message = _check_output(["git", "tag", "-l", "--format=%(tag) %(contents)", last_tag])
+    last_tag_message = _check_output(
+        ["git", "tag", "-l", "--format=%(tag) %(contents)", last_tag]
+    )
 
     print(">>> Last tag was: {}".format(last_tag))
     print(">>> Message:")
@@ -68,10 +70,13 @@ def run():
         "git log {last_tag}..HEAD --oneline".format(last_tag=last_tag).split()
     )
     # Take out Merge commit lines
-    message = '\n'.join([
-        line for line in message.splitlines()
-        if not line[8:].startswith('Merge pull request')
-    ])
+    message = "\n".join(
+        [
+            line
+            for line in message.splitlines()
+            if not line[8:].startswith("Merge pull request")
+        ]
+    )
 
     # Next, come up with the next tag name.
     # Normally it's today's date in ISO format with dots.
@@ -94,12 +99,12 @@ def run():
     remote_name = get_remote_name()
 
     # Create tag
-    input(">>> Ready to tag \"{}\"? Ctrl-c to cancel".format(tag_name))
+    input('>>> Ready to tag "{}"? Ctrl-c to cancel'.format(tag_name))
     print(">>> Creating tag...")
     subprocess.check_call(["git", "tag", "-s", tag_name, "-m", message])
 
     # Push tag
-    input(">>> Ready to push to remote \"{}\"? Ctrl-c to cancel".format(remote_name))
+    input('>>> Ready to push to remote "{}"? Ctrl-c to cancel'.format(remote_name))
     print(">>> Pushing...")
     subprocess.check_call(["git", "push", "--tags", remote_name, tag_name])
 
