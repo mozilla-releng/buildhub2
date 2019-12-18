@@ -14,6 +14,8 @@ elasticsearch==6.3.1
 elasticsearch-dsl==6.3.1
 jsonschema
 markus
+sphinx
+sphinx-rtd-theme
 psycopg2-binary
 pyyaml
 raven
