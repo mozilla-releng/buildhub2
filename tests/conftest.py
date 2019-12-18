@@ -14,7 +14,16 @@ import requests_mock
 
 from django.conf import settings
 
+# Needed to make sure django-configurations works correctly
+# Without it, we get:
+# django.core.exceptions.ImproperlyConfigured:
+# django-configurations settings importer wasn't correctly installed.
+# Please use one of the starter functions to install it as mentioned
+# in the docs: https://django-configurations.readthedocs.io/
+from buildhub import wsgi
 from buildhub.main.search import BuildDoc
+
+assert wsgi
 
 
 def pytest_configure():

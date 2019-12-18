@@ -24,7 +24,7 @@ def test_check_elasticsearch_connection_error(mocker):
     mocked_fetch.side_effect = mocked_side_effect
     errors = check_elasticsearch(None)
     assert errors
-    error, = errors
+    (error,) = errors
     assert "Unable to connect to Elasticsearch" in error.msg
 
 
@@ -37,6 +37,6 @@ def test_check_elasticsearch_failed_health(mocker):
     mocked_fetch.side_effect = mocked_side_effect
     errors = check_elasticsearch(None)
     assert errors
-    error, = errors
+    (error,) = errors
     assert "not healthy" in error.msg
     assert "brownish" in error.msg

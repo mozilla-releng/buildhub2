@@ -75,7 +75,7 @@ class Command(BaseCommand):
             """,
                 [options["parent_id"], options["collection_id"]],
             )
-            total_records, = cursor.fetchone()
+            (total_records,) = cursor.fetchone()
             print(f"There are currently {total_records:,} in the Kinto database.")
 
         pages = 0

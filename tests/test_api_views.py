@@ -20,7 +20,7 @@ def test_happy_path(valid_build, client, elasticsearch):
     assert response.status_code == 200
     result = response.json()
     assert result["hits"]["total"] == 1
-    hit, = result["hits"]["hits"]
+    (hit,) = result["hits"]["hits"]
     assert hit["_source"]["target"]["version"] == build["target"]["version"]
 
     # No CSP header for the API requests since they're always JSON.

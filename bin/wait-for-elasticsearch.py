@@ -34,7 +34,7 @@ def _fatal_code(exception):
 @backoff.on_exception(
     backoff.constant,
     (ConnectionError, HTTPError),
-    max_tries=12,
+    max_tries=20,
     on_backoff=_backoff_hdlr,
     interval=2,
     jitter=None,

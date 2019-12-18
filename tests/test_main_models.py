@@ -36,7 +36,7 @@ def test_insert_writes_to_elasticsearch(settings, elasticsearch, valid_build):
     search = BuildDoc.search()
     response = search.execute()
     assert response.hits.total == 1
-    build_doc, = response
+    (build_doc,) = response
     assert build_doc.id == inserted.id
     as_dict = build_doc.to_dict()
     as_dict.pop("id")

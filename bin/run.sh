@@ -30,7 +30,6 @@ else
   echo "Not waiting for any services"
 fi
 
-
 case $1 in
   daemon)
     ${CMD_PREFIX_PYTHON:-python} manage.py daemon
