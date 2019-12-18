@@ -1,16 +1,21 @@
 backoff
 botocore
 boto3
-django
+# Because of https://github.com/mozilla/django-csp/issues/129
+django==2.2.8
 django-configurations
 django-cors-headers
+django_csp
 dj-database-url
 dockerflow
-elasticsearch
-elasticsearch-dsl
+# Pinned because upgrading breaks something
+# TODO: debug me!
+elasticsearch==6.3.1
+elasticsearch-dsl==6.3.1
 jsonschema
 markus
 psycopg2-binary
 pyyaml
 raven
 requests
+whitenoise
