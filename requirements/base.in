@@ -12,6 +12,7 @@ dockerflow
 # TODO: debug me!
 elasticsearch==6.3.1
 elasticsearch-dsl==6.3.1
+google-cloud-bigquery
 gunicorn
 jsonschema
 markus
