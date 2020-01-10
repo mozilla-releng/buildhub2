@@ -9,6 +9,7 @@ import os
 import yaml
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.core.serializers import serialize
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -44,6 +45,9 @@ class Build(models.Model):
 
     def to_search(self, **kwargs):
         return BuildDoc.create(self.id, **self.build)
+
+    def to_dict(self):
+        return json.loads(serialize("json", [self]))[0]["fields"]
 
     hash_prefix = "v1"
 

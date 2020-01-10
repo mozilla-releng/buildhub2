@@ -25,6 +25,37 @@ def test_insert(settings, valid_build):
 
 
 @pytest.mark.django_db
+def test_model_serialization(valid_build):
+    """Example document:
+    ```
+    {
+        "build_hash": "v1:465552ab2ea1b5039a086987b70c598c",
+        "metadata": {
+            "version": "Testing"
+        },
+        "build": {
+            ...
+        },
+        "created_at": "2020-01-10T22:46:32.274Z",
+        "s3_object_key": "",
+        "s3_object_etag": ""
+    }
+    ```
+    """
+    build = valid_build()
+    inserted = Build.insert(build)
+    doc = inserted.to_dict()
+    assert set(doc.keys()) == {
+        "build_hash",
+        "build",
+        "metadata",
+        "created_at",
+        "s3_object_key",
+        "s3_object_etag",
+    }
+
+
+@pytest.mark.django_db
 def test_insert_writes_to_elasticsearch(settings, elasticsearch, valid_build):
     build = valid_build()
     inserted = Build.insert(build)
