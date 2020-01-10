@@ -185,6 +185,11 @@ class Elasticsearch:
     MAX_SEARCH_SIZE = values.IntegerValue(1000)
 
 
+class BigQuery:
+    BQ_DATASET_ID = value.Value("buildhub2")
+    BQ_TABLE_ID = value.Value("builds")
+
+
 class OptionalDatabaseURLValue(values.DatabaseURLValue):
     def caster(self, url, **options):
         if not url:
