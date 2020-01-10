@@ -186,8 +186,8 @@ class Elasticsearch:
 
 
 class BigQuery:
-    BQ_DATASET_ID = value.Value("buildhub2")
-    BQ_TABLE_ID = value.Value("builds")
+    BQ_DATASET_ID = values.Value("buildhub2")
+    BQ_TABLE_ID = values.Value("builds")
 
 
 class OptionalDatabaseURLValue(values.DatabaseURLValue):
