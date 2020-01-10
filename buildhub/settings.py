@@ -387,8 +387,7 @@ class Localdev(Base):
 
 
 class Test(Base):
-    """Configurat
-    ion to be used during testing"""
+    """Configuration to be used during testing"""
 
     DEBUG = False
     ES_BUILD_INDEX = "test_buildhub2"
