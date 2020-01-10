@@ -186,6 +186,7 @@ class Elasticsearch:
 
 
 class BigQuery:
+    BQ_PROJECT_ID = values.Value("")
     BQ_DATASET_ID = values.Value("buildhub2")
     BQ_TABLE_ID = values.Value("builds")
 
@@ -197,8 +198,8 @@ class OptionalDatabaseURLValue(values.DatabaseURLValue):
         return dj_database_url.parse(url, **options)
 
 
-class Base(Core, Elasticsearch):
-    """Settings that may change per-environment, som defaults."""
+class Base(Core, Elasticsearch, BigQuery):
+    """Settings that may change per-environment, some defaults."""
 
     # Django
     SECRET_KEY = values.SecretValue()
