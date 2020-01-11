@@ -1,0 +1,140 @@
+[
+  {
+    "fields": [
+      {
+        "mode": "NULLABLE",
+        "name": "as",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "cc",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "cxx",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "date",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "host",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "id",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "ld",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "number",
+        "type": "INT64"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "target",
+        "type": "STRING"
+      }
+    ],
+    "mode": "REQUIRED",
+    "name": "build",
+    "type": "RECORD"
+  },
+  {
+    "fields": [
+      {
+        "mode": "REQUIRED",
+        "name": "date",
+        "type": "TIMESTAMP"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "mimetype",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "size",
+        "type": "INT64"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "url",
+        "type": "STRING"
+      }
+    ],
+    "mode": "REQUIRED",
+    "name": "download",
+    "type": "RECORD"
+  },
+  {
+    "fields": [
+      {
+        "mode": "REQUIRED",
+        "name": "product",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "repository",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "revision",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "tree",
+        "type": "STRING"
+      }
+    ],
+    "mode": "REQUIRED",
+    "name": "source",
+    "type": "RECORD"
+  },
+  {
+    "fields": [
+      {
+        "mode": "REQUIRED",
+        "name": "channel",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "locale",
+        "type": "STRING"
+      },
+      {
+        "mode": "NULLABLE",
+        "name": "os",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "platform",
+        "type": "STRING"
+      },
+      {
+        "mode": "REQUIRED",
+        "name": "version",
+        "type": "STRING"
+      }
+    ],
+    "mode": "REQUIRED",
+    "name": "target",
+    "type": "RECORD"
+  }
+]

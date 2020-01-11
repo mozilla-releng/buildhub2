@@ -13,6 +13,7 @@ import requests
 import requests_mock
 
 from django.conf import settings
+from google.cloud import bigquery
 
 # Needed to make sure django-configurations works correctly
 # Without it, we get:
@@ -22,6 +23,9 @@ from django.conf import settings
 # in the docs: https://django-configurations.readthedocs.io/
 from buildhub import wsgi
 from buildhub.main.search import BuildDoc
+from buildhub.main.bigquery import get_schema_file_object
+
+from utils import runif_bigquery_testing_enabled
 
 assert wsgi
 
@@ -93,6 +97,42 @@ def elasticsearch(request):
     build_index.create()
     yield build_index
     build_index.delete(ignore=404)
+
+
+@runif_bigquery_testing_enabled
+@pytest.fixture
+def bigquery_testing_table():
+    """Yields a BigQuery client and the reference to the testing table.
+    
+    Usage::
+
+        @runif_bigquery_testing_enabled
+        def test_bigquery_behavior(bigquery_testing_table):
+            client, table = bigquery
+            ...
+            errors = client.insert_rows(table, rows)
+            ...
+    """
+    project_id = settings.BQ_PROJECT_ID
+    client = bigquery.Client(project=project_id)
+
+    # create a new testing dataset
+    dataset_id = f"{settings.BQ_DATASET_ID}_pytest"
+    client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
+    client.create_dataset(dataset_id)
+
+    # create a partitioned table
+    schema = client.schema_from_json(get_schema_file_object())
+    table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}"
+    table = bigquery.table.Table(table_id, schema)
+    table.time_partitioning = bigquery.TimePartitioning(
+        type_=bigquery.TimePartitioningType.DAY, field="created_at"
+    )
+    client.create_table(table)
+
+    # yield and cleanup
+    yield client, table
+    client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
 
 
 @pytest.fixture

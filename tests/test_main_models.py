@@ -7,6 +7,7 @@ from jsonschema import ValidationError
 
 from buildhub.main.models import Build
 from buildhub.main.search import BuildDoc
+from utils import runif_bigquery_testing_enabled
 
 
 @pytest.mark.django_db
@@ -53,6 +54,21 @@ def test_model_serialization(valid_build):
         "s3_object_key",
         "s3_object_etag",
     }
+
+
+@runif_bigquery_testing_enabled
+@pytest.mark.django_db
+def test_serialized_instance_inserts_into_bigquery(bigquery_testing_table, valid_build):
+    """Test that the fixture is created and insertion is successful."""
+    client, table = bigquery_testing_table
+    doc = Build.insert(valid_build()).to_dict()
+    errors = client.insert_rows(table, [doc])
+    assert errors == []
+
+    table_id = f"{table.dataset_id}.{table.table_id}"
+    job = client.query(f"SELECT COUNT(*) as n_rows FROM {table_id}")
+    result = list(job.result())[0]
+    assert result.n_rows == 1
 
 
 @pytest.mark.django_db
