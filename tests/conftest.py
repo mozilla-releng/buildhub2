@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 from functools import partial
+import uuid
 
 import pytest
 from unittest import mock
@@ -123,7 +124,12 @@ def bigquery_testing_table():
 
     # create a partitioned table
     schema = client.schema_from_json(get_schema_file_object())
-    table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}"
+    # Due to eventual consistency and caching behavior when streaming into
+    # re-created tables, we include a random table suffix to always create a new
+    # table. This avoids streaming delays.
+    # https://github.com/googleapis/google-cloud-php/issues/871
+    salt = str(uuid.uuid4())[:8]
+    table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}_{salt}"
     table = bigquery.table.Table(table_id, schema)
     table.time_partitioning = bigquery.TimePartitioning(
         type_=bigquery.TimePartitioningType.DAY, field="created_at"
