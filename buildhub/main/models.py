@@ -18,6 +18,7 @@ from jsonschema import ValidationError
 from jsonschema.validators import validator_for
 
 from buildhub.main.search import BuildDoc, es_retry
+from buildhub.main.bigquery import insert_build
 
 with open(os.path.join(settings.BASE_DIR, "schema.yaml")) as f:
     SCHEMA = yaml.safe_load(f)["schema"]
@@ -115,6 +116,7 @@ class Build(models.Model):
         ):
             # If it returns something, it got created! Must inform Elasticsearch.
             send_to_elasticsearch(cls, build)
+            send_to_bigquery(cls, build)
             return build
 
     @classmethod
@@ -177,3 +179,9 @@ class Build(models.Model):
 def send_to_elasticsearch(sender, instance, **kwargs):
     doc = instance.to_search()
     es_retry(doc.save)
+
+
+@receiver(post_save, sender=Build)
+def send_to_bigquery(sender, instance, **kwargs):
+    doc = instance.to_dict()
+    insert_build(doc)

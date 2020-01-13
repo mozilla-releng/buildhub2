@@ -71,6 +71,26 @@ def test_serialized_instance_inserts_into_bigquery(bigquery_testing_table, valid
     assert result.n_rows == 1
 
 
+@runif_bigquery_testing_enabled
+@pytest.mark.django_db
+def test_insert_writes_to_bigquery(bigquery_testing_table, valid_build, settings):
+    """Test that the fixture is created and insertion is successful."""
+    client, table = bigquery_testing_table
+
+    # mock settings to ensure callback sends data to the right place
+    settings.BQ_DATASET_ID = table.dataset_id
+    settings.BQ_TABLE_ID = table.table_id
+
+    build = valid_build()
+    inserted = Build.insert(build)
+    assert inserted
+
+    table_id = f"{table.dataset_id}.{table.table_id}"
+    job = client.query(f"SELECT COUNT(*) as n_rows FROM {table_id}")
+    result = list(job.result())[0]
+    assert result.n_rows == 1
+
+
 @pytest.mark.django_db
 def test_insert_writes_to_elasticsearch(settings, elasticsearch, valid_build):
     build = valid_build()

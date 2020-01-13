@@ -1,11 +1,15 @@
+import logging
 import json
 import os
 import io
 from django.conf import settings
 from google.cloud import bigquery
+from google.cloud.exceptions import NotFound
 
 with open(os.path.join(settings.BASE_DIR, "schema.bigquery.json")) as f:
     PAYLOAD_SCHEMA = json.load(f)
+
+logger = logging.getLogger("buildhub")
 
 # Information outside of the payload, as defined by the main model specified
 # using json syntax for BigQuery schemas.
@@ -32,4 +36,19 @@ def get_schema_file_object():
 
 def insert_build(document):
     """Insert a single document into an existing BigQuery table."""
-    pass
+    # new client instance for every insertion
+    project_id = settings.BQ_PROJECT_ID
+    dataset_id = settings.BQ_DATASET_ID
+    table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}"
+
+    client = bigquery.Client(project=project_id)
+    try:
+        table = client.get_table(table_id)
+    except NotFound:
+        # Log an error and continue processing.
+        logging.error(f"table {table_id} not configured")
+        return
+
+    errors = client.insert_rows(table, [document])
+    if errors:
+        logging.error(f"failed into insert row: {errors[0]}")
