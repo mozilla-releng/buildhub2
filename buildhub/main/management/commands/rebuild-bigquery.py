@@ -3,6 +3,7 @@
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
 import logging
+import time
 import requests
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -44,10 +45,11 @@ class Command(BaseCommand):
         )
         client.create_table(table)
 
-        max_error_count = 1000
-        error_count = 0
-        chunk_size = 10000
+        max_error_count = settings.BQ_REBUILD_MAX_ERROR_COUNT
+        chunk_size = settings.BQ_REBUILD_CHUNK_SIZE
         count = 0
+        error_count = 0
+        start = time.time()
 
         build_docs = Build.objects.all().order_by("created_at")
         total_count = build_docs.count()
@@ -68,3 +70,9 @@ class Command(BaseCommand):
                 "\t",
                 "{:.1f}%".format(100 * count / total_count),
             )
+
+        end = time.time()
+        print(
+            f"Completed insert of {count} documents with {error_count} errors "
+            f"in {end-start} seconds"
+        )
