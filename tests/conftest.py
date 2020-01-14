@@ -104,7 +104,7 @@ def elasticsearch(request):
 @pytest.fixture
 def bigquery_testing_table():
     """Yields a BigQuery client and the reference to the testing table.
-    
+
     Usage::
 
         @runif_bigquery_testing_enabled

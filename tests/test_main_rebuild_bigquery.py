@@ -9,7 +9,7 @@ from utils import runif_bigquery_testing_enabled
 @pytest.mark.django_db
 def test_rebuild_bigquery_command(bigquery_testing_table, valid_build, settings):
     """Test that the fixture is created and insertion is successful.
-    
+
     This test relies on implicit behavior to work correctly. First, streaming
     data into a recreated table does not work in testing due to caching (see
     salting in the bigquery fixture in conftest.py). Additionally, inserting

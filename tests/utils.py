@@ -1,18 +1,19 @@
 import os
-from django.conf import settings
 from google.cloud import bigquery
 
 # this is slow, so we evaluate this once and return the result
 try:
     bigquery.Client()
     BIGQUERY_AUTHENTICATED = True
-except:
+except Exception:
     # google.auth.exceptions.DefaultCredentialsError
     BIGQUERY_AUTHENTICATED = False
 
 
 def runif_bigquery_testing_enabled(func):
-    """A decorator that will skip the test if the current environment is not set up for running tests.
+    """A decorator that will skip the test if the current environment is not
+    set up for running tests.
+
         @runif_bigquery_testing_enabled
         def test_my_function_that_uses_bigquery(table_fixture):
             ...
