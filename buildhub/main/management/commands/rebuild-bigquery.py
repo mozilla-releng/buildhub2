@@ -19,6 +19,15 @@ logger = logging.getLogger("buildhub")
 class Command(BaseCommand):
     help = "Create new table from Postgres into BigQuery via batched inserts."
 
+    def add_arguments(self, parser):
+        super().add_arguments(parser)
+        parser.add_argument(
+            "--yes",
+            action="store_true",
+            default=False,
+            help="Confirm overwriting tables without prompt",
+        )
+
     def handle(self, *args, **options):
         """See https://googleapis.dev/python/bigquery/latest/index.html."""
 
@@ -33,7 +42,7 @@ class Command(BaseCommand):
         except NotFound:
             print(f"Will create {table_id}.")
 
-        if input("Are you sure? [y/N] ").lower().strip() != "y":
+        if not options["yes"] and input("Are you sure? [y/N] ").lower().strip() != "y":
             print("Aborted!")
             return
 
@@ -51,10 +60,15 @@ class Command(BaseCommand):
         error_count = 0
         start = time.time()
 
-        build_docs = Build.objects.all().order_by("created_at")
-        total_count = build_docs.count()
-        for chunk in build_docs.iterator(chunk_size=chunk_size):
-            rows = [doc.to_dict(True) for doc in chunk]
+        builds = Build.objects.all().order_by("created_at")
+        total_count = builds.count()
+
+        # stateful inner loop
+        def insert_batch(rows):
+            nonlocal count
+            nonlocal error_count
+            if not rows:
+                return
             errors = client.insert_rows(table, rows)
             for error in errors:
                 error_count += 1
@@ -63,13 +77,22 @@ class Command(BaseCommand):
                     raise Exception(
                         "encountered max number of errors: {error_count}/count"
                     )
-            count += chunk_size
+            count += len(rows)
             # print at every chunk
             print(
                 format(count, ",").ljust(8),
                 "\t",
                 "{:.1f}%".format(100 * count / total_count),
             )
+
+        rows = []
+        for build in builds.iterator(chunk_size=chunk_size):
+            rows.append(build.to_dict())
+            if len(rows) < chunk_size:
+                continue
+            insert_batch(rows)
+            rows = []
+        insert_batch(rows)
 
         end = time.time()
         print(
