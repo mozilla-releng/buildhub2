@@ -116,7 +116,8 @@ class Build(models.Model):
         ):
             # If it returns something, it got created! Must inform Elasticsearch.
             send_to_elasticsearch(cls, build)
-            send_to_bigquery(cls, build)
+            if settings.BQ_ENABLED:
+                send_to_bigquery(cls, build)
             return build
 
     @classmethod

@@ -38,6 +38,7 @@ def pytest_configure():
     # This makes sure we never actually use the Elasticsearch index
     # we use for development.
     settings.ES_BUILD_INDEX = "test_buildhub2"
+    settings.BQ_ENABLED = False
 
     # Make sure we can ping the Elasticsearch
     response = requests.get(settings.ES_URLS[0])
@@ -102,7 +103,7 @@ def elasticsearch(request):
 
 @runif_bigquery_testing_enabled
 @pytest.fixture
-def bigquery_testing_table():
+def bigquery_testing_table(settings):
     """Yields a BigQuery client and the reference to the testing table.
 
     Usage::
@@ -114,6 +115,9 @@ def bigquery_testing_table():
             errors = client.insert_rows(table, rows)
             ...
     """
+    # enable callback after insertion into the model store
+    settings.BQ_ENABLED = True
+
     project_id = settings.BQ_PROJECT_ID
     client = bigquery.Client(project=project_id)
 

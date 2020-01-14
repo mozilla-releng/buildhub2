@@ -186,6 +186,7 @@ class Elasticsearch:
 
 
 class BigQuery:
+    BQ_ENABLED = values.BooleanValue(False)
     BQ_PROJECT_ID = values.Value("")
     BQ_DATASET_ID = values.Value("buildhub2")
     BQ_TABLE_ID = values.Value("builds")
