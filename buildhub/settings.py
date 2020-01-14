@@ -190,6 +190,9 @@ class BigQuery:
     BQ_DATASET_ID = values.Value("buildhub2")
     BQ_TABLE_ID = values.Value("builds")
 
+    BQ_REBUILD_MAX_ERROR_COUNT = values.IntegerValue(1000)
+    BQ_REBUILD_CHUNK_SIZE = values.IntegerValue(10000)
+
 
 class OptionalDatabaseURLValue(values.DatabaseURLValue):
     def caster(self, url, **options):
