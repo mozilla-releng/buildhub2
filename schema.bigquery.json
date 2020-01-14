@@ -2,46 +2,55 @@
   {
     "fields": [
       {
+        "description": "Assembler - Executable",
         "mode": "NULLABLE",
         "name": "as",
         "type": "STRING"
       },
       {
+        "description": "C compiler - Command-line",
         "mode": "NULLABLE",
         "name": "cc",
         "type": "STRING"
       },
       {
+        "description": "C++ compiler - Command-line",
         "mode": "NULLABLE",
         "name": "cxx",
         "type": "STRING"
       },
       {
+        "description": "Build date - i.e: 2017-04-13T21:49:00Z",
         "mode": "NULLABLE",
         "name": "date",
         "type": "TIMESTAMP"
       },
       {
+        "description": "Compiler host alias - (cpu)-(vendor)-(os)",
         "mode": "NULLABLE",
         "name": "host",
         "type": "STRING"
       },
       {
+        "description": "Build ID - Build ID",
         "mode": "NULLABLE",
         "name": "id",
         "type": "STRING"
       },
       {
+        "description": "Linker - Executable",
         "mode": "NULLABLE",
         "name": "ld",
         "type": "STRING"
       },
       {
+        "description": "Version - Build number",
         "mode": "NULLABLE",
         "name": "number",
         "type": "INT64"
       },
       {
+        "description": "Target host alias - (cpu)-(vendor)-(os)",
         "mode": "NULLABLE",
         "name": "target",
         "type": "STRING"
@@ -54,21 +63,25 @@
   {
     "fields": [
       {
+        "description": "Date - Build publication date",
         "mode": "REQUIRED",
         "name": "date",
         "type": "TIMESTAMP"
       },
       {
+        "description": "Mimetype",
         "mode": "REQUIRED",
         "name": "mimetype",
         "type": "STRING"
       },
       {
+        "description": "Size - In bytes",
         "mode": "REQUIRED",
         "name": "size",
         "type": "INT64"
       },
       {
+        "description": "URL - URL of the build",
         "mode": "REQUIRED",
         "name": "url",
         "type": "STRING"
@@ -81,21 +94,25 @@
   {
     "fields": [
       {
+        "description": "Product - Product name",
         "mode": "REQUIRED",
         "name": "product",
         "type": "STRING"
       },
       {
+        "description": "Repository",
         "mode": "NULLABLE",
         "name": "repository",
         "type": "STRING"
       },
       {
+        "description": "Revision number in the tree",
         "mode": "NULLABLE",
         "name": "revision",
         "type": "STRING"
       },
       {
+        "description": "Tree - i.e mozilla-central",
         "mode": "NULLABLE",
         "name": "tree",
         "type": "STRING"
@@ -108,26 +125,31 @@
   {
     "fields": [
       {
+        "description": "Update channel",
         "mode": "REQUIRED",
         "name": "channel",
         "type": "STRING"
       },
       {
+        "description": "Locale",
         "mode": "REQUIRED",
         "name": "locale",
         "type": "STRING"
       },
       {
+        "description": "OS - Operating system family",
         "mode": "NULLABLE",
         "name": "os",
         "type": "STRING"
       },
       {
+        "description": "Platform - Operating system and Architecture",
         "mode": "REQUIRED",
         "name": "platform",
         "type": "STRING"
       },
       {
+        "description": "Version",
         "mode": "REQUIRED",
         "name": "version",
         "type": "STRING"
