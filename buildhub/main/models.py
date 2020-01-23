@@ -185,4 +185,6 @@ def send_to_elasticsearch(sender, instance, **kwargs):
 @receiver(post_save, sender=Build)
 def send_to_bigquery(sender, instance, **kwargs):
     doc = instance.to_dict()
+    # The Python BigQuery library includes a retry mechanism for transient errors.
+    # See: https://googleapis.dev/python/bigquery/latest/generated/google.cloud.bigquery.retry.DEFAULT_RETRY.html
     insert_build(doc)
