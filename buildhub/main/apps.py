@@ -7,6 +7,7 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from elasticsearch_dsl.connections import connections
+from google.cloud import bigquery
 
 
 class MainConfig(AppConfig):
@@ -16,6 +17,7 @@ class MainConfig(AppConfig):
         self._connect_elasticsearch()
         self._configure_markus()
         self._check_s3_bucket_urls()
+        self._check_bigquery_table()
 
     @staticmethod
     def _connect_elasticsearch():
@@ -34,3 +36,15 @@ class MainConfig(AppConfig):
                 f"settings.SQS_S3_BUCKET_URL ({settings.SQS_S3_BUCKET_URL}) doesn't "
                 "need to be set if it's the same value as settings.S3_BUCKET_URL"
             )
+
+    @staticmethod
+    def _check_bigquery_table():
+        """Check for configured BigQuery credentials and access to the table.
+        On failure, this will raise various exception from the `google.cloud`
+        namespace."""
+        project_id = settings.BQ_PROJECT_ID
+        dataset_id = settings.BQ_DATASET_ID
+        table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}"
+        if settings.BQ_ENABLED:
+            client = bigquery.Client(project=project_id)
+            table = client.get_table(table_id)
