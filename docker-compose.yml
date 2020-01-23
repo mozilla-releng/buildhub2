@@ -62,7 +62,7 @@ services:
     volumes:
       - $PWD:/app
       # if credentials do not exist, mount an arbitrary file
-      - ${GOOGLE_APPLICATION_CREDENTIALS:-./README.rst}:/tmp/credentials
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/credentials
     command: web-dev
 
   ui:
