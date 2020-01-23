@@ -47,4 +47,4 @@ class MainConfig(AppConfig):
         table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}"
         if settings.BQ_ENABLED:
             client = bigquery.Client(project=project_id)
-            table = client.get_table(table_id)
+            client.get_table(table_id)

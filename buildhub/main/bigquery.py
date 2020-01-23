@@ -4,7 +4,7 @@ import os
 import io
 from django.conf import settings
 from google.cloud import bigquery
-from google.cloud.exceptions import NotFound
+
 
 with open(os.path.join(settings.BASE_DIR, "schema.bigquery.json")) as f:
     PAYLOAD_SCHEMA = json.load(f)
