@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
+from unittest import mock
+
 import pytest
 from jsonschema import ValidationError
 
@@ -74,6 +76,40 @@ def test_serialized_instance_inserts_into_bigquery(
     job = client.query(f"SELECT COUNT(*) as n_rows FROM {table_id}")
     result = list(job.result())[0]
     assert result.n_rows == 1
+
+
+@pytest.mark.django_db
+@mock.patch("buildhub.main.bigquery.bigquery")
+def test_insert_skips_writes_to_bigquery_when_disabled(
+    mocked_bigquery, valid_build, settings
+):
+    settings.BQ_ENABLED = False
+    build = valid_build()
+    inserted = Build.insert(build)
+    assert inserted
+
+    mocked_bigquery.assert_not_called()
+
+
+@pytest.mark.django_db
+@mock.patch("buildhub.main.bigquery.bigquery")
+def test_insert_writes_to_bigquery_when_enabled(
+    mocked_bigquery, valid_build, settings, mocker
+):
+    mocked_client = mocker.MagicMock()
+    mocked_bigquery.Client.return_value = mocked_client
+
+    settings.BQ_ENABLED = True
+    build = valid_build()
+    inserted = Build.insert(build)
+    assert inserted
+
+    mocked_client.insert_rows.assert_called_once()
+    args = mocked_client.insert_rows.call_args
+    # takes a (table, document) tuple
+    documents = args[0][1]
+    assert len(documents) == 1
+    assert documents[0]["build_hash"] == inserted.build_hash
 
 
 @runif_bigquery_testing_enabled
