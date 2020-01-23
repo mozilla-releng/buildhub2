@@ -10,16 +10,13 @@ from utils import runif_bigquery_testing_enabled
 def test_rebuild_bigquery_command(bigquery_testing_table, valid_build, settings):
     """Test that the fixture is created and insertion is successful.
 
-    This test relies on implicit behavior to work correctly. First, streaming
-    data into a recreated table does not work in testing due to caching (see
-    salting in the bigquery fixture in conftest.py). Additionally, inserting
-    data into the Build model will trigger a callback to send data to the
-    BigQuery table. Once data has been inserted into the default (unconfigured)
-    table, we mock the settings to point to our testing table. We then run the
-    rebuild-table command and assert our conditions.
+    Note that streaming data into a recreated table does not work in testing due
+    to caching (see salting in the bigquery fixture in conftest.py).
     """
     client, table = bigquery_testing_table
 
+    # We insert data into the database that predates BigQuery functionality
+    settings.BQ_ENABLED = False
     n_documents = 10
     build = valid_build()
     for i in range(n_documents):
@@ -27,7 +24,7 @@ def test_rebuild_bigquery_command(bigquery_testing_table, valid_build, settings)
         inserted = Build.insert(build)
         assert inserted
 
-    # ordering matters
+    settings.BQ_ENABLED = True
     settings.BQ_DATASET_ID = table.dataset_id
     settings.BQ_TABLE_ID = table.table_id
     settings.BQ_REBUILD_MAX_ERROR_COUNT = 0

@@ -42,13 +42,7 @@ def insert_build(document):
     table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}"
 
     client = bigquery.Client(project=project_id)
-    try:
-        table = client.get_table(table_id)
-    except NotFound:
-        # Log an error and continue processing.
-        logging.error(f"table {table_id} not configured")
-        return
-
+    table = client.get_table(table_id)
     errors = client.insert_rows(table, [document])
     if errors:
         logging.error(f"failed into insert row: {errors[0]}")
