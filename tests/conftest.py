@@ -101,7 +101,6 @@ def elasticsearch(request):
     build_index.delete(ignore=404)
 
 
-@runif_bigquery_testing_enabled
 @pytest.fixture
 def bigquery_testing_table(settings):
     """Yields a BigQuery client and the reference to the testing table.

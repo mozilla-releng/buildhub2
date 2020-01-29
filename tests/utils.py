@@ -1,12 +1,12 @@
 import os
 from google.cloud import bigquery
+from google.auth.exceptions import DefaultCredentialsError
 
 # this is slow, so we evaluate this once and return the result
 try:
     bigquery.Client()
     BIGQUERY_AUTHENTICATED = True
-except Exception:
-    # google.auth.exceptions.DefaultCredentialsError
+except DefaultCredentialsError:
     BIGQUERY_AUTHENTICATED = False
 
 

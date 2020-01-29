@@ -7,6 +7,15 @@ from utils import runif_bigquery_testing_enabled
 
 @runif_bigquery_testing_enabled
 @pytest.mark.django_db
+def test_rebuild_bigquery_command_no_table_and_dataset(settings):
+    settings.BQ_ENABLED = True
+    settings.BQ_DATASET_ID = "testing_not_exists_dataset"
+    settings.BQ_TABLE_ID = "testing_not_exists_table"
+    call_command("rebuild-bigquery", yes=True)
+
+
+@runif_bigquery_testing_enabled
+@pytest.mark.django_db
 def test_rebuild_bigquery_command(bigquery_testing_table, valid_build, settings):
     """Test that the fixture is created and insertion is successful.
 
