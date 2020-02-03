@@ -61,13 +61,13 @@ def test_model_serialization(valid_build):
 @runif_bigquery_testing_enabled
 @pytest.mark.django_db
 def test_serialized_instance_inserts_into_bigquery(
-    bigquery_testing_table, valid_build, settings
+    bigquery_client, bigquery_testing_table, valid_build, settings
 ):
     """Test that the fixture is created and insertion is successful."""
     # This test does not rely on auto-insertion
     settings.BQ_ENABLED = False
-
-    client, table = bigquery_testing_table
+    client = bigquery_client
+    table = bigquery_testing_table
     doc = Build.insert(valid_build()).to_dict()
     errors = client.insert_rows(table, [doc])
     assert errors == []
@@ -114,9 +114,12 @@ def test_insert_writes_to_bigquery_when_enabled(
 
 @runif_bigquery_testing_enabled
 @pytest.mark.django_db
-def test_insert_writes_to_bigquery(bigquery_testing_table, valid_build, settings):
+def test_insert_writes_to_bigquery(
+    bigquery_client, bigquery_testing_table, valid_build, settings
+):
     """Test that the fixture is created and insertion is successful."""
-    client, table = bigquery_testing_table
+    client = bigquery_client
+    table = bigquery_testing_table
 
     # mock settings to ensure callback sends data to the right place
     settings.BQ_DATASET_ID = table.dataset_id

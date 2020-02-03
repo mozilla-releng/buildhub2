@@ -100,7 +100,24 @@ def elasticsearch(request):
 
 
 @pytest.fixture
-def bigquery_testing_table(settings):
+def bigquery_client(settings):
+    project_id = settings.BQ_PROJECT_ID
+    client = bigquery.Client(project=project_id)
+    yield client
+
+
+@pytest.fixture
+def bigquery_testing_dataset(bigquery_client, settings):
+    client = bigquery_client
+    dataset_id = f"{settings.BQ_DATASET_ID}_pytest"
+    client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
+    dataset = client.create_dataset(dataset_id)
+    yield dataset
+    client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
+
+
+@pytest.fixture
+def bigquery_testing_table(bigquery_client, bigquery_testing_dataset, settings):
     """Yields a BigQuery client and the reference to the testing table.
 
     Usage::
@@ -112,34 +129,27 @@ def bigquery_testing_table(settings):
             errors = client.insert_rows(table, rows)
             ...
     """
+    client = bigquery_client
+
     # enable callback after insertion into the model store
     settings.BQ_ENABLED = True
 
-    project_id = settings.BQ_PROJECT_ID
-    client = bigquery.Client(project=project_id)
-
-    # create a new testing dataset
-    dataset_id = f"{settings.BQ_DATASET_ID}_pytest"
-    client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
-    client.create_dataset(dataset_id)
-
-    # create a partitioned table
-    schema = client.schema_from_json(get_schema_file_object())
-    # Due to eventual consistency and caching behavior when streaming into
-    # re-created tables, we include a random table suffix to always create a new
-    # table. This avoids streaming delays.
+    # Create a partitioned table. Due to eventual consistency and caching
+    # behavior when streaming into re-created tables, we include a random table
+    # suffix to always create a new table. This avoids streaming delays.
     # https://github.com/googleapis/google-cloud-php/issues/871
     salt = str(uuid.uuid4())[:8]
-    table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}_{salt}"
-    table = bigquery.table.Table(table_id, schema)
+    table_id = f"{settings.BQ_TABLE_ID}_{salt}"
+    table_ref = bigquery_testing_dataset.table(table_id)
+
+    schema = client.schema_from_json(get_schema_file_object())
+    table = bigquery.table.Table(table_ref, schema)
     table.time_partitioning = bigquery.TimePartitioning(
         type_=bigquery.TimePartitioningType.DAY, field="created_at"
     )
     client.create_table(table)
 
-    # yield and cleanup
-    yield client, table
-    client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
+    yield table
 
 
 @pytest.fixture
