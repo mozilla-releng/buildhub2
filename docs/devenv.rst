@@ -71,12 +71,43 @@ need the public key called ``SENTRY_PUBLIC_DSN``. For example:
 
 Content Security Policy (CSP) headers are on by default. To change the URL for
 where violations are sent you can change ``DJANGO_CSP_REPORT_URI``. By default
-it's set to ``''``. Meaning, unless set it won't be included as a header.
-See the `MDN documentation on report-uri <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri>`_ for
-more info.
+it's set to ``''``. Meaning, unless set it won't be included as a header. See
+the `MDN documentation on report-uri`__ for more info.
 
 .. _report-uri: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/report-uri
+__ report-uri_
 
+To configure writing to BigQuery, the following variables will need to be set:
+
+.. code-block:: shell
+
+    DJANGO_BQ_ENABLED=True
+    DJANGO_BQ_PROJECT_ID=...
+    DJANGO_BQ_DATASET_ID=...
+    DJANGO_BQ_TABLE_ID=...
+
+The project and dataset will need to be provisioned before running the server
+with this functionality enabled. Additionally, credentials will need to be
+passed to the server. If it is running in Google Compute Engine, this is
+configured through the default service account. To run this via
+``docker-compose``, the following lines in ``docker-compose.yml`` will need to
+be un-commented:
+
+.. code-block:: yaml
+
+    volumes:
+      ...
+      # - ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/credentials
+
+In addition, set the following variable after downloading the service account
+credentials from ``IAM & admin > Service accounts`` in the Google Cloud Platform
+console for the project.
+
+.. code-block:: shell
+
+    GOOGLE_APPLICATION_CREDENTIALS=/path/to/keyfile.json
+
+Run ``make test`` and check that none of the tests are skipped.
 
 Adding data
 ===========

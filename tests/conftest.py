@@ -26,8 +26,6 @@ from buildhub import wsgi
 from buildhub.main.search import BuildDoc
 from buildhub.main.bigquery import get_schema_file_object
 
-from utils import runif_bigquery_testing_enabled
-
 assert wsgi
 
 
