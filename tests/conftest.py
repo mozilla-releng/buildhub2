@@ -6,7 +6,6 @@ import json
 import os
 import shutil
 from functools import partial
-import uuid
 
 import pytest
 from unittest import mock
@@ -24,7 +23,8 @@ from google.cloud import bigquery
 # in the docs: https://django-configurations.readthedocs.io/
 from buildhub import wsgi
 from buildhub.main.search import BuildDoc
-from buildhub.main.bigquery import get_schema_file_object
+from buildhub.main.bigquery import create_table
+from utils import salted_table_id
 
 assert wsgi
 
@@ -123,14 +123,13 @@ def bigquery_testing_table(bigquery_client, bigquery_testing_dataset, settings):
     Usage::
 
         @runif_bigquery_testing_enabled
-        def test_bigquery_behavior(bigquery_testing_table):
-            client, table = bigquery
+        def test_bigquery_behavior(bigquery_client, bigquery_testing_table):
+            client = bigquery_client
+            table = bigquery_testing_table
             ...
             errors = client.insert_rows(table, rows)
             ...
     """
-    client = bigquery_client
-
     # enable callback after insertion into the model store
     settings.BQ_ENABLED = True
 
@@ -138,16 +137,8 @@ def bigquery_testing_table(bigquery_client, bigquery_testing_dataset, settings):
     # behavior when streaming into re-created tables, we include a random table
     # suffix to always create a new table. This avoids streaming delays.
     # https://github.com/googleapis/google-cloud-php/issues/871
-    salt = str(uuid.uuid4())[:8]
-    table_id = f"{settings.BQ_TABLE_ID}_{salt}"
-    table_ref = bigquery_testing_dataset.table(table_id)
-
-    schema = client.schema_from_json(get_schema_file_object())
-    table = bigquery.table.Table(table_ref, schema)
-    table.time_partitioning = bigquery.TimePartitioning(
-        type_=bigquery.TimePartitioningType.DAY, field="created_at"
-    )
-    client.create_table(table)
+    table_ref = bigquery_testing_dataset.table(salted_table_id(settings.BQ_TABLE_ID))
+    table = create_table(bigquery_client, table_ref)
 
     yield table
 

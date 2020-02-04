@@ -1,9 +1,34 @@
-import pytest
-from django.core.management import call_command
+from unittest import mock
 
-from buildhub.main.models import Build
-from utils import runif_bigquery_testing_enabled
+import pytest
 from google.api_core.exceptions import NotFound
+
+from buildhub.main.bigquery import ensure_table
+from buildhub.main.models import Build
+from django.core.management import call_command
+from utils import runif_bigquery_testing_enabled, salted_table_id
+
+
+@runif_bigquery_testing_enabled
+@mock.patch("buildhub.main.bigquery.logger")
+def test_bigquery_ensure_table(
+    mocked_logger, bigquery_client, bigquery_testing_dataset, settings, mocker
+):
+    client = bigquery_client
+    settings.BQ_DATASET_ID = bigquery_testing_dataset.dataset_id
+    settings.BQ_TABLE_ID = salted_table_id("testing_not_exists_table")
+
+    table_id = (
+        f"{settings.BQ_PROJECT_ID}.{settings.BQ_DATASET_ID}.{settings.BQ_TABLE_ID}"
+    )
+    expected_log = f"Table {table_id} did not exist and was created."
+
+    with pytest.raises(NotFound):
+        client.get_table(table_id)
+    ensure_table()
+    mocked_logger.info.assert_called_once()
+    mocked_logger.info.assert_called_with(expected_log)
+    client.get_table(table_id)
 
 
 @runif_bigquery_testing_enabled
@@ -11,7 +36,7 @@ from google.api_core.exceptions import NotFound
 def test_rebuild_bigquery_command_no_table_and_dataset(settings):
     settings.BQ_ENABLED = True
     settings.BQ_DATASET_ID = "testing_not_exists_dataset"
-    settings.BQ_TABLE_ID = "testing_not_exists_table"
+    settings.BQ_TABLE_ID = salted_table_id("testing_not_exists_table")
     # Dataset not found
     with pytest.raises(NotFound, match=fr".*{settings.BQ_DATASET_ID}.*"):
         call_command("rebuild-bigquery", yes=True)
@@ -25,13 +50,10 @@ def test_rebuild_bigquery_command_no_table(
     client = bigquery_client
     settings.BQ_ENABLED = True
     settings.BQ_DATASET_ID = bigquery_testing_dataset.dataset_id
-    settings.BQ_TABLE_ID = "testing_not_exists_table"
-
-    # Ensure table is created during startup if not found
-    client.get_table(f"{settings.BQ_DATASET_ID}.{settings.BQ_TABLE_ID}")
+    settings.BQ_TABLE_ID = salted_table_id("testing_not_exists_table")
 
     call_command("rebuild-bigquery", yes=True)
-    bigquery_client.get_table(f"{settings.BQ_DATASET_ID}.{settings.BQ_TABLE_ID}")
+    client.get_table(f"{settings.BQ_DATASET_ID}.{settings.BQ_TABLE_ID}")
 
 
 @runif_bigquery_testing_enabled

@@ -4,7 +4,7 @@ import os
 import io
 from django.conf import settings
 from google.cloud import bigquery
-
+from google.api_core.exceptions import NotFound
 
 with open(os.path.join(settings.BASE_DIR, "schema.bigquery.json")) as f:
     PAYLOAD_SCHEMA = json.load(f)
@@ -34,6 +34,32 @@ def get_schema_file_object():
     return io.StringIO(serialized)
 
 
+def create_table(client, table):
+    schema = client.schema_from_json(get_schema_file_object())
+    table = bigquery.table.Table(table, schema)
+    table.time_partitioning = bigquery.TimePartitioning(
+        type_=bigquery.TimePartitioningType.DAY, field="created_at"
+    )
+    return client.create_table(table)
+
+
+def ensure_table():
+    """This function serves as a check for application startup."""
+    project_id = settings.BQ_PROJECT_ID
+    dataset_id = settings.BQ_DATASET_ID
+    table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}"
+
+    client = bigquery.Client(project=project_id)
+    try:
+        client.get_table(table_id)
+    except NotFound as ex:
+        # re-raise unless the exception is about a missing table
+        if settings.BQ_TABLE_ID not in ex.message:
+            raise ex
+        logger.info(f"Table {table_id} did not exist and was created.")
+        create_table(client, table_id)
+
+
 def insert_build(document):
     """Insert a single document into an existing BigQuery table."""
     # new client instance for every insertion
@@ -45,4 +71,4 @@ def insert_build(document):
     table = client.get_table(table_id)
     errors = client.insert_rows(table, [document])
     if errors:
-        logging.error(f"failed into insert row: {errors[0]}")
+        logger.error(f"failed into insert row: {errors[0]}")

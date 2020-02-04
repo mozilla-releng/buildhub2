@@ -10,7 +10,7 @@ from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
 
 from buildhub.main.models import Build
-from buildhub.main.bigquery import get_schema_file_object
+from buildhub.main.bigquery import create_table
 
 logger = logging.getLogger("buildhub")
 
@@ -46,12 +46,7 @@ class Command(BaseCommand):
             return
 
         client.delete_table(table_id, not_found_ok=True)
-        schema = client.schema_from_json(get_schema_file_object())
-        table = bigquery.table.Table(table_id, schema)
-        table.time_partitioning = bigquery.TimePartitioning(
-            type_=bigquery.TimePartitioningType.DAY, field="created_at"
-        )
-        client.create_table(table)
+        table = create_table(client, table_id)
 
         max_error_count = settings.BQ_REBUILD_MAX_ERROR_COUNT
         chunk_size = settings.BQ_REBUILD_CHUNK_SIZE

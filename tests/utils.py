@@ -1,4 +1,5 @@
 import os
+import uuid
 from google.cloud import bigquery
 from google.auth.exceptions import DefaultCredentialsError
 
@@ -8,6 +9,11 @@ try:
     BIGQUERY_AUTHENTICATED = True
 except DefaultCredentialsError:
     BIGQUERY_AUTHENTICATED = False
+
+
+def salted_table_id(table_id):
+    salt = str(uuid.uuid4())[:8]
+    return f"{table_id}_{salt}"
 
 
 def runif_bigquery_testing_enabled(func):

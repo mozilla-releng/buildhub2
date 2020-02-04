@@ -7,7 +7,7 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from elasticsearch_dsl.connections import connections
-from google.cloud import bigquery
+from buildhub.main.bigquery import ensure_table
 
 
 class MainConfig(AppConfig):
@@ -17,7 +17,7 @@ class MainConfig(AppConfig):
         self._connect_elasticsearch()
         self._configure_markus()
         self._check_s3_bucket_urls()
-        self._check_bigquery_table()
+        self._ensure_bigquery_table()
 
     @staticmethod
     def _connect_elasticsearch():
@@ -38,13 +38,9 @@ class MainConfig(AppConfig):
             )
 
     @staticmethod
-    def _check_bigquery_table():
+    def _ensure_bigquery_table():
         """Check for configured BigQuery credentials and access to the table.
-        On failure, this will raise various exception from the `google.cloud`
+        On failure, this will raise various exception from the `google`
         namespace."""
-        project_id = settings.BQ_PROJECT_ID
-        dataset_id = settings.BQ_DATASET_ID
-        table_id = f"{project_id}.{dataset_id}.{settings.BQ_TABLE_ID}"
         if settings.BQ_ENABLED:
-            client = bigquery.Client(project=project_id)
-            client.get_table(table_id)
+            ensure_table()
