@@ -9,6 +9,7 @@ import os
 import yaml
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.core.serializers import serialize
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -17,6 +18,7 @@ from jsonschema import ValidationError
 from jsonschema.validators import validator_for
 
 from buildhub.main.search import BuildDoc, es_retry
+from buildhub.main.bigquery import insert_build
 
 with open(os.path.join(settings.BASE_DIR, "schema.yaml")) as f:
     SCHEMA = yaml.safe_load(f)["schema"]
@@ -44,6 +46,9 @@ class Build(models.Model):
 
     def to_search(self, **kwargs):
         return BuildDoc.create(self.id, **self.build)
+
+    def to_dict(self):
+        return json.loads(serialize("json", [self]))[0]["fields"]
 
     hash_prefix = "v1"
 
@@ -111,6 +116,8 @@ class Build(models.Model):
         ):
             # If it returns something, it got created! Must inform Elasticsearch.
             send_to_elasticsearch(cls, build)
+            if settings.BQ_ENABLED:
+                send_to_bigquery(cls, build)
             return build
 
     @classmethod
@@ -173,3 +180,12 @@ class Build(models.Model):
 def send_to_elasticsearch(sender, instance, **kwargs):
     doc = instance.to_search()
     es_retry(doc.save)
+
+
+@receiver(post_save, sender=Build)
+def send_to_bigquery(sender, instance, **kwargs):
+    doc = instance.to_dict()
+    # The Python BigQuery library includes a retry mechanism for transient
+    # errors. Search https://googleapis.dev/python/bigquery/latest under
+    # google.cloud.bigquery.retry.DEFAULT_RETRY for more details.
+    insert_build(doc)

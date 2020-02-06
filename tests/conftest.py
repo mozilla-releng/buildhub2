@@ -13,6 +13,7 @@ import requests
 import requests_mock
 
 from django.conf import settings
+from google.cloud import bigquery
 
 # Needed to make sure django-configurations works correctly
 # Without it, we get:
@@ -22,6 +23,8 @@ from django.conf import settings
 # in the docs: https://django-configurations.readthedocs.io/
 from buildhub import wsgi
 from buildhub.main.search import BuildDoc
+from buildhub.main.bigquery import create_table
+from utils import salted_table_id
 
 assert wsgi
 
@@ -33,6 +36,7 @@ def pytest_configure():
     # This makes sure we never actually use the Elasticsearch index
     # we use for development.
     settings.ES_BUILD_INDEX = "test_buildhub2"
+    settings.BQ_ENABLED = False
 
     # Make sure we can ping the Elasticsearch
     response = requests.get(settings.ES_URLS[0])
@@ -93,6 +97,50 @@ def elasticsearch(request):
     build_index.create()
     yield build_index
     build_index.delete(ignore=404)
+
+
+@pytest.fixture
+def bigquery_client(settings):
+    project_id = settings.BQ_PROJECT_ID
+    client = bigquery.Client(project=project_id)
+    yield client
+
+
+@pytest.fixture
+def bigquery_testing_dataset(bigquery_client, settings):
+    client = bigquery_client
+    dataset_id = f"{settings.BQ_DATASET_ID}_pytest"
+    client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
+    dataset = client.create_dataset(dataset_id)
+    yield dataset
+    client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
+
+
+@pytest.fixture
+def bigquery_testing_table(bigquery_client, bigquery_testing_dataset, settings):
+    """Yields a BigQuery client and the reference to the testing table.
+
+    Usage::
+
+        @runif_bigquery_testing_enabled
+        def test_bigquery_behavior(bigquery_client, bigquery_testing_table):
+            client = bigquery_client
+            table = bigquery_testing_table
+            ...
+            errors = client.insert_rows(table, rows)
+            ...
+    """
+    # enable callback after insertion into the model store
+    settings.BQ_ENABLED = True
+
+    # Create a partitioned table. Due to eventual consistency and caching
+    # behavior when streaming into re-created tables, we include a random table
+    # suffix to always create a new table. This avoids streaming delays.
+    # https://github.com/googleapis/google-cloud-php/issues/871
+    table_ref = bigquery_testing_dataset.table(salted_table_id(settings.BQ_TABLE_ID))
+    table = create_table(bigquery_client, table_ref)
+
+    yield table
 
 
 @pytest.fixture

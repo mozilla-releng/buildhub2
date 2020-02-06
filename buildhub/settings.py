@@ -185,6 +185,16 @@ class Elasticsearch:
     MAX_SEARCH_SIZE = values.IntegerValue(1000)
 
 
+class BigQuery:
+    BQ_ENABLED = values.BooleanValue(False)
+    BQ_PROJECT_ID = values.Value("")
+    BQ_DATASET_ID = values.Value("buildhub2")
+    BQ_TABLE_ID = values.Value("builds")
+
+    BQ_REBUILD_MAX_ERROR_COUNT = values.IntegerValue(1000)
+    BQ_REBUILD_CHUNK_SIZE = values.IntegerValue(10000)
+
+
 class OptionalDatabaseURLValue(values.DatabaseURLValue):
     def caster(self, url, **options):
         if not url:
@@ -192,8 +202,8 @@ class OptionalDatabaseURLValue(values.DatabaseURLValue):
         return dj_database_url.parse(url, **options)
 
 
-class Base(Core, Elasticsearch):
-    """Settings that may change per-environment, som defaults."""
+class Base(Core, Elasticsearch, BigQuery):
+    """Settings that may change per-environment, some defaults."""
 
     # Django
     SECRET_KEY = values.SecretValue()
@@ -382,8 +392,7 @@ class Localdev(Base):
 
 
 class Test(Base):
-    """Configurat
-    ion to be used during testing"""
+    """Configuration to be used during testing"""
 
     DEBUG = False
     ES_BUILD_INDEX = "test_buildhub2"

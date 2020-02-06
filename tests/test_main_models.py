@@ -2,11 +2,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, you can obtain one at http://mozilla.org/MPL/2.0/.
 
+from unittest import mock
+
 import pytest
 from jsonschema import ValidationError
 
 from buildhub.main.models import Build
 from buildhub.main.search import BuildDoc
+from utils import runif_bigquery_testing_enabled
 
 
 @pytest.mark.django_db
@@ -22,6 +25,114 @@ def test_insert(settings, valid_build):
     second_time = Build.insert(build)
     assert not second_time
     assert Build.objects.all().count() == 1
+
+
+@pytest.mark.django_db
+def test_model_serialization(valid_build):
+    """Example document:
+    ```
+    {
+        "build_hash": "v1:465552ab2ea1b5039a086987b70c598c",
+        "metadata": {
+            "version": "Testing"
+        },
+        "build": {
+            ...
+        },
+        "created_at": "2020-01-10T22:46:32.274Z",
+        "s3_object_key": "",
+        "s3_object_etag": ""
+    }
+    ```
+    """
+    build = valid_build()
+    inserted = Build.insert(build)
+    doc = inserted.to_dict()
+    assert set(doc.keys()) == {
+        "build_hash",
+        "build",
+        "metadata",
+        "created_at",
+        "s3_object_key",
+        "s3_object_etag",
+    }
+
+
+@runif_bigquery_testing_enabled
+@pytest.mark.django_db
+def test_serialized_instance_inserts_into_bigquery(
+    bigquery_client, bigquery_testing_table, valid_build, settings
+):
+    """Test that the fixture is created and insertion is successful."""
+    # This test does not rely on auto-insertion
+    settings.BQ_ENABLED = False
+    client = bigquery_client
+    table = bigquery_testing_table
+    doc = Build.insert(valid_build()).to_dict()
+    errors = client.insert_rows(table, [doc])
+    assert errors == []
+
+    table_id = f"{table.dataset_id}.{table.table_id}"
+    job = client.query(f"SELECT COUNT(*) as n_rows FROM {table_id}")
+    result = list(job.result())[0]
+    assert result.n_rows == 1
+
+
+@pytest.mark.django_db
+@mock.patch("buildhub.main.bigquery.bigquery")
+def test_insert_skips_writes_to_bigquery_when_disabled(
+    mocked_bigquery, valid_build, settings
+):
+    settings.BQ_ENABLED = False
+    build = valid_build()
+    inserted = Build.insert(build)
+    assert inserted
+
+    mocked_bigquery.assert_not_called()
+
+
+@pytest.mark.django_db
+@mock.patch("buildhub.main.bigquery.bigquery")
+def test_insert_writes_to_bigquery_when_enabled(
+    mocked_bigquery, valid_build, settings, mocker
+):
+    mocked_client = mocker.MagicMock()
+    mocked_bigquery.Client.return_value = mocked_client
+
+    settings.BQ_ENABLED = True
+    build = valid_build()
+    inserted = Build.insert(build)
+    assert inserted
+
+    mocked_client.insert_rows.assert_called_once()
+    args = mocked_client.insert_rows.call_args
+    # takes a (table, document) tuple
+    documents = args[0][1]
+    assert len(documents) == 1
+    assert documents[0]["build_hash"] == inserted.build_hash
+
+
+@runif_bigquery_testing_enabled
+@pytest.mark.django_db
+def test_insert_writes_to_bigquery(
+    bigquery_client, bigquery_testing_table, valid_build, settings
+):
+    """Test that the fixture is created and insertion is successful."""
+    client = bigquery_client
+    table = bigquery_testing_table
+
+    # mock settings to ensure callback sends data to the right place
+    settings.BQ_DATASET_ID = table.dataset_id
+    settings.BQ_TABLE_ID = table.table_id
+
+    build = valid_build()
+    inserted = Build.insert(build)
+    assert inserted
+
+    table_id = f"{table.dataset_id}.{table.table_id}"
+    job = client.query(f"SELECT COUNT(*) as n_rows FROM {table_id}")
+    result = list(job.result())[0]
+    assert result.n_rows == 1
 
 
 @pytest.mark.django_db
