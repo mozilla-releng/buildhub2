@@ -18,10 +18,10 @@ def get_remote_name():
 
     for line in remote_output.splitlines():
         line = line.split("\t")
-        if "mozilla-services" in line[1]:
+        if "mozilla-releng" in line[1]:
             return line[0]
 
-    raise Exception("Can't figure out remote name for mozilla-services.")
+    raise Exception("Can't figure out remote name for mozilla-releng.")
 
 
 def run():
