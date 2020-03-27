@@ -66,7 +66,7 @@ class Command(BaseCommand):
             errors = client.insert_rows(table, rows)
             for error in errors:
                 error_count += 1
-                logging.warning(error)
+                logger.warning("Errors in row %s: %s", error["index"], error["errors"])
                 if error_count >= max_error_count:
                     raise Exception(
                         "encountered max number of errors: {error_count}/count"
