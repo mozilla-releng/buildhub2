@@ -26,6 +26,7 @@ BQ_SCHEMA = [
     {"name": "created_at", "type": "TIMESTAMP", "mode": "REQUIRED"},
     {"name": "s3_object_key", "type": "STRING", "mode": "NULLABLE"},
     {"name": "s3_object_etag", "type": "STRING", "mode": "NULLABLE"},
+    {"name": "submission_timestamp", "type": "TIMESTAMP", "mode": "REQUIRED"},
 ]
 
 
@@ -38,7 +39,7 @@ def create_table(client, table):
     schema = client.schema_from_json(get_schema_file_object())
     table = bigquery.table.Table(table, schema)
     table.time_partitioning = bigquery.TimePartitioning(
-        type_=bigquery.TimePartitioningType.DAY, field="created_at"
+        type_=bigquery.TimePartitioningType.DAY, field="submission_timestamp"
     )
     return client.create_table(table)
 

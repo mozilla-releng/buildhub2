@@ -55,6 +55,7 @@ def test_model_serialization(valid_build):
         "created_at",
         "s3_object_key",
         "s3_object_etag",
+        "submission_timestamp"
     }
 
 
