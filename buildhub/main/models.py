@@ -5,6 +5,7 @@
 import hashlib
 import json
 import os
+import time
 
 import yaml
 from django.conf import settings
@@ -47,8 +48,11 @@ class Build(models.Model):
     def to_search(self, **kwargs):
         return BuildDoc.create(self.id, **self.build)
 
-    def to_dict(self):
-        return json.loads(serialize("json", [self]))[0]["fields"]
+    def to_dict(self, with_timestamp=True):
+        data = json.loads(serialize("json", [self]))[0]["fields"]
+        if with_timestamp:
+            data["submission_timestamp"] = time.time()
+        return data
 
     hash_prefix = "v1"
 
