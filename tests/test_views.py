@@ -57,7 +57,7 @@ def test_always_index_html(client, temp_static_root, settings):
     # However, if the file exists it gets served thanks to Whitenoise
     response = client.get("/foo.js")
     assert response.status_code == 200
-    assert response["content-type"] == 'application/javascript; charset="utf-8"'
+    assert response["content-type"] == 'text/javascript; charset="utf-8"'
     content = response.getvalue().decode(response.charset)
     assert "alert('Hi!)" in content
 
@@ -82,7 +82,7 @@ def test_custom_cache_control_whitenoise(client, temp_static_root, settings):
 
     response = client.get("/main.8741ee2b.js")
     assert response.status_code == 200
-    assert response["content-type"] == 'application/javascript; charset="utf-8"'
+    assert response["content-type"] == 'text/javascript; charset="utf-8"'
     assert response["cache-control"] == "max-age=315360000, public, immutable"
 
 

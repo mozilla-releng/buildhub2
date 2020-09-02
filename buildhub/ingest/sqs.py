@@ -87,7 +87,7 @@ def process_event(config, body):
         s3 = record.get("s3")
         if not s3:
             # If it's not an S3 event, we don't care.
-            logger.debug(f"Ignoring record because it's not S3")
+            logger.debug("Ignoring record because it's not S3")
             continue
         # Only bother if the filename is exactly "buildhub.json"
         if not os.path.basename(s3["object"]["key"]).endswith("buildhub.json"):
