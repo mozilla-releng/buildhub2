@@ -21,7 +21,12 @@ BQ_SCHEMA = [
         "name": "metadata",
         "type": "RECORD",
         "mode": "NULLABLE",
-        "fields": [{"name": "version", "type": "STRING", "mode": "NULLABLE"}],
+        "fields": [
+            {"name": "commit", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "version", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "source", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "build", "type": "STRING", "mode": "NULLABLE"},
+        ],
     },
     {"name": "created_at", "type": "TIMESTAMP", "mode": "REQUIRED"},
     {"name": "s3_object_key", "type": "STRING", "mode": "NULLABLE"},
