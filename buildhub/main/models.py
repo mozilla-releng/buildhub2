@@ -4,6 +4,7 @@
 
 import hashlib
 import json
+import logging
 import os
 import time
 
@@ -20,6 +21,8 @@ from jsonschema.validators import validator_for
 
 from buildhub.main.search import BuildDoc, es_retry
 from buildhub.main.bigquery import insert_build
+
+logger = logging.getLogger("buildhub")
 
 with open(os.path.join(settings.BASE_DIR, "schema.yaml")) as f:
     SCHEMA = yaml.safe_load(f)["schema"]
@@ -121,7 +124,10 @@ class Build(models.Model):
             # If it returns something, it got created! Must inform Elasticsearch.
             send_to_elasticsearch(cls, build)
             if settings.BQ_ENABLED:
+                logger.info(f"Sending {build_hash} to bigquery")
                 send_to_bigquery(cls, build)
+            else:
+                logger.info("Bigquery not enabled, not sending anything to it")
             return build
 
     @classmethod
