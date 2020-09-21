@@ -52,6 +52,7 @@ def ensure_table():
 
     client = bigquery.Client(project=project_id)
     try:
+        logger.info(f"Checking to see if {table_id} exists")
         client.get_table(table_id)
     except NotFound as ex:
         # re-raise unless the exception is about a missing table
@@ -70,6 +71,7 @@ def insert_build(document):
 
     client = bigquery.Client(project=project_id)
     table = client.get_table(table_id)
+    logging.info(f"Inserting rows into {table_id}")
     errors = client.insert_rows(table, [document])
     if errors:
         logger.error(f"failed into insert row: {errors[0]}")
