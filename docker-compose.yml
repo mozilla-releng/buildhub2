@@ -61,6 +61,7 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/credentials
     volumes:
       - $PWD:/app
+      # uncomment after setting appropriate .env variables to enable BigQuery testing
       # - ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/credentials
     command: web-dev
 

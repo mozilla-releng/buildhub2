@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 from functools import partial
+from uuid import uuid4
 
 import pytest
 from unittest import mock
@@ -109,7 +110,7 @@ def bigquery_client(settings):
 @pytest.fixture
 def bigquery_testing_dataset(bigquery_client, settings):
     client = bigquery_client
-    dataset_id = f"{settings.BQ_DATASET_ID}_pytest"
+    dataset_id = f"{settings.BQ_DATASET_ID}_pytest_{str(uuid4())[:8]}"
     client.delete_dataset(dataset_id, delete_contents=True, not_found_ok=True)
     dataset = client.create_dataset(dataset_id)
     yield dataset
