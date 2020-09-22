@@ -26,7 +26,6 @@ def test_bigquery_ensure_table(
     with pytest.raises(NotFound):
         client.get_table(table_id)
     ensure_table()
-    mocked_logger.info.assert_called_once()
     mocked_logger.info.assert_called_with(expected_log)
     client.get_table(table_id)
 
