@@ -195,6 +195,10 @@ def send_to_elasticsearch(sender, instance, **kwargs):
 @receiver(post_save, sender=Build)
 def send_to_bigquery(sender, instance, **kwargs):
     doc = instance.to_dict()
+    valid_metadata_keys = ["commit", "version", "source", "build"]
+    doc["metadata"] = {
+        k: v for k, v in doc["metadata"].items() if k in valid_metadata_keys
+    }
     # The Python BigQuery library includes a retry mechanism for transient
     # errors. Search https://googleapis.dev/python/bigquery/latest under
     # google.cloud.bigquery.retry.DEFAULT_RETRY for more details.
