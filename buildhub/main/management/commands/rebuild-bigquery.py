@@ -81,7 +81,12 @@ class Command(BaseCommand):
 
         rows = []
         for build in builds.iterator(chunk_size=chunk_size):
-            rows.append(build.to_dict())
+            valid_metadata_keys = ["commit", "version", "source", "build"]
+            doc = build.to_dict()
+            doc["metadata"] = {
+                k: v for k, v in doc["metadata"].items() if k in valid_metadata_keys
+            }
+            rows.append(doc)
             if len(rows) < chunk_size:
                 continue
             insert_batch(rows)
