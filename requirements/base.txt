@@ -116,9 +116,9 @@ google-auth==1.21.0 \
     --hash=sha256:982e1f82cace752134660b4c0ff660761b32146a55abb3ad6d225529012af87c \
     --hash=sha256:f2498ad9cac3d2942d6c509ba18c4639656b366681881a1805f44f2a0c2d46f1 \
     # via google-api-core
-google-cloud-bigquery==1.27.2 \
-    --hash=sha256:171eb279a43df3e51cefd25542cbb9ab0d59d62949a29a7c33f0020560573a8d \
-    --hash=sha256:8a21cfe5db0c84aca0730197b50ea1649350619849283d0b5e7b506d803a6fa1 \
+google-cloud-bigquery==1.28.0 \
+    --hash=sha256:9266e989531f290d3b836dc7b308ac22b350c4d664af19325bd0102261231b71 \
+    --hash=sha256:9784cff71d6a46ce202748169f9c7e38fc99d6babbb2f3cdc540475d11f572b9 \
     # via -r base.in
 google-cloud-core==1.4.1 \
     --hash=sha256:4c9e457fcfc026fdde2e492228f04417d4c717fb0f29f070122fb0ab89e34ebd \
@@ -164,10 +164,6 @@ imagesize==1.2.0 \
     --hash=sha256:6965f19a6a2039c7d48bca7dba2473069ff854c36ae6f19d2cde309d998228a1 \
     --hash=sha256:b1f6b5a4eab1f73479a50fb79fcf729514a900c341d8503d62a62dbc4127a2b1 \
     # via sphinx
-importlib-metadata==1.7.0 \
-    --hash=sha256:90bb658cdbbf6d1735b6341ce708fc7024a3e14e99ffdc5783edea9f9b077f83 \
-    --hash=sha256:dc15b2969b4ce36305c51eebe62d418ac7791e9a157911d58bfb1f9ccd8e2070 \
-    # via jsonschema
 jinja2==2.11.2 \
     --hash=sha256:89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0 \
     --hash=sha256:f0a4641d3cf955324a89c04f3d94663aa4d638abe8f733ecd3582848e1c37035 \
@@ -409,10 +405,6 @@ whitenoise==5.2.0 \
     --hash=sha256:05ce0be39ad85740a78750c86a93485c40f08ad8c62a6006de0233765996e5c7 \
     --hash=sha256:05d00198c777028d72d8b0bbd234db605ef6d60e9410125124002518a48e515d \
     # via -r base.in
-zipp==3.1.0 \
-    --hash=sha256:aa36550ff0c0b7ef7fa639055d797116ee891440eac1a56f378e2d3179e0320b \
-    --hash=sha256:c599e4d75c98f6798c509911d08a22e6c021d074469042177c8c86fb92eefd96 \
-    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==50.0.3 \
