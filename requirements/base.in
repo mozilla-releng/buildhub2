@@ -10,7 +10,7 @@ dj-database-url
 dockerflow
 # Pinned because upgrading breaks something
 # TODO: debug me!
-elasticsearch==6.3.1
+elasticsearch==6.8.2
 elasticsearch-dsl==6.3.1
 google-cloud-bigquery
 gunicorn
