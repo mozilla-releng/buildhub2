@@ -16,10 +16,15 @@ DESCRIPTION = "Create and delete the database set by DATABASE_URL."
 EPILOG = "Required DATABASE_URL to be set in the environment."
 
 
-def create_database(dsn):
+def parse_dsn(dsn):
     parsed = urlparse(dsn)
     db_name = parsed.path[1:]
-    adjusted_dsn = dsn[: -(len(db_name) + 1)]
+    adjusted_dsn = dsn[: -(len(db_name) + 1)] + "/postgres"
+    return db_name, adjusted_dsn
+
+
+def create_database(dsn):
+    db_name, adjusted_dsn = parse_dsn(dsn)
 
     conn = psycopg2.connect(adjusted_dsn)
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -33,9 +38,7 @@ def create_database(dsn):
 
 
 def drop_database(dsn):
-    parsed = urlparse(dsn)
-    db_name = parsed.path[1:]
-    adjusted_dsn = dsn[: -(len(db_name) + 1)]
+    db_name, adjusted_dsn = parse_dsn(dsn)
 
     conn = psycopg2.connect(adjusted_dsn)
     conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
