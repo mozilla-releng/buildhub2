@@ -1,8 +1,7 @@
 backoff
 botocore
 boto3
-# Because of https://github.com/mozilla/django-csp/issues/129
-django==2.2.9
+django
 django-configurations
 django-cors-headers
 django_csp
@@ -14,6 +13,8 @@ elasticsearch==6.3.1
 elasticsearch-dsl==6.3.1
 google-cloud-bigquery
 gunicorn
+# Needed for compatibility with base.in
+importlib-metadata==4.2.0
 jsonschema
 markus
 sphinx
