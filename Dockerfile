@@ -32,9 +32,8 @@ RUN groupadd --gid 10001 app && \
 
 # Install Python dependencies
 COPY requirements/ /app/requirements/
-RUN pip install --no-cache-dir -r requirements/base.txt
-# TODO: Stop installing these into the main container
-RUN pip install --no-cache-dir -r requirements/test.txt
+ADD system-setup.sh /setup/system-setup.sh
+RUN bash /setup/system-setup.sh
 
 # Copy the app
 COPY . /app
