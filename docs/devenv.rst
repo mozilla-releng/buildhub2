@@ -28,7 +28,33 @@ Then do the following:
    # Wipe and initialize services
    $ make setup
 
+If ``make setup`` fails, run the following command to see detailed logs:
+
+.. code-block:: shell
+   $ docker-compose up
+
 Once you've done that, you can run Buildhub2.
+
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+Below are some known issues you might run into and their workarounds.
+
+* ElasticSearch fails with following error:
+
+.. code-block:: shell
+
+   elasticsearch    | ERROR: [1] bootstrap checks failed
+   elasticsearch    | [1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
+
+This can be worked around by running:
+
+.. code-block:: shell
+
+   $ sysctl -w vm.max_map_count=262144
+
+If you want this to be permanent across restarts, you also need to add this
+value to ``/etc/sysctl.conf``.
 
 
 Configuration
