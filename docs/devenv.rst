@@ -31,6 +31,7 @@ Then do the following:
 If ``make setup`` fails, run the following command to see detailed logs:
 
 .. code-block:: shell
+
    $ docker-compose up
 
 Once you've done that, you can run Buildhub2.
