@@ -2,7 +2,7 @@ backoff
 botocore
 boto3
 # Because of https://github.com/mozilla/django-csp/issues/129
-django==2.2.9
+django==4.0.3
 django-configurations
 django-cors-headers
 django_csp
