@@ -11,7 +11,7 @@ dockerflow
 # Pinned because upgrading breaks something
 # TODO: debug me!
 elasticsearch==6.3.1
-elasticsearch-dsl==6.3.1
+elasticsearch-dsl==6.4.0
 google-cloud-bigquery
 gunicorn
 jsonschema
