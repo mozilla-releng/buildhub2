@@ -18,7 +18,7 @@ RUN bin/build-ui.sh
 
 
 # Next, all the things for building the Python web service
-FROM python:3.7-slim@sha256:3e4be41076ebb6fe8c3112b220ce133ef0dc49c814024e4874ca76eae3c8dec0
+FROM python:3.7-slim@sha256:b53f496ca43e5af6994f8e316cf03af31050bf7944e0e4a308ad86c001cf028b
 
 WORKDIR /app/
 
