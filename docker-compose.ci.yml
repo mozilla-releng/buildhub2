@@ -17,7 +17,7 @@ services:
   elasticsearch:
     # Intent to always match
     # https://github.com/mozilla-services/cloudops-infra/blob/buildhub2/projects/buildhub2/k8s/charts/elasticsearch/values.yaml
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.7.1@sha256:4b945a65ffef04f317bba80dadb6557c3aa3a124e5b6c1ec65b53dde77846527
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
