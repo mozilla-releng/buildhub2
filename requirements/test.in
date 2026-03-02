@@ -1,6 +1,5 @@
 -r base.in
 
-black
 flake8
 pytest
 pytest-django
