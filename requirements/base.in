@@ -12,14 +12,21 @@ dockerflow
 # TODO: debug me!
 elasticsearch==6.3.1
 elasticsearch-dsl==6.3.1
+google-api-core>=1.34.1
 google-cloud-bigquery
+google-cloud-pubsub
 gunicorn
 jsonschema
 markus
 sphinx
 sphinx-rtd-theme
-psycopg2-binary
+psycopg2-binary>=2.9.9
 pyyaml
 raven
 requests
 whitenoise
+
+# pin necessary packages to recent versions to allow for python 3.12 upgrade without upgrading the world
+# these can be removed when we upgrade the rest of the packages to latest versions
+cffi>=1.16.0
+packaging==24.1
