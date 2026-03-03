@@ -5,23 +5,23 @@
   "dependencies": {
     "@hot-loader/react-dom": "^16.8.6",
     "@searchkit/refinement-autosuggest": "0.0.1-6",
-    "filesize": "4.1.2",
-    "react": "16.8.6",
-    "react-dom": "16.8.6",
-    "searchkit": "2.3.0"
+    "filesize": "4.2.1",
+    "react": "16.14.0",
+    "react-dom": "16.14.0",
+    "searchkit": "2.4.4"
   },
   "devDependencies": {
     "@mozilla-frontend-infra/react-lint": "^1.2.2",
     "@neutrinojs/jest": "9.0.0-rc.0",
     "@neutrinojs/react": "9.0.0-rc.0",
-    "dotenv": "^8.0.0",
+    "dotenv": "^8.1.0",
     "dotenv-cli": "^2.0.0",
     "eslint": "^5",
     "jest": "^23",
     "neutrino": "9.0.0-rc.0",
-    "webpack": "^4",
-    "webpack-cli": "^3",
-    "webpack-dev-server": "^3"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.2"
   },
   "resolutions": {
     "axios": ">=0.19.0",
