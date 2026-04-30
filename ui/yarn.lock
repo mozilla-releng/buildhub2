@@ -886,13 +886,13 @@
     deepmerge "^1.5.2"
     webpack-manifest-plugin "^2.0.4"
 
-"@searchkit/refinement-autosuggest@0.0.1-6":
-  version "0.0.1-6"
-  resolved "https://registry.yarnpkg.com/@searchkit/refinement-autosuggest/-/refinement-autosuggest-0.0.1-6.tgz#175ffa021db4859692d3b247150bb9cf49c3f989"
-  integrity sha512-5OGb0XRV5pZzc+cth5YjAMFRQzMcI3RrRkKMNJrKcB8N78RGe7cW5Vd75nJEiTtfI8wiXnfnZm/zhiHNEjpNTA==
+"@searchkit/refinement-autosuggest@0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@searchkit/refinement-autosuggest/-/refinement-autosuggest-0.2.4.tgz#2e0eee3b4e04ca80a979a546ac509fdec54d47d2"
+  integrity sha512-1RFJ6dE3APeU7AWqT98V03RPMnZCt9C5BA5j3WWKXKqbZJx76Y7cEJ9cFg7/o5lheGDB50v1J7O2sx3qDn/YZA==
   dependencies:
     "@types/react-select" "^1.0.59"
-    lodash "^4.17.4"
+    lodash "^4.17.5"
     react-select "^1.0.0-rc.10"
 
 "@types/events@*":
@@ -5413,7 +5413,7 @@ lodash.unescape@4.0.1:
   resolved "https://registry.yarnpkg.com/lodash.unescape/-/lodash.unescape-4.0.1.tgz#bf2249886ce514cda112fae9218cdc065211fc9c"
   integrity sha1-vyJJiGzlFM2hEvrpIYzcBlIR/Jw=
 
-lodash@4.17.4, "lodash@>=3.5 <5", lodash@>=4.17.13, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.4:
+lodash@4.17.4, "lodash@>=3.5 <5", lodash@>=4.17.13, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.4, lodash@^4.17.5:
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
