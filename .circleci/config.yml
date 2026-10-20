@@ -10,7 +10,7 @@ version: 2
 jobs:
   build_test_publish:
     docker:
-      - image: mozilla/cidockerbases:docker-latest
+      - image: mozilla/cidockerbases:docker-latest@sha256:b7042b1717c5df9f1a29e7b9390e73c8137d8a3edbcf6af1bd7db832a6802118
     working_directory: ~/buildhub2
     steps:
       - checkout
