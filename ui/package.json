@@ -15,7 +15,7 @@
     "@neutrinojs/jest": "9.0.0-rc.0",
     "@neutrinojs/react": "9.0.0-rc.0",
     "dotenv": "^8.0.0",
-    "dotenv-cli": "^2.0.0",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^5",
     "jest": "^23",
     "neutrino": "9.0.0-rc.0",
