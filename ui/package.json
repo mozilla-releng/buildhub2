@@ -5,7 +5,7 @@
   "dependencies": {
     "@hot-loader/react-dom": "^16.8.6",
     "@searchkit/refinement-autosuggest": "0.0.1-6",
-    "filesize": "4.1.2",
+    "filesize": "11.0.30",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "searchkit": "2.3.0"
